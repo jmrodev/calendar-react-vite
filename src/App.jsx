@@ -1,17 +1,15 @@
 import { useState } from 'react'
-import { Header } from './src/components/header'
-import { Main } from './src/components/main'
-import { Footer } from './src/components/footer'
-import { Aside } from './src/components/aside'
+import { Header } from './src/components/header/header'
+import { Footer } from './src/components/footer/footer'
 import './App.css'
+import Content  from './src/components/container/Content'
 
 function App() {
 
   return (
     <div className='container'>
       <Header />
-      <Aside />
-      <Main />
+      <Content />
       <Footer />
     </div>
   )

@@ -1,0 +1,51 @@
+.calendar {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.navigation {
+    margin: 10px 0; /* Espacio entre la navegación y el calendario */
+}
+
+.navigation button {
+    margin: 0 5px; /* Espacio entre los botones */
+    padding: 5px 10px; /* Padding para los botones */
+    cursor: pointer; /* Cambiar el cursor al pasar sobre el botón */
+}
+
+.weekdays {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr); /* 7 columnas para los días de la semana */
+    width: 100%;
+    font-weight: bold;
+    text-align: center; /* Centrar el texto */
+}
+
+.days {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr); /* 7 columnas para los días de la semana */
+    gap: 5px; /* Espacio entre los días */
+}
+
+.day {
+    padding: 20px; /* Aumentar el padding para un mejor aspecto */
+    text-align: center;
+    border: 1px solid #ccc; /* Borde para los días */
+    border-radius: 5px;
+    background-color: #373942; /* Color de fondo para los días */
+}
+
+.today {
+    background-color: #ffeb3b; /* Color para el día de hoy */
+    color:rgb(17, 17, 15)
+}
+
+.weekend {
+    background-color: #f44336; /* Color para sábados y domingos */
+    color: white; /* Texto blanco para el fin de semana */
+} 
+
+.empty{
+    visibility: hidden; /* Ocultar los días vacíos */
+}
