@@ -15,7 +15,7 @@
   display: grid;
   grid-template-columns: 1fr 4fr;
   grid-template-areas: 
-  "aside main main main main" 
+  "aside main" 
 }
 
 main {
@@ -24,6 +24,7 @@ main {
 }
 
 aside {
+  padding: 3rem;
   grid-area: aside;
   background-color: #2b2929;
 }
@@ -35,6 +36,7 @@ header {
 
 
 footer {
+  height: 1fr;
   background-color: #58494f;
 }
 

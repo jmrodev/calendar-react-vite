@@ -7,8 +7,8 @@ export const Main = () => {
     // Renderizar el componente
     return (
         <main>
-            <Timer /> {/* Incluir el componente Timer */}
-            <Calendar /> {/* Incluir el componente Calendar */}
+            <Timer /> 
+          
         </main>
     );
 }

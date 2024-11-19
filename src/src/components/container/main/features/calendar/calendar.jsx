@@ -59,9 +59,9 @@ const Calendar = () => {
         <div className="calendar">
             <h2>Calendario de {currentDate.toLocaleString('default', { month: 'long' })} {currentDate.getFullYear()}</h2>
             <div className="navigation">
-                <button onClick={goToPreviousMonth}>Anterior</button>
-                <button onClick={goToNextMonth}>Siguiente</button>
-                <button onClick={goToCurrentMonth}>Mes Actual</button> {/* Botón para volver al mes actual */}
+                <button className='nav-btn' onClick={goToPreviousMonth}>{'\u2799'}</button>
+                <button className='nav-btn' onClick={goToNextMonth}>{'\u27A1'}</button>
+                <button className='nav-btn' onClick={goToCurrentMonth}>Mes Actual</button> {/* Botón para volver al mes actual */}
             </div>
             <div className="weekdays">
                 <div>Dom</div>

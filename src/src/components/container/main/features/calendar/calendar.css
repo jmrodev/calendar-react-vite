@@ -5,47 +5,56 @@
 }
 
 .navigation {
-    margin: 10px 0; /* Espacio entre la navegación y el calendario */
+    margin: 0.5rem 0;
 }
 
 .navigation button {
-    margin: 0 5px; /* Espacio entre los botones */
-    padding: 5px 10px; /* Padding para los botones */
-    cursor: pointer; /* Cambiar el cursor al pasar sobre el botón */
+    margin: 0 0.3rem;
+    padding: 0.3rem 0.8rem;
+    cursor: pointer;
 }
 
 .weekdays {
     display: grid;
-    grid-template-columns: repeat(7, 1fr); /* 7 columnas para los días de la semana */
-    width: 100%;
+    grid-template-columns: repeat(7, 1fr);
     font-weight: bold;
-    text-align: center; /* Centrar el texto */
+    text-align: center;
+    font-size: 0.8rem;
 }
 
 .days {
     display: grid;
-    grid-template-columns: repeat(7, 1fr); /* 7 columnas para los días de la semana */
-    gap: 5px; /* Espacio entre los días */
+    grid-template-columns: repeat(7, 1fr);
+    gap: 0.3rem;
 }
 
 .day {
-    padding: 20px; /* Aumentar el padding para un mejor aspecto */
+    padding: 0.1rem;
     text-align: center;
-    border: 1px solid #ccc; /* Borde para los días */
-    border-radius: 5px;
-    background-color: #373942; /* Color de fondo para los días */
+    border: 1px solid #ccc;
+    border-radius: 0.3rem;
+    background-color: #373942;
+    font-size: 0.9rem;
 }
 
 .today {
-    background-color: #ffeb3b; /* Color para el día de hoy */
-    color:rgb(17, 17, 15)
+    background-color: #ffeb3b;
+    color: rgb(17, 17, 15);
 }
 
 .weekend {
-    background-color: #f44336; /* Color para sábados y domingos */
-    color: white; /* Texto blanco para el fin de semana */
+    background-color: #f44336;
+    color: white;
 } 
 
-.empty{
-    visibility: hidden; /* Ocultar los días vacíos */
+.empty {
+    visibility: hidden;
+}
+.nav-btn {
+    background-color: #ffeb3b;
+    color: rgb(17, 17, 15);
+    border: none;
+    border-radius: 0.3rem;
+    padding: 0.2rem 0.5rem;
+    cursor: pointer;
 }
