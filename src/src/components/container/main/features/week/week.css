@@ -1,0 +1,48 @@
+.week-schedule {
+
+    max-width: 400px;
+    margin: 40px auto;
+    padding: 40px;
+    background-color: #c04646;
+    border-radius: 8px;
+}
+
+.time-slots {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 10px;
+}
+
+.time-slot {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px;
+    border: 1px solid #1c28c9;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+.time-slot.available {
+    background-color: #1d5c97;
+}
+
+.time-slot.booked {
+    background-color: #6e2b35;
+}
+
+.time-slot:hover {
+    background-color: #a85c5c;
+}
+
+.time {
+    font-weight: bold;
+    margin-right: 10px;
+}
+
+.appointment-details {
+    color: #f1efef;
+    flex-grow: 1;
+    text-align: right;
+}

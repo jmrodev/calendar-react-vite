@@ -1,9 +1,10 @@
 import React, { useState } from 'react';
+import Week from '../week/week';
 import './calendar.css'; // Asegúrate de tener un archivo CSS para los estilos
 
 const Calendar = () => {
-    const [currentDate, setCurrentDate] = useState(new Date()); // Estado para la fecha actual
-
+    const [currentDate, setCurrentDate] = useState(new Date());
+const [selectedDate, setSelectedDate] = useState(null); 
     // Función para obtener el primer día del mes
     const getFirstDayOfMonth = (year, month) => {
         return new Date(year, month, 1).getDay(); // Devuelve el día de la semana (0-6)
@@ -31,8 +32,14 @@ const Calendar = () => {
         for (let day = 1; day <= daysInMonth; day++) {
             const isToday = day === currentDate.getDate() && month === currentDate.getMonth() && year === currentDate.getFullYear();
             const isWeekend = (firstDay + day - 1) % 7 === 0 || (firstDay + day - 1) % 7 === 6; // Sábado o Domingo
+            const dateForDay = new Date(year, month, day);
+            
             calendar.push(
-                <div key={day} className={`day ${isToday ? 'today' : ''} ${isWeekend ? 'weekend' : ''}`}>
+                <div 
+                key={day}
+                 className={`day ${isToday ? 'today' : ''} ${isWeekend ? 'weekend' : ''}`}
+                 onClick={() => setSelectedDate(dateForDay)}
+                 >
                     {day}
                 </div>
             );
@@ -57,24 +64,28 @@ const Calendar = () => {
 
     return (
         <div className="calendar">
-            <h2>Calendario de {currentDate.toLocaleString('default', { month: 'long' })} {currentDate.getFullYear()}</h2>
-            <div className="navigation">
-                <button className='nav-btn' onClick={goToPreviousMonth}>{'\u2799'}</button>
-                <button className='nav-btn' onClick={goToNextMonth}>{'\u27A1'}</button>
-                <button className='nav-btn' onClick={goToCurrentMonth}>Mes Actual</button> {/* Botón para volver al mes actual */}
-            </div>
+            <h4>{currentDate.toLocaleString('default', { month: 'long' })} {currentDate.getFullYear()}</h4>
+          
             <div className="weekdays">
-                <div>Dom</div>
-                <div>Lun</div>
-                <div>Mar</div>
-                <div>Mié</div>
-                <div>Jue</div>
-                <div>Vie</div>
-                <div>Sab</div>
+                <div className='day header-day weekend'>Dom</div>
+                <div className='day header-day'>Lun</div>
+                <div className='day header-day'>Mar</div>
+                <div className='day header-day'>Mié</div>
+                <div className='day header-day'>Jue</div>
+                <div className='day header-day'>Vie</div>
+                <div className='day header-day weekend'>Sab</div>
             </div>
             <div className="days">
                 {generateCalendar()} {/* Generar el calendario */}
             </div>
+            <div className="navigation">
+                <button className='nav-btn' onClick={goToPreviousMonth}>◀</button>
+                <button className='nav-btn' onClick={goToCurrentMonth}>▼</button>
+                <button className='nav-btn' onClick={goToNextMonth}>▶</button>
+            </div>
+            {/* <Week selectedDate={selectedDate} />  */}
+            {selectedDate && <Week selectedDate={selectedDate} />}
+
         </div>
     );
 };
