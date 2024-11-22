@@ -1,9 +1,10 @@
+import React from 'react';
 import Calendar from "../main/features/calendar/calendar";
 
-export const Aside = () => {
+export const Aside = ({ onDateSelect, selectedDate }) => {
     return (
         <aside>
-            <Calendar /> 
+            <Calendar onDateSelect={onDateSelect} selectedDate={selectedDate} /> 
         </aside>
     );
-}
+};

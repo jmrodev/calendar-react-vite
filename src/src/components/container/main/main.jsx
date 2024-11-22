@@ -1,11 +1,10 @@
-import React from 'react'; 
-import Week from './features/week/week'; 
-import Calendar from './features/calendar/calendar'; 
+import React from 'react';
+import Week from './features/week/week';
 
-export const Main = () => {
+export const Main = ({ selectedDate }) => {
     return (
         <main>
-            <Week /> 
+            <Week selectedDate={selectedDate} />
         </main>
     );
-}
+};

@@ -1,74 +1,132 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import './week.css';
+import AppointmentService from '../../../../../services/appointmentService';
+
+const appointmentService = new AppointmentService();
 
 const Week = ({ selectedDate }) => {
-    const [appointments, setAppointments] = useState({});
+    const [timeSlots, setTimeSlots] = useState([]);
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState(null);
 
-    // Generate time slots from 8 AM to 7 PM (19:00)
-    const generateTimeSlots = () => {
-        const slots = [];
-        for (let hour = 8; hour < 20; hour++) {
-            const timeString = `${hour.toString().padStart(2, '0')}:00`;
-            slots.push({
-                time: timeString,
-                available: true,
-                appointment: null
-            });
-        }
-        return slots;
-    };
-
-    const [timeSlots, setTimeSlots] = useState(generateTimeSlots());
-
-    const handleSlotClick = (slot) => {
-        const newAppointments = { ...appointments };
-        const key = slot.time;
-
-        if (!newAppointments[key]) {
-            // Create new appointment
-            newAppointments[key] = {
-                patient: prompt('Enter patient name:'),
-                date: selectedDate
-            };
+    const generateTimeSlots = async () => {
+        try {
+            const dateStr = selectedDate ? selectedDate.toISOString().split('T')[0] : '';
             
-            // Update time slots
-            const updatedSlots = timeSlots.map(s => 
-                s.time === slot.time 
-                    ? { ...s, available: false, appointment: newAppointments[key] }
-                    : s
-            );
+            // Get existing appointments for the selected date
+            const existingSlots = await appointmentService.getAppointmentsByDate(dateStr);
             
-            setAppointments(newAppointments);
-            setTimeSlots(updatedSlots);
-        } else {
-            // Remove appointment
-            delete newAppointments[key];
+            const slots = [];
+            const initHour = 9;
+            const finishHour = 19;
             
-            const updatedSlots = timeSlots.map(s => 
-                s.time === slot.time 
-                    ? { ...s, available: true, appointment: null }
-                    : s
-            );
+            for (let hour = initHour; hour < finishHour; hour++) {
+                const timeString = `${hour.toString().padStart(2, '0')}:00`;
+                
+                // Find existing slot or create new one
+                const existingSlot = existingSlots.find(slot => slot.time === timeString);
+                
+                if (existingSlot) {
+                    slots.push({
+                        ...existingSlot,
+                        id: `${dateStr}-${timeString}`
+                    });
+                } else {
+                    slots.push({
+                        _id: `${dateStr}-${timeString}`,
+                        date: dateStr,
+                        time: timeString,
+                        available: true,
+                        appointment: null
+                    });
+                }
+            }
             
-            setAppointments(newAppointments);
-            setTimeSlots(updatedSlots);
+            return slots;
+        } catch (err) {
+            throw new Error('Error generating time slots: ' + err.message);
         }
     };
+
+    useEffect(() => {
+        const loadSlots = async () => {
+            if (selectedDate) {
+                try {
+                    setLoading(true);
+                    setError(null);
+                    const slots = await generateTimeSlots();
+                    setTimeSlots(slots);
+                } catch (err) {
+                    setError(err.message);
+                } finally {
+                    setLoading(false);
+                }
+            }
+        };
+
+        loadSlots();
+    }, [selectedDate]);
+
+    const handleSlotClick = async (slot) => {
+        try {
+            if (!slot.appointment) {
+                const patientName = prompt('Enter patient name:');
+                const reason = prompt('Enter appointment reason:');
+                
+                if (patientName && reason) {
+                    await appointmentService.createAppointment({
+                        date: slot.date,
+                        time: slot.time,
+                        name: patientName,
+                        reason: reason
+                    });
+                    
+                    // Refresh slots after creating appointment
+                    const updatedSlots = await generateTimeSlots();
+                    setTimeSlots(updatedSlots);
+                }
+            } else {
+                const confirmation = prompt('To delete the appointment, type "SI":');
+                if (confirmation === 'SI') {
+                    await appointmentService.deleteAppointment(slot.date, slot.time);
+                    
+                    // Refresh slots after deleting appointment
+                    const updatedSlots = await generateTimeSlots();
+                    setTimeSlots(updatedSlots);
+                }
+            }
+        } catch (err) {
+            setError(err.message);
+        }
+    };
+
+    if (!selectedDate) {
+        return <div className="week-schedule">Please select a date to view available slots.</div>;
+    }
+
+    if (loading) {
+        return <div className="week-schedule">Loading appointments...</div>;
+    }
+
+    if (error) {
+        return <div className="week-schedule error">Error: {error}</div>;
+    }
 
     return (
         <section className="week-schedule">
-            <h2>Appointments for {selectedDate ? selectedDate.toLocaleDateString() : 'Select a Date'}</h2>
+            <h2>Appointments for {selectedDate.toLocaleDateString()}</h2>
             <div className="time-slots">
-                {timeSlots.map((slot, index) => (
+                {timeSlots.map((slot) => (
                     <div 
-                        key={slot.time} 
-                        className={`time-slot ${slot.available ? 'available' : 'booked'}`}
+                        key={slot.id}
+                        className={`time-slot ${slot.available && !slot.appointment ? 'available' : 'booked'}`}
                         onClick={() => handleSlotClick(slot)}
                     >
                         <div className="time">{slot.time}</div>
                         {slot.appointment && (
                             <div className="appointment-details">
-                                {slot.appointment.patient}
+                                <div>{slot.appointment.name}</div>
+                                <div className="reason">{slot.appointment.reason}</div>
                             </div>
                         )}
                     </div>

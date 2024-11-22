@@ -1,0 +1,32 @@
+[
+    {
+        "date": "2024-11-21",
+        "time": "09:00",
+        "available": true,
+        "appointment": null
+    },
+    {
+        "date": "2024-11-21",
+        "time": "10:00",
+        "available": false,
+        "appointment": {
+            "name": "John Doe",
+            "reason": "Consultation"
+        }
+    },
+    {
+        "date": "2024-11-21",
+        "time": "11:00",
+        "available": true,
+        "appointment": null
+    },
+    {
+        "date": "2024-11-21",
+        "time": "12:00",
+        "available": false,
+        "appointment": {
+            "name": "Jane Smith",
+            "reason": "Follow-up"
+        }
+    }
+]
