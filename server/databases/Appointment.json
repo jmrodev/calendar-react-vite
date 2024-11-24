@@ -1,1 +1,1 @@
-[{"_id":2,"date":"2024-11-24","appointmentTime":"10:00","realAppointmentTime":"10:00","available":true,"status":"completed","appointment":{"confirmAppointment":true,"name":"jj","reason":"asdfafsd"}},{"_id":1,"date":"2024-11-24","appointmentTime":"09:00","realAppointmentTime":"09:00","available":true,"status":"completed","appointment":{"confirmAppointment":true,"name":"sdf","reason":"sdfg"}}]
+[]

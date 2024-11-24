@@ -48,20 +48,49 @@ class AppointmentService {
         }
     }
 
-    async deleteAppointment(date, time) {
+    async deleteAppointment(id) {
         try {
-            const response = await fetch(`${this.baseUrl}/appointments/${date}/${time}`, {
-                method: 'DELETE'
+            const response = await fetch(`${this.baseUrl}/appointments/${id}`, {
+                method: 'DELETE',
+                headers: {
+                    'Accept': 'application/json',
+                    'Content-Type': 'application/json',
+                }
+            });
+
+            if (!response.ok) {
+                const errorData = await response.json().catch(() => ({
+                    error: `Server error: ${response.status}`
+                }));
+                throw new Error(errorData.error || 'Failed to delete appointment');
+            }
+
+            const data = await response.json();
+            return { success: true, message: data.message };
+        } catch (error) {
+            return { success: false, message: error.message };
+        }
+    }
+
+
+    async updateAppointment(id, data) {
+        try {
+            const response = await fetch(`${this.baseUrl}/appointments/${id}`, {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(data)
             });
 
             if (!response.ok) {
                 const error = await response.json();
-                throw new Error(error.error || 'Failed to delete appointment');
+                throw new Error(error.error || 'Failed to update appointment');
             }
 
-            return true;
+            return await response.json();
         } catch (error) {
-            throw new Error(`Error deleting appointment: ${error.message}`);
+            throw new Error(`Error updating appointment: ${error.message}`);
         }
     }
 

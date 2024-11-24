@@ -58,6 +58,69 @@ app.get('/api/appointments', (req, res) => {
     }
 });
 
+// Agregar nuevo endpoint para obtener cita por ID
+app.get('/api/appointments/:id', async (req, res) => {
+    try {
+        const { id } = req.params;
+        const appointment = await Appointment.find({ _id: Number(id) });
+        
+        if (!appointment || appointment.length === 0) {
+            return res.status(404).json({ error: 'Appointment not found' });
+        }
+        
+        res.json(appointment[0]);
+    } catch (error) {
+        res.status(500).json({ error: error.message });
+    }
+});
+
+// Modificar el endpoint DELETE para aceptar ID
+app.delete('/api/appointments/:id', async (req, res) => {
+    try {
+        const { id } = req.params;
+        
+        // Find the appointment by ID
+        const appointment = await Appointment.find({ _id: Number(id) })[0];
+        
+        if (!appointment) {
+            return res.status(404).json({ 
+                success: false, 
+                error: 'Appointment not found' 
+            });
+        }
+
+        // Create deletion log
+        const logId = newLogId();
+        const logEntry = DeletionLog.create({
+            _id: logId,
+            appointmentId: appointment._id,
+            deletedAt: new Date().toISOString(),
+            deletedData: {
+                date: appointment.date,
+                appointmentTime: appointment.appointmentTime,
+                realAppointmentTime: appointment.realAppointmentTime,
+                appointment: appointment.appointment
+            }
+        });
+
+        await logEntry.save();
+        
+        // Remove the appointment
+        await appointment.remove();
+
+        res.json({ 
+            success: true, 
+            message: 'Appointment cancelled and logged successfully' 
+        });
+    } catch (error) {
+        console.error('Delete appointment error:', error);
+        res.status(500).json({ 
+            success: false, 
+            error: error.message || 'Internal server error' 
+        });
+    }
+});
+
 // GET - Obtener citas por fecha
 app.get('/api/appointments/date/:date', (req, res) => {
     try {

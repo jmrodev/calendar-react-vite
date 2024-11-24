@@ -1,5 +1,5 @@
 import React from 'react';
-import Week from './features/week/week';
+import Week from './features/week/Week';
 
 export const Main = ({ selectedDate }) => {
     return (
