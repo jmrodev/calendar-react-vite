@@ -1,4 +1,3 @@
-// appointmentService.js
 class AppointmentService {
     constructor() {
         this.baseUrl = 'http://localhost:3001/api';
@@ -65,6 +64,47 @@ class AppointmentService {
             throw new Error(`Error deleting appointment: ${error.message}`);
         }
     }
+
+    async confirmAppointment(id, data) {
+        try {
+            const response = await fetch(`${this.baseUrl}/appointments/confirm/${id}`, {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(data),
+            });
+
+            if (!response.ok) {
+                const error = await response.json();
+                throw new Error(error.error || 'Failed to confirm appointment');
+            }
+
+            return await response.json();
+        } catch (error) {
+            throw new Error(`Error confirming appointment: ${error.message}`);
+        }
+    }
+
+    async completeAppointment(id) {
+        try {
+            const response = await fetch(`${this.baseUrl}/appointments/complete/${id}`, {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json',
+                }
+            });
+
+            if (!response.ok) {
+                const error = await response.json();
+                throw new Error(error.error || 'Failed to complete appointment');
+            }
+
+            return await response.json();
+        } catch (error) {
+            throw new Error(`Error completing appointment: ${error.message}`);
+        }
+    }
 }
 
-export default AppointmentService;
+export default new AppointmentService();

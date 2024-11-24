@@ -11,12 +11,15 @@ app.use(express.json());
 const Appointment = Schema("Appointment", {
     _id: { type: Number, required: true },
     date: { type: String, required: true },
-    time: { type: String, required: true },
+    appointmentTime: { type: String, required: true },
+    realAppointmentTime: { type: String, required: true },
     available: { type: Boolean, required: true },
+    status: { type: String, required: true, default: 'pending' }, // pending, confirmed, completed
     appointment: {
         type: Object,
         required: true,
-        schema: {
+        schema: {    
+            confirmAppointment: { type: Boolean, required: true },
             name: { type: String, required: true },
             reason: { type: String, required: true }
         }
@@ -67,47 +70,77 @@ app.get('/api/appointments/date/:date', (req, res) => {
 });
 
 // POST - Crear nueva cita
-app.post('/api/appointments', (req, res) => {
+app.post('/api/appointments', async (req, res) => {
     try {
-        const { date, time, name, reason } = req.body;
-        const _id = newId(); // Generar _id automáticamente
+        const { date, appointmentTime, realAppointmentTime, available, appointment } = req.body;
 
-        // Verificar si ya existe una cita en ese horario
-        const existingAppointment = Appointment.find(
-            app => app.date === date && app.time === time && !app.available
-        )[0];
-
-        if (existingAppointment) {
-            return res.status(400).json({ error: 'Time slot is already booked' });
+        // Verificar que appointmentTime, date y appointment estén presentes
+        if (!appointmentTime) {
+            return res.status(400).json({ error: 'The value "appointmentTime" is required.' });
+        }
+        if (!date) {
+            return res.status(400).json({ error: 'The value "date" is required.' });
+        }
+        if (!appointment) {
+            return res.status(400).json({ error: 'The value "appointment" is required.' });
         }
 
-        // Crear la nueva cita
-        const appointment = Appointment.create({
-            _id, // Incluye el _id generado automáticamente
-            date,
-            time,
-            available: false,
-            appointment: {
-                name,
-                reason
-            }
-        }).save();
+        // Verificar si ya existe una cita en la misma fecha y hora
+        const existingAppointment = await Appointment.findOne({ date, appointmentTime });
+        if (existingAppointment) {
+            return res.status(400).json({ error: 'The selected date and time are already booked.' });
+        }
 
-        res.status(201).json(appointment);
+        const newAppointment = Appointment.create({
+            _id: newId(), // Generar un nuevo ID
+            date,
+            appointmentTime,
+            realAppointmentTime,
+            available,
+            appointment
+        });
+        const objectSaved = await newAppointment.save(); 
+        
+        res.status(201).json(objectSaved);
+    } catch (error) {
+        res.status(400).json({ error: error.message });
+    }
+});
+
+// PUT - Confirmar cita
+app.put('/api/appointments/confirm/:id', async (req, res) => {
+    try {
+        const { id } = req.params;
+        const { confirmAppointment } = req.body; // Se espera que se envíe el estado de confirmación
+        
+        // Buscar la cita por ID
+        const appointment = await Appointment.find({ _id: Number(id) }); // Cambiado para usar Appointment.find
+
+        if (!appointment || appointment.length === 0) {
+            return res.status(404).json({ error: 'Appointment not found' });
+        }
+
+        // Actualizar el estado de confirmación
+        appointment[0].appointment.confirmAppointment = confirmAppointment; // Cambiar a true o false según el cuerpo de la solicitud
+
+        // Guardar los cambios en la base de datos
+        await appointment[0].save(); // Guardar la cita actualizada
+
+        res.json({ message: 'Appointment confirmed successfully', appointment: appointment[0] });
     } catch (error) {
         res.status(500).json({ error: error.message });
     }
 });
 
 // DELETE - Cancelar cita y guardar log
-app.delete('/api/appointments/:date/:time', (req, res) => {
+app.delete('/api/appointments/:date/:time', async (req, res) => {
     console.log('DELETE endpoint alcanzado');
     try {
         const { date, time } = req.params;
 
         // Buscar la cita específica
         const appointment = Appointment.find(
-            app => app.date === date && app.time === time
+            app => app.date === date && app.appointmentTime === time
         )[0];
 
         // Verificar si la cita existe
@@ -123,15 +156,37 @@ app.delete('/api/appointments/:date/:time', (req, res) => {
             deletedAt: new Date().toISOString(),
             deletedData: {
                 date: appointment.date,
-                time: appointment.time,
+                appointmentTime: appointment.appointmentTime,
+                realAppointmentTime: appointment.realAppointmentTime,
                 appointment: appointment.appointment
             }
-        }).save();
+        });
+
+        await logEntry.save(); // Guardar el log de eliminación
 
         // Cancelar la cita
-        appointment.remove(appointment);
+        appointment.remove(); // Eliminar la cita
 
         res.json({ message: 'Appointment cancelled and logged successfully' });
+    } catch (error) {
+        res.status(500).json({ error: error.message });
+    }
+});
+
+app.put('/api/appointments/complete/:id', async (req, res) => {
+    try {
+        const { id } = req.params;
+        
+        const appointment = await Appointment.find({ _id: Number(id) });
+
+        if (!appointment || appointment.length === 0) {
+            return res.status(404).json({ error: 'Appointment not found' });
+        }
+
+        appointment[0].status = 'completed';
+        await appointment[0].save();
+
+        res.json({ message: 'Appointment marked as completed', appointment: appointment[0] });
     } catch (error) {
         res.status(500).json({ error: error.message });
     }

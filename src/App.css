@@ -19,7 +19,8 @@
 
 main {
   grid-area: main;
-  background-color: #404246;
+  background-color: transparent;
+  margin-right: 5rem;
 }
 
 aside {
