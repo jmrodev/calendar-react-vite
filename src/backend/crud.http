@@ -40,3 +40,14 @@ Content-Type: application/json
 {
     "confirmAppointment": true
 }
+
+###
+
+### Login
+POST http://localhost:3001/api/login
+Content-Type: application/json
+
+{
+    "username": "usuarioEjemplo",
+    "password": "contraseñaEjemplo"
+}

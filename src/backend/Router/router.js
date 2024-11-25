@@ -1,4 +1,4 @@
-import { authenticateToken, authorizeRoles } from '../authMiddleware.js';
+import { authenticateToken, authorizeRoles } from '../Auth/authMiddleware.js';
 import { Router } from 'express';
 import { 
     createAppointment, 
@@ -9,32 +9,35 @@ import {
     confirmAppointment, 
     completeAppointment 
 } from '../Controller/AppointmentController.js'; // Importa las funciones del controlador
+import { login } from '../Auth/auth.js';
 
 const router = Router();
 
+router.post('/login', login); // Aquí se asocia la ruta /login con la función login
+
 // POST - Crear nueva cita
-router.post('/api/appointments', authenticateToken, authorizeRoles('admin', 'user'), createAppointment);
+router.post('/appointments', authenticateToken, authorizeRoles('admin', 'user'), createAppointment);
 
 // GET - Obtener todas las citas
-router.get('/api/appointments', getAllAppointments);
+router.get('/appointments', getAllAppointments);
 
 // GET - Obtener cita por ID
-router.get('/api/appointments/:id', getAppointmentById);
+router.get('/appointments/:id', getAppointmentById);
 
 // DELETE - Eliminar cita por ID
-router.delete('/api/appointments/:id', deleteAppointment);
+router.delete('/appointments/:id', deleteAppointment);
 
 // GET - Obtener citas por fecha
-router.get('/api/appointments/date/:date', getAppointmentsByDate);
+router.get('/appointments/date/:date', getAppointmentsByDate);
 
 // PUT - Confirmar cita
-router.put('/api/appointments/confirm/:id', confirmAppointment);
+router.put('/appointments/confirm/:id', confirmAppointment);
 
 // PUT - Completar cita
-router.put('/api/appointments/complete/:id', completeAppointment);
+router.put('/appointments/complete/:id', completeAppointment);
 
 // DELETE - Cancelar cita por fecha y hora (si es necesario)
-router.delete('/api/appointments/:date/:time', async (req, res) => {
+router.delete('/appointments/:date/:time', async (req, res) => {
     // Aquí puedes implementar la lógica si es necesario
     // O puedes eliminar esta ruta si no es necesaria
 });
