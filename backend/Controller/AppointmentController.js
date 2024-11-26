@@ -19,13 +19,13 @@ export const createAppointment = async (req, res) => {
         }
 
         // Verificar si el usuario es un 'user' y limitar los horarios
-        if (req.user.role === 'user') {
-            const morningTime = '09:00'; // Define tu horario de mañana
-            const afternoonTime = '15:00'; // Define tu horario de tarde
-            if (appointmentTime !== morningTime && appointmentTime !== afternoonTime) {
-                return res.status(400).json({ error: 'Invalid appointment time for user role.' });
-            }
-        }
+        // if (req.user.role === 'user') {
+        //     const morningTime = '09:00'; // Define tu horario de mañana
+        //     const afternoonTime = '15:00'; // Define tu horario de tarde
+        //     if (appointmentTime !== morningTime && appointmentTime !== afternoonTime) {
+        //         return res.status(400).json({ error: 'Invalid appointment time for user role.' });
+        //     }
+        // }
 
         // Verificar si ya existe una cita en la misma fecha y hora
         const existingAppointment = await AppointmentSchema.findOne({ date, appointmentTime });

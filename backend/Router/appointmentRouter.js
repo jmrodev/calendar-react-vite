@@ -14,7 +14,7 @@ const appointmentRouter = express.Router();
 
 // Rutas de citas
 // POST - Crear nueva cita
-appointmentRouter.post('/', authenticateToken, authorizeRoles('admin', 'user'), createAppointment);
+appointmentRouter.post('/',  createAppointment);
 
 // GET - Obtener todas las citas
 appointmentRouter.get('/', getAllAppointments);

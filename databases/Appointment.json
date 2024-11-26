@@ -1,1 +1,1 @@
-[]
+[{"_id":3,"date":"2024-11-22","appointmentTime":"18:00","realAppointmentTime":"15:00","available":false,"status":"pending","appointment":{"confirmAppointment":false,"name":"Jane Doe","reason":"Consultation"}}]

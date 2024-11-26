@@ -44,20 +44,20 @@ Content-Type: application/json
 ###
 
 ### Login
-POST http://localhost:3001/api/login
+POST http://localhost:3001/api/auth/login
 Content-Type: application/json
 
 {
-    "username": "usuarioEjemplo",
-    "password": "contraseñaEjemplo",
+    "username": "usuarioEjemplo2",
+    "password": "contraseñaEjemplo2",
     "role": "admin"
 }
 ###
-POST http://localhost:3001/api/register
+POST http://localhost:3001/api/auth/register
 Content-Type: application/json
 
 {
-    "username": "usuarioEjemplo",
-    "password": "contraseñaEjemplo",
+    "username": "usuarioEjemplo2",
+    "password": "contraseñaEjemplo2",
     "role": "admin"
 }
