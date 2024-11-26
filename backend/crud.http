@@ -49,5 +49,15 @@ Content-Type: application/json
 
 {
     "username": "usuarioEjemplo",
-    "password": "contraseñaEjemplo"
+    "password": "contraseñaEjemplo",
+    "role": "admin"
+}
+###
+POST http://localhost:3001/api/register
+Content-Type: application/json
+
+{
+    "username": "usuarioEjemplo",
+    "password": "contraseñaEjemplo",
+    "role": "admin"
 }

@@ -1,6 +1,6 @@
-import { Appointment } from '../Models/AppointmentModel.js';
-import { DeletionLog } from '../Models/LogModel.js';
-import { newId, newLogId } from '../Utils/createId.js';
+import { AppointmentSchema } from '../Models/AppointmentSchema.js';
+import { DeletionLogSchema } from '../Models/LogSchema.js';
+import { newUserId, newLogId } from '../Utils/createId.js';
 
 // Función para crear una nueva cita
 export const createAppointment = async (req, res) => {
@@ -28,13 +28,13 @@ export const createAppointment = async (req, res) => {
         }
 
         // Verificar si ya existe una cita en la misma fecha y hora
-        const existingAppointment = await Appointment.findOne({ date, appointmentTime });
+        const existingAppointment = await AppointmentSchema.findOne({ date, appointmentTime });
         if (existingAppointment) {
             return res.status(400).json({ error: 'The selected date and time are already booked.' });
         }
 
-        const newAppointment = Appointment.create({
-            _id: newId(), // Generar un nuevo ID
+        const newAppointment = AppointmentSchema.create({
+            _id: newUserId(), // Generar un nuevo ID
             date,
             appointmentTime,
             realAppointmentTime,
@@ -52,7 +52,7 @@ export const createAppointment = async (req, res) => {
 // Función para obtener todas las citas
 export const getAllAppointments = async (req, res) => {
     try {
-        const appointments = await Appointment.find();
+        const appointments = await AppointmentSchema.find();
         res.json(appointments);
     } catch (error) {
         res.status(500).json({ error: error.message });
@@ -63,10 +63,10 @@ export const getAllAppointments = async (req, res) => {
 export const getAppointmentById = async (req, res) => {
     try {
         const { id } = req.params;
-        const appointment = await Appointment.find({ _id: Number(id) });
+        const appointment = await AppointmentSchema.find({ _id: Number(id) });
 
         if (!appointment || appointment.length === 0) {
-            return res.status(404).json({ error: 'Appointment not found' });
+            return res.status(404).json({ error: 'AppointmentSchema not found' });
         }
 
         res.json(appointment[0]);
@@ -81,18 +81,18 @@ export const deleteAppointment = async (req, res) => {
         const { id } = req.params;
 
         // Find the appointment by ID
-        const appointment = await Appointment.find({ _id: Number(id) })[0];
+        const appointment = await AppointmentSchema.find({ _id: Number(id) })[0];
 
         if (!appointment) {
             return res.status(404).json({
                 success: false,
-                error: 'Appointment not found'
+                error: 'AppointmentSchema not found'
             });
         }
 
         // Create deletion log
         const logId = newLogId();
-        const logEntry = DeletionLog.create({
+        const logEntry = DeletionLogSchema.create({
             _id: logId,
             appointmentId: appointment._id,
             deletedAt: new Date().toISOString(),
@@ -111,7 +111,7 @@ export const deleteAppointment = async (req, res) => {
 
         res.json({
             success: true,
-            message: 'Appointment cancelled and logged successfully'
+            message: 'AppointmentSchema cancelled and logged successfully'
         });
     } catch (error) {
         console.error('Delete appointment error:', error);
@@ -126,7 +126,7 @@ export const deleteAppointment = async (req, res) => {
 export const getAppointmentsByDate = async (req, res) => {
     try {
         const { date } = req.params;
-        const appointments = await Appointment.find({ date });
+        const appointments = await AppointmentSchema.find({ date });
         res.json(appointments);
     } catch (error) {
         res.status(500).json({ error: error.message });
@@ -140,10 +140,10 @@ export const confirmAppointment = async (req, res) => {
         const { confirmAppointment } = req.body; // Se espera que se envíe el estado de confirmación
 
         // Buscar la cita por ID
-        const appointment = await Appointment.find({ _id: Number(id) });
+        const appointment = await AppointmentSchema.find({ _id: Number(id) });
 
         if (!appointment || appointment.length === 0) {
-            return res.status(404).json({ error: 'Appointment not found' });
+            return res.status(404).json({ error: 'AppointmentSchema not found' });
         }
 
         // Actualizar el estado de confirmación
@@ -152,7 +152,7 @@ export const confirmAppointment = async (req, res) => {
         // Guardar los cambios en la base de datos
         await appointment[0].save(); // Guardar la cita actualizada
 
-        res.json({ message: 'Appointment confirmed successfully', appointment: appointment[0] });
+        res.json({ message: 'AppointmentSchema confirmed successfully', appointment: appointment[0] });
     } catch (error) {
         res.status(500).json({ error: error.message });
     }
@@ -163,16 +163,16 @@ export const completeAppointment = async (req, res) => {
     try {
         const { id } = req.params;
 
-        const appointment = await Appointment.find({ _id: Number(id) });
+        const appointment = await AppointmentSchema.find({ _id: Number(id) });
 
         if (!appointment || appointment.length === 0) {
-            return res.status(404).json({ error: 'Appointment not found' });
+            return res.status(404).json({ error: 'AppointmentSchema not found' });
         }
 
         appointment[0].status = 'completed';
         await appointment[0].save();
 
-        res.json({ message: 'Appointment marked as completed', appointment: appointment[0] });
+        res.json({ message: 'AppointmentSchema marked as completed', appointment: appointment[0] });
     } catch (error) {
         res.status(500).json({ error: error.message });
     }

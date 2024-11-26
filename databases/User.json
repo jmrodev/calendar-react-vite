@@ -1,0 +1,9 @@
+[
+    {
+        "_id": 1,
+        "username": "usuarioEjemplo",
+        "password": "$2b$10$iQ.NNwd2jczHcUousGpN9uV/.Ulm3itYrka8JTSJD./npbDuudsJK",
+        "role": "user",
+        "loginAttempts": 0
+    }
+]
