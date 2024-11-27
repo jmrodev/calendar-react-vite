@@ -1,8 +1,6 @@
 import { UserModel } from "../Models/UserModel";
 import { newUserId } from "../Utils/createId";
 
-
-
 const createUser = async (req, res) => {
         
     try {

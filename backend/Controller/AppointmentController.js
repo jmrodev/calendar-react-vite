@@ -1,6 +1,6 @@
 import { AppointmentSchema } from '../Models/AppointmentSchema.js';
 import { DeletionLogSchema } from '../Models/LogSchema.js';
-import { newUserId, newLogId } from '../Utils/createId.js';
+import { newLogId, newAppointmentId } from '../Utils/createId.js';
 
 export const createAppointment = async (req, res) => {
     try {
@@ -31,7 +31,7 @@ export const createAppointment = async (req, res) => {
         }
 
         const newAppointment = AppointmentSchema.create({
-            _id: newUserId(), 
+            _id: newAppointmentId(), 
             date,
             appointmentTime,
             realAppointmentTime,
@@ -158,5 +158,45 @@ export const completeAppointment = async (req, res) => {
         res.json({ message: 'AppointmentSchema marked as completed', appointment: appointment[0] });
     } catch (error) {
         res.status(500).json({ error: error.message });
+    }
+};
+
+export const deleteAppointmentByDateAndTime = async (req, res) => {
+    try {
+        const { date, time } = req.params;
+
+        const appointment = await AppointmentSchema.find({ date, appointmentTime: time })[0];
+
+        if (!appointment) {
+            return res.status(404).json({
+                success: false,
+                error: 'AppointmentSchema not found'
+            });
+        }
+
+        const logId = newLogId();
+        const logEntry = DeletionLogSchema.create({
+            _id: logId,
+            appointmentId: appointment._id,
+            deletedAt: new Date().toISOString(),
+            deletedData: {
+                date: appointment.date,
+                appointmentTime: appointment.appointmentTime,
+                realAppointmentTime: appointment.realAppointmentTime,
+                appointment: appointment.appointment
+            }
+        });
+        await logEntry.save();
+        await appointment.remove();
+        res.json({
+            success: true,
+            message: 'AppointmentSchema cancelled and logged successfully'
+        });
+    } catch (error) {
+        console.error('Delete appointment error:', error);
+        res.status(500).json({
+            success: false,
+            error: error.message || 'Internal server error'
+        });
     }
 };

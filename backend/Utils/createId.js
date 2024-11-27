@@ -1,8 +1,8 @@
 import { UserSchema } from "../Models/UserSchema.js";
-
+import { AppointmentSchema } from "../Models/AppointmentSchema.js";
 
 const newAppointmentId = () => {
-    const allAppointments = Appointment.find();
+    const allAppointments = AppointmentSchema.find();
     if (allAppointments.length === 0) return 1; 
     return Math.max(...allAppointments.map(a => a._id)) + 1;
 };

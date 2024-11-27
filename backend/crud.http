@@ -1,9 +1,6 @@
-# CRUD para Citas
-###
 # @variableName = variableValue
 @host = localhost:3001
-@token = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOjIsInJvbGUiOiJ1c2VyIiwiaWF0IjoxNzMyNjcwMDU5LCJleHAiOjE3MzI2NzM2NTl9.xv7MADEEAYKajsRVr4BSKHGsnzpSJDUghp3Y4JCUhSQ
-###
+@token = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOjIsInJvbGUiOiJ1c2VyIiwiaWF0IjoxNzMyNjk5OTEwLCJleHAiOjE3MzI3MDM1MTB9.QBiIh934CC1m-bIDk4kJd9do21tiNA91BfEJlBRsoBs
 ### Crear una cita
 POST http://{{host}}/api/appointments
 Content-Type: application/json
@@ -11,7 +8,7 @@ Authorization: token {{token}}
 
 {
     "date": "2024-11-23",
-    "appointmentTime": "19:00",
+    "appointmentTime": "8:00",
     "realAppointmentTime": "15:00",
     "available": true,
     "appointment": {
@@ -40,7 +37,7 @@ Authorization: token {{token}}
 ###
 
 ### Confirmar una cita
-PUT http://{{host}}/api/appointments/confirm/2
+PUT http://{{host}}/api/appointments/confirm/3
 Content-Type: application/json
 Authorization: token {{token}}
 
@@ -54,6 +51,7 @@ Authorization: token {{token}}
 POST http://{{host}}/api/auth/login
 Content-Type: application/json
 Authorization: token {{token}}
+
 {
     "username": "usuarioEjemplo2",
     "password": "contraseñaEjemplo2",
