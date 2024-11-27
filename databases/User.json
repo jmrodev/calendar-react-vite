@@ -1,1 +1,1 @@
-[{"_id":2,"username":"usuarioEjemplo2","password":"$2b$10$T4Im7zIzr1CTII2OjnAmLuNawuC8wyT94/Iqv2fDOoaKb4ZPmafnm","role":"user","loginAttempts":0},{"_id":1,"username":"usuarioEjemplo","password":"$2b$10$iQ.NNwd2jczHcUousGpN9uV/.Ulm3itYrka8JTSJD./npbDuudsJK","role":"user","loginAttempts":0}]
+[{"_id":1,"username":"usuarioEjemplo2","password":"$2b$10$G/46Mcqf7xpUuS.1pdKK9eo6hTOszZVydIPg5j.56A7s4OnOn.GF.","role":"admin","loginAttempts":0}]

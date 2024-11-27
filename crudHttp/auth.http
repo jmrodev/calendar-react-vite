@@ -1,0 +1,24 @@
+# @variableName = variableValue
+@host = localhost:3001
+@token =eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOjEsInJvbGUiOiJhZG1pbiIsImlhdCI6MTczMjcxMDUwMywiZXhwIjoxNzMyNzE0MTAzfQ.BdhqntAakA7CZWpnjNiTPmr48UUgrsZ0QsZUh5fIkBI
+
+### Login admin
+POST http://{{host}}/api/auth/login
+Content-Type: application/json
+Authorization: token {{token}}
+
+{
+    "username": "usuarioEjemplo2",
+    "password": "contraseñaEjemplo2",
+    "role": "admin"
+}
+###
+POST http://{{host}}/api/auth/register
+Content-Type: application/json
+Authorization: token {{token}}
+
+{
+    "username": "usuarioEjemplo2",
+    "password": "contraseñaEjemplo2",
+    "role": "admin"
+}

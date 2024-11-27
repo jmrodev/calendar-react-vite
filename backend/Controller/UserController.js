@@ -1,5 +1,5 @@
-import { UserModel } from "../Models/UserModel";
-import { newUserId } from "../Utils/createId";
+import { UserSchema } from "../Models/UserSchema.js";
+import { newUserId } from "../Utils/createId.js";
 
 const createUser = async (req, res) => {
         
@@ -18,7 +18,9 @@ const createUser = async (req, res) => {
             return res.status(400).json({ error: 'Password too short' });
         }
 
-        const newUser = UserModel.create({
+        console.log('Creating user with username:', username, 'and role:', role);
+        
+        const newUser = UserSchema.create({
             _id: newUserId(), 
             username,
             password,
@@ -38,7 +40,7 @@ const createUser = async (req, res) => {
 
 const getAllUsers = async (req, res) => {
     try {
-        const users = await UserModel.find();
+        const users = await UserSchema.find();
         res.json(users);
     }
     catch (error) {
@@ -50,10 +52,10 @@ const getAllUsers = async (req, res) => {
 const getUserById = async (req, res) => {
     try {
         const { id } = req.params;
-        const user = await UserModel.find({ _id: Number(id) });
+        const user = await UserSchema.find({ _id: Number(id) });
 
         if (!user || user.length === 0) {
-            return res.status(404).json({ error: 'UserModel not found' });
+            return res.status(404).json({ error: 'UserSchema not found' });
         }
 
         res.json(user[0]);
@@ -69,17 +71,17 @@ const deleteUser = async (req, res) => {
         const { id } = req.params;
 
         
-        const user = await UserModel.find({ _id: Number(id) })[0];
+        const user = await UserSchema.find({ _id: Number(id) })[0];
 
         if (!user) {
             return res.status(404).json({
                 success: false,
-                error: 'UserModel not found'
+                error: 'UserSchema not found'
             });
         }
 
         
-        const deletedUser = await UserModel.delete({ _id: Number(id) });
+        const deletedUser = await UserSchema.delete({ _id: Number(id) });
 
         res.json({
             success: true,
@@ -98,12 +100,12 @@ const updateUser = async (req, res) => {
         const { username, password, role } = req.body;
 
         
-        const user = await UserModel.find({ _id: Number(id) })[0];
+        const user = await UserSchema.find({ _id: Number(id) })[0];
 
         if (!user) {
             return res.status(404).json({
                 success: false,
-                error: 'UserModel not found'
+                error: 'UserSchema not found'
             });
         }
 

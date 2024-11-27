@@ -88,7 +88,7 @@ export const login = async (req, res) => {
 
 export const register = async (req, res) => {
     try {
-        const { username, password } = req.body;
+        const { username, password, role} = req.body;
         
         
         if (!username || !password) {
@@ -110,7 +110,7 @@ export const register = async (req, res) => {
             _id: newUserId(), 
             username, 
             password,
-            role: 'user'
+            role
         };
                 
         

@@ -1,6 +1,9 @@
 # @variableName = variableValue
 @host = localhost:3001
-@token = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOjIsInJvbGUiOiJ1c2VyIiwiaWF0IjoxNzMyNjk5OTEwLCJleHAiOjE3MzI3MDM1MTB9.QBiIh934CC1m-bIDk4kJd9do21tiNA91BfEJlBRsoBs
+@token =eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOjEsInJvbGUiOiJhZG1pbiIsImlhdCI6MTczMjcxMDUwMywiZXhwIjoxNzMyNzE0MTAzfQ.BdhqntAakA7CZWpnjNiTPmr48UUgrsZ0QsZUh5fIkBI
+
+
+
 ### Crear una cita
 POST http://{{host}}/api/appointments
 Content-Type: application/json
@@ -17,8 +20,6 @@ Authorization: token {{token}}
         "reason": "Consultation"
     }
 }
-
-###
 
 ### Obtener todas las citas
 GET http://{{host}}/api/appointments
@@ -44,30 +45,3 @@ Authorization: token {{token}}
 {
     "confirmAppointment": true
 }
-
-###
-
-### Login
-POST http://{{host}}/api/auth/login
-Content-Type: application/json
-Authorization: token {{token}}
-
-{
-    "username": "usuarioEjemplo2",
-    "password": "contraseñaEjemplo2",
-    "role": "admin"
-}
-###
-POST http://{{host}}/api/auth/register
-Content-Type: application/json
-Authorization: token {{token}}
-
-{
-    "username": "usuarioEjemplo2",
-    "password": "contraseñaEjemplo2",
-    "role": "admin"
-}
-
-###
-GET http://{{host}}/api/appointments HTTP/1.1
-Authorization: token {{token}}
