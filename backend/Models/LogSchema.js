@@ -1,7 +1,7 @@
 import dbLocal from 'db-local';
 const { Schema } = new dbLocal({ path: "../databases" });
 
-// Define el esquema para los logs de eliminaciones
+
 const DeletionLogSchema = Schema("DeletionLog", {
     _id: { type: Number, required: true },
     appointmentId: { type: Number, required: true },

@@ -2,7 +2,7 @@ import bcrypt from 'bcrypt';
 import { UserSchema } from '../Models/UserSchema.js';
 
 export async function verifyPassword(user, password) {
-    // Verificar bloqueo
+    
     if (user.lockUntil && user.lockUntil > Date.now()) {
         throw new Error('Cuenta bloqueada temporalmente');
     }
@@ -18,7 +18,7 @@ export async function verifyPassword(user, password) {
         return false;
     }
 
-    // Reset intentos fallidos
+    
     if (user.loginAttempts > 0) {
         user.loginAttempts = 0;
         user.lockUntil = null;
@@ -29,7 +29,7 @@ export async function verifyPassword(user, password) {
 }
 
 export async function hashPassword(userData) {
-    // Solo hashear si la contraseña no está hasheada
+    
     if (!userData.password || userData.password.startsWith('$2b$')) {
         return userData;
     }

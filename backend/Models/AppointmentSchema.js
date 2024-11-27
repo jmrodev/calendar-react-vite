@@ -1,14 +1,14 @@
 import dbLocal from 'db-local';
 const { Schema } = new dbLocal({ path: "../databases" });
 
-// Define el esquema para las citas
+
 const AppointmentSchema = Schema("Appointment", {
     _id: { type: Number, required: true },
     date: { type: String, required: true },
     appointmentTime: { type: String, required: true },
     realAppointmentTime: { type: String, required: true },
     available: { type: Boolean, required: true },
-    status: { type: String, required: true, default: 'pending' }, // pending, confirmed, completed
+    status: { type: String, required: true, default: 'pending' }, 
     appointment: {
         type: Object,
         required: true,

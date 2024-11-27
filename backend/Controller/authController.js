@@ -11,10 +11,10 @@ import {
     createUser
 } from '../Utils/authUtils.js';
 
-// Rate limiting middleware
+
 export const loginLimiter = rateLimit({
-  windowMs: 15 * 60 * 1000, // 15 minutos
-  max: 5, // 5 intentos por ventana
+  windowMs: 15 * 60 * 1000, 
+  max: 5, 
   message: { error: 'Demasiados intentos de inicio de sesión. Por favor, inténtelo más tarde.' }
 });
 
@@ -22,25 +22,25 @@ export const login = async (req, res) => {
     try {
         const { username, password } = req.body;
         
-        // Validación de entrada
+        
         if (!username || !password) {
             return res.status(400).json({ 
                 error: 'El usuario y la contraseña son requeridos' 
             });
         }
         
-        // Búsqueda de usuario
+        
         const user = findUserByUsername(username);
         
         if (!user) {
-            // Usar bcrypt.compare con hash ficticio para prevenir ataques de tiempo
+            
             await bcrypt.compare(password, '$2b$10$' + 'a'.repeat(53));
             return res.status(401).json({ 
                 error: 'Credenciales inválidas' 
             });
         }
         
-        // Verificar contraseña
+        
         const isPasswordValid = await verifyPassword(user, password);
         
         if (!isPasswordValid) {
@@ -49,7 +49,7 @@ export const login = async (req, res) => {
             });
         }
         
-        // Generar JWT con payload mínimo
+        
         const token = jwt.sign(
             { 
                 sub: user._id,
@@ -62,12 +62,12 @@ export const login = async (req, res) => {
             }
         );
         
-        // Establecer JWT en cookie HTTP-only
+        
         res.cookie('token', token, {
             httpOnly: true,
             secure: process.env.NODE_ENV === 'production',
             sameSite: 'strict',
-            maxAge: 3600000 // 1 hora
+            maxAge: 3600000 
         });
         
         res.json({ 
@@ -90,14 +90,14 @@ export const register = async (req, res) => {
     try {
         const { username, password } = req.body;
         
-        // Validación de entrada
+        
         if (!username || !password) {
             return res.status(400).json({ 
                 error: 'El usuario y la contraseña son requeridos' 
             });
         }
         
-        // Validar si el usuario ya existe
+        
         const existingUser = findUserByUsername(username);
         if (existingUser) {
             return res.status(400).json({ 
@@ -105,7 +105,7 @@ export const register = async (req, res) => {
             });
         }
         
-        // Preparar datos de usuario
+        
         const userData = {
             _id: newUserId(), 
             username, 
@@ -113,11 +113,11 @@ export const register = async (req, res) => {
             role: 'user'
         };
                 
-        // Hashear la contraseña
+        
         const userDataWithHashedPassword = await hashPassword(userData);
         
         
-        // Crear usuario
+        
         const savedUser = createUser(userDataWithHashedPassword);
         
         

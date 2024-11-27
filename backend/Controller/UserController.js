@@ -1,8 +1,8 @@
 import { UserModel } from "../Models/UserModel";
 import { newUserId } from "../Utils/createId";
 
-//Estas funciones sera usadas por el Administrador para gestion de usuarios
-// Función para crear un nuevo usuario
+
+
 const createUser = async (req, res) => {
         
     try {
@@ -21,7 +21,7 @@ const createUser = async (req, res) => {
         }
 
         const newUser = UserModel.create({
-            _id: newUserId(), // Generar un nuevo ID
+            _id: newUserId(), 
             username,
             password,
             role
@@ -37,7 +37,7 @@ const createUser = async (req, res) => {
     }
 }
 
-// Función para obtener todos los usuarios
+
 const getAllUsers = async (req, res) => {
     try {
         const users = await UserModel.find();
@@ -48,7 +48,7 @@ const getAllUsers = async (req, res) => {
     }
 }
 
-// Función para obtener usuario por ID
+
 const getUserById = async (req, res) => {
     try {
         const { id } = req.params;
@@ -65,12 +65,12 @@ const getUserById = async (req, res) => {
     }
 }
 
-// Función para eliminar un usuario
+
 const deleteUser = async (req, res) => {
     try {
         const { id } = req.params;
 
-        // Find the user by ID
+        
         const user = await UserModel.find({ _id: Number(id) })[0];
 
         if (!user) {
@@ -80,7 +80,7 @@ const deleteUser = async (req, res) => {
             });
         }
 
-        // Create deletion log
+        
         const deletedUser = await UserModel.delete({ _id: Number(id) });
 
         res.json({
@@ -93,13 +93,13 @@ const deleteUser = async (req, res) => {
     }
 }
 
-// Función para actualizar un usuario
+
 const updateUser = async (req, res) => {
     try {
         const { id } = req.params;
         const { username, password, role } = req.body;
 
-        // Find the user by ID
+        
         const user = await UserModel.find({ _id: Number(id) })[0];
 
         if (!user) {
@@ -109,7 +109,7 @@ const updateUser = async (req, res) => {
             });
         }
 
-        // Update the user
+        
         user.username = username;
         user.password = password;
         user.role = role;
