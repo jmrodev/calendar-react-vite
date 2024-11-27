@@ -1,4 +1,4 @@
-// Week.jsx
+
 import React, { useState, useEffect } from 'react';
 import TimeSlot from './TimeSlot';
 import { generateTimeSlots } from './timeSlotUtils';

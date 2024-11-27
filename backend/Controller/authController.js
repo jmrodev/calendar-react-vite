@@ -87,8 +87,6 @@ export const login = async (req, res) => {
 };
 
 export const register = async (req, res) => {
-    console.log('register');
-    console.log(req.body);
     try {
         const { username, password } = req.body;
         
@@ -114,18 +112,14 @@ export const register = async (req, res) => {
             password,
             role: 'user'
         };
-        
-        console.log('userData', userData);
-        
+                
         // Hashear la contraseña
         const userDataWithHashedPassword = await hashPassword(userData);
         
-        console.log('userDataWithHashedPassword', userDataWithHashedPassword);
         
         // Crear usuario
         const savedUser = createUser(userDataWithHashedPassword);
         
-        console.log('savedUser', savedUser);
         
         res.json({ 
             success: true,

@@ -1,17 +1,22 @@
 # CRUD para Citas
-
+###
+# @variableName = variableValue
+@host = localhost:3001
+@token = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOjIsInJvbGUiOiJ1c2VyIiwiaWF0IjoxNzMyNjcwMDU5LCJleHAiOjE3MzI2NzM2NTl9.xv7MADEEAYKajsRVr4BSKHGsnzpSJDUghp3Y4JCUhSQ
+###
 ### Crear una cita
-POST http://localhost:3001/api/appointments
+POST http://{{host}}/api/appointments
 Content-Type: application/json
+Authorization: token {{token}}
 
 {
-    "date": "2024-11-22",
-    "appointmentTime": "18:00",
+    "date": "2024-11-23",
+    "appointmentTime": "19:00",
     "realAppointmentTime": "15:00",
-    "available": false,
+    "available": true,
     "appointment": {
         "confirmAppointment": false,
-        "name": "Jane Doe",
+        "name": "John Doe",
         "reason": "Consultation"
     }
 }
@@ -19,23 +24,25 @@ Content-Type: application/json
 ###
 
 ### Obtener todas las citas
-GET http://localhost:3001/api/appointments
+GET http://{{host}}/api/appointments
+Authorization: token {{token}}
 
 ###
 
 ### Obtener citas por fecha
-GET http://localhost:3001/api/appointments/date/2024-11-22
-
+GET http://{{host}}/api/appointments/date/2024-11-22
+Authorization: token {{token}}
 ###
 
 ### Eliminar una cita
-DELETE http://localhost:3001/api/appointments/2024-11-22/18:00
-
+DELETE http://{{{{host}}}}/api/appointments/2024-11-22/18:00
+Authorization: token {{token}}
 ###
 
 ### Confirmar una cita
-PUT http://localhost:3001/api/appointments/confirm/2
+PUT http://{{host}}/api/appointments/confirm/2
 Content-Type: application/json
+Authorization: token {{token}}
 
 {
     "confirmAppointment": true
@@ -44,20 +51,25 @@ Content-Type: application/json
 ###
 
 ### Login
-POST http://localhost:3001/api/auth/login
+POST http://{{host}}/api/auth/login
 Content-Type: application/json
-
+Authorization: token {{token}}
 {
     "username": "usuarioEjemplo2",
     "password": "contraseñaEjemplo2",
     "role": "admin"
 }
 ###
-POST http://localhost:3001/api/auth/register
+POST http://{{host}}/api/auth/register
 Content-Type: application/json
+Authorization: token {{token}}
 
 {
     "username": "usuarioEjemplo2",
     "password": "contraseñaEjemplo2",
     "role": "admin"
 }
+
+###
+GET http://{{host}}/api/appointments HTTP/1.1
+Authorization: token {{token}}

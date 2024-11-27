@@ -1,4 +1,4 @@
-// timeSlotUtils.js
+
 
 import AppointmentService from '../../../../../services/appointmentService';
 
@@ -14,7 +14,7 @@ export const generateTimeSlots = async (selectedDate) => {
             const timeString = `${hour.toString().padStart(2, '0')}:00`;
             const existingSlot = existingSlots.find(slot => slot.appointmentTime === timeString);
             if (existingSlot) {
-                // Asegurar que tenemos tanto _id como id
+                
                 slots.push({ 
                     ...existingSlot, 
                     id: existingSlot._id,

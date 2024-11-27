@@ -2,12 +2,10 @@ import { AppointmentSchema } from '../Models/AppointmentSchema.js';
 import { DeletionLogSchema } from '../Models/LogSchema.js';
 import { newUserId, newLogId } from '../Utils/createId.js';
 
-// Función para crear una nueva cita
 export const createAppointment = async (req, res) => {
     try {
         const { date, appointmentTime, realAppointmentTime, available, appointment } = req.body;
 
-        // Verificar que appointmentTime, date y appointment estén presentes
         if (!appointmentTime) {
             return res.status(400).json({ error: 'The value "appointmentTime" is required.' });
         }
@@ -27,14 +25,13 @@ export const createAppointment = async (req, res) => {
         //     }
         // }
 
-        // Verificar si ya existe una cita en la misma fecha y hora
         const existingAppointment = await AppointmentSchema.findOne({ date, appointmentTime });
         if (existingAppointment) {
             return res.status(400).json({ error: 'The selected date and time are already booked.' });
         }
 
         const newAppointment = AppointmentSchema.create({
-            _id: newUserId(), // Generar un nuevo ID
+            _id: newUserId(), 
             date,
             appointmentTime,
             realAppointmentTime,
@@ -49,7 +46,6 @@ export const createAppointment = async (req, res) => {
     }
 };
 
-// Función para obtener todas las citas
 export const getAllAppointments = async (req, res) => {
     try {
         const appointments = await AppointmentSchema.find();
@@ -59,7 +55,6 @@ export const getAllAppointments = async (req, res) => {
     }
 };
 
-// Función para obtener cita por ID
 export const getAppointmentById = async (req, res) => {
     try {
         const { id } = req.params;
@@ -75,12 +70,10 @@ export const getAppointmentById = async (req, res) => {
     }
 };
 
-// Función para eliminar una cita
 export const deleteAppointment = async (req, res) => {
     try {
         const { id } = req.params;
 
-        // Find the appointment by ID
         const appointment = await AppointmentSchema.find({ _id: Number(id) })[0];
 
         if (!appointment) {
@@ -90,7 +83,6 @@ export const deleteAppointment = async (req, res) => {
             });
         }
 
-        // Create deletion log
         const logId = newLogId();
         const logEntry = DeletionLogSchema.create({
             _id: logId,
@@ -103,12 +95,8 @@ export const deleteAppointment = async (req, res) => {
                 appointment: appointment.appointment
             }
         });
-
         await logEntry.save();
-
-        // Remove the appointment
         await appointment.remove();
-
         res.json({
             success: true,
             message: 'AppointmentSchema cancelled and logged successfully'
@@ -122,7 +110,6 @@ export const deleteAppointment = async (req, res) => {
     }
 };
 
-// Función para obtener citas por fecha
 export const getAppointmentsByDate = async (req, res) => {
     try {
         const { date } = req.params;
@@ -133,24 +120,20 @@ export const getAppointmentsByDate = async (req, res) => {
     }
 };
 
-// Función para confirmar cita
 export const confirmAppointment = async (req, res) => {
     try {
         const { id } = req.params;
-        const { confirmAppointment } = req.body; // Se espera que se envíe el estado de confirmación
+        const { confirmAppointment } = req.body; 
 
-        // Buscar la cita por ID
         const appointment = await AppointmentSchema.find({ _id: Number(id) });
 
         if (!appointment || appointment.length === 0) {
             return res.status(404).json({ error: 'AppointmentSchema not found' });
         }
 
-        // Actualizar el estado de confirmación
-        appointment[0].appointment.confirmAppointment = confirmAppointment; // Cambiar a true o false según el cuerpo de la solicitud
+        appointment[0].appointment.confirmAppointment = confirmAppointment; 
 
-        // Guardar los cambios en la base de datos
-        await appointment[0].save(); // Guardar la cita actualizada
+        await appointment[0].save(); 
 
         res.json({ message: 'AppointmentSchema confirmed successfully', appointment: appointment[0] });
     } catch (error) {
@@ -158,7 +141,7 @@ export const confirmAppointment = async (req, res) => {
     }
 };
 
-// Función para completar cita
+
 export const completeAppointment = async (req, res) => {
     try {
         const { id } = req.params;

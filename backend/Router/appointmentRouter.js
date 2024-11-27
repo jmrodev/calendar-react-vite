@@ -14,28 +14,28 @@ const appointmentRouter = express.Router();
 
 // Rutas de citas
 // POST - Crear nueva cita
-appointmentRouter.post('/',  createAppointment);
+appointmentRouter.post('/', authenticateToken, createAppointment);
 
 // GET - Obtener todas las citas
-appointmentRouter.get('/', getAllAppointments);
+appointmentRouter.get('/', authenticateToken, getAllAppointments);
 
 // GET - Obtener cita por ID
-appointmentRouter.get('/:id', getAppointmentById);
+appointmentRouter.get('/:id', authenticateToken, getAppointmentById);
 
 // DELETE - Eliminar cita por ID
-appointmentRouter.delete('/:id', deleteAppointment);
+appointmentRouter.delete('/:id', authenticateToken, deleteAppointment);
 
 // GET - Obtener citas por fecha
-appointmentRouter.get('/date/:date', getAppointmentsByDate);
+appointmentRouter.get('/date/:date', authenticateToken, getAppointmentsByDate);
 
 // PUT - Confirmar cita
-appointmentRouter.put('/confirm/:id', confirmAppointment);
+appointmentRouter.put('/confirm/:id', authenticateToken, confirmAppointment);
 
 // PUT - Completar cita
-appointmentRouter.put('/complete/:id', completeAppointment);
+appointmentRouter.put('/complete/:id', authenticateToken, completeAppointment);
 
 // DELETE - Cancelar cita por fecha y hora (si es necesario)
-appointmentRouter.delete('/:date/:time', async (req, res) => {
+appointmentRouter.delete('/:date/:time', authenticateToken, async (req, res) => {
     // Aquí puedes implementar la lógica si es necesario
     // O puedes eliminar esta ruta si no es necesaria
 });

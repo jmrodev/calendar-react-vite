@@ -1,18 +1,14 @@
 import { UserModel } from "../Models/UserModel";
 import { newUserId } from "../Utils/createId";
 
-
+//Estas funciones sera usadas por el Administrador para gestion de usuarios
 // Función para crear un nuevo usuario
 const createUser = async (req, res) => {
-    console.log('Creando usuario');
-    
-    console.log(req.body);
-    
+        
     try {
         const { username, password, role } = req.body;
-        console.log(req.body);
         
-        if (role !== 'admin' && role !== 'user') {
+        if (role !== 'admin') {
             return res.status(400).json({ error: 'Invalid role to create users' });
         }
         

@@ -1,4 +1,4 @@
-// appointmentHandlers.js
+
 
 import AppointmentService from '../../../../../services/appointmentService';
 
@@ -126,13 +126,11 @@ export const handleEdit = async (event, slot, setTimeSlots, setError) => {
 };
 export const handleReassignClick = async (event, slot, selectedDate, setTimeSlots, setError) => {
     event.stopPropagation();
-    try {
-        console.log('Starting reassignment for slot:', slot);
-        
+    try {        
         const confirmation = window.confirm('¿Está seguro que desea reasignar esta cita?');
         if (!confirmation) return;
 
-        // Get new patient information
+        
         const newName = prompt('Ingrese el nombre del nuevo paciente:');
         if (!newName) {
             alert('El nombre del paciente no puede estar vacío.');
@@ -145,19 +143,19 @@ export const handleReassignClick = async (event, slot, selectedDate, setTimeSlot
             return;
         }
 
-        // Ensure we have a valid appointment ID
+        
         const appointmentId = slot._id || slot.id;
         if (!appointmentId) {
             throw new Error('ID de cita no válido');
         }
 
-        // First delete the existing appointment
+        
         const deleteResult = await AppointmentService.deleteAppointment(appointmentId);
         if (!deleteResult.success) {
             throw new Error(`Error al eliminar la cita: ${deleteResult.message}`);
         }
 
-        // Create the new appointment
+        
         const newAppointmentData = {
             date: selectedDate.toISOString().split('T')[0],
             appointmentTime: slot.appointmentTime,
@@ -173,7 +171,7 @@ export const handleReassignClick = async (event, slot, selectedDate, setTimeSlot
 
         const response = await AppointmentService.createAppointment(newAppointmentData);
 
-        // Update UI
+        
         setTimeSlots(prevSlots =>
             prevSlots.map(s =>
                 s.appointmentTime === slot.appointmentTime
@@ -187,7 +185,7 @@ export const handleReassignClick = async (event, slot, selectedDate, setTimeSlot
         alert('Error durante la reasignación: ' + err.message);
     }
 };
-// También necesitamos asegurar que handleDelete use el ID correcto
+
 export const handleDelete = async (event, slot, setTimeSlots, setError) => {
     event.stopPropagation();
     try {

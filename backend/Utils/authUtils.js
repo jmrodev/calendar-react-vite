@@ -43,6 +43,5 @@ export function findUserByUsername(username) {
 }
 
 export function createUser(userData) {
-    // En db-local, no necesitas llamar UserSchema como función
     return UserSchema.create(userData).save();
 }
