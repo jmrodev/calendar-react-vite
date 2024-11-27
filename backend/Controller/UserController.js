@@ -18,7 +18,6 @@ const createUser = async (req, res) => {
             return res.status(400).json({ error: 'Password too short' });
         }
 
-        console.log('Creating user with username:', username, 'and role:', role);
         
         const newUser = UserSchema.create({
             _id: newUserId(), 

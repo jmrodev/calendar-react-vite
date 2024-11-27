@@ -110,7 +110,7 @@ export const register = async (req, res) => {
             _id: newUserId(), 
             username, 
             password,
-            role
+            role : role ? role : 'user'
         };
                 
         

@@ -1,6 +1,6 @@
 # @variableName = variableValue
 @host = localhost:3001
-@token =eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOjEsInJvbGUiOiJhZG1pbiIsImlhdCI6MTczMjcxMDUwMywiZXhwIjoxNzMyNzE0MTAzfQ.BdhqntAakA7CZWpnjNiTPmr48UUgrsZ0QsZUh5fIkBI
+@token =eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOjEsInJvbGUiOiJhZG1pbiIsImlhdCI6MTczMjcyMDgwMCwiZXhwIjoxNzMyNzI0NDAwfQ.mEg_02b5ywDYaKUrYctR5c_gCXE67ufSxCvAVhhseLw
 
 ### Login admin
 POST http://{{host}}/api/auth/login

@@ -1,3 +1,4 @@
+import { checkPermission } from '../config/role.config.js';
 import jwt from 'jsonwebtoken';
 import dotenv from 'dotenv';
 
@@ -30,16 +31,28 @@ export const authenticateToken = (req, res, next) => {
         next();
     });
 };
+// // authorizationMiddleware.js
 
-export const authorizeRoles = (...roles) => {
-    console.log(roles);
+export const authorize = (resource, action) => {
+  return (req, res, next) => {
+    const userRole = req.user.role;
     
-    return (req, res, next) => {
-        console.log(req.user.role);
-        
-        if (!roles.includes(req.user.role)) {
-            return res.status(403).json({ error: 'Access denied' });
-        }
-        next();
-    };
-}
+    if (checkPermission(userRole, resource, action)) {
+      next();
+    } else {
+      res.status(403).json({ 
+        error: 'No tienes permiso para realizar esta acción' 
+      });
+    }
+  };
+};
+// export const authorizeRoles = (...roles) => {
+    
+//     return (req, res, next) => {
+       
+//         if (!roles.includes(req.user.role)) {
+//             return res.status(403).json({ error: 'Access denied' });
+//         }
+//         next();
+//     };
+// }

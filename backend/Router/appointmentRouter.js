@@ -1,5 +1,5 @@
 import express from 'express';
-import { authenticateToken, authorizeRoles } from '../Middleware/authMiddleware.js';
+import { authenticateToken, authorize } from '../Middleware/authMiddleware.js';
 import { 
     createAppointment, 
     getAllAppointments, 
@@ -12,14 +12,44 @@ import {
 
 const appointmentRouter = express.Router();
 
-appointmentRouter.post('/', authenticateToken, createAppointment);
-appointmentRouter.get('/', authenticateToken, getAllAppointments);
-appointmentRouter.get('/:id', authenticateToken, getAppointmentById);
-appointmentRouter.delete('/:id', authenticateToken, deleteAppointment);
-appointmentRouter.get('/date/:date', authenticateToken, getAppointmentsByDate);
-appointmentRouter.put('/confirm/:id', authenticateToken, confirmAppointment);
-appointmentRouter.put('/complete/:id', authenticateToken, completeAppointment);
-appointmentRouter.delete('/:date/:time', authenticateToken, async (req, res) => {
-});
+appointmentRouter.post('/',
+     authenticateToken,
+     authorize('users', 'create'),
+     createAppointment);
 
+appointmentRouter.get('/',
+    authenticateToken,
+    authorize('users', 'read'), 
+    getAllAppointments);
+
+appointmentRouter.get('/:id',
+    authenticateToken,
+    authorize('users', 'read'),
+    getAppointmentById);
+
+appointmentRouter.delete('/:id',
+    authenticateToken,
+    authorize('users', 'delete'),
+    deleteAppointment);
+
+appointmentRouter.get('/date/:date',
+    authenticateToken,
+    authorize('users', 'read'),
+    getAppointmentsByDate);
+
+appointmentRouter.put('/confirm/:id',
+    authenticateToken,
+    authorize('users', 'update'),
+    confirmAppointment);
+
+appointmentRouter.put('/complete/:id',
+    authenticateToken,
+    authorize('users', 'update'),
+    completeAppointment);
+
+appointmentRouter.delete('/:date/:time',
+    authenticateToken,
+    authorize('users', 'delete'),
+    deleteAppointment);
+    
 export default appointmentRouter;
