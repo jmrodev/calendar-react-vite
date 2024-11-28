@@ -1,24 +1,22 @@
 # @variableName = variableValue
 @host = localhost:3001
-@token =eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOjEsInJvbGUiOiJhZG1pbiIsImlhdCI6MTczMjcyMDgwMCwiZXhwIjoxNzMyNzI0NDAwfQ.mEg_02b5ywDYaKUrYctR5c_gCXE67ufSxCvAVhhseLw
+@token =eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOjEsInJvbGUiOiJhZG1pbiIsInVzZXJuYW1lIjoidXN1YXJpb0VqZW1wbG8yIiwiaWF0IjoxNzMyNzM1MDI5LCJleHAiOjE3MzI3Mzg2Mjl9.y9P0a5Ut3Ey3lwdgDrBUn_Sh-SdKCPQKmv_U4gaKfX8
 
 ### Login admin
 POST http://{{host}}/api/auth/login
 Content-Type: application/json
-Authorization: token {{token}}
 
 {
-    "username": "usuarioEjemplo2",
-    "password": "contraseñaEjemplo2",
+    "username":"asdfghjklleee",
+    "password": "Asdfghj??a3kl",
     "role": "admin"
 }
 ###
 POST http://{{host}}/api/auth/register
 Content-Type: application/json
-Authorization: token {{token}}
 
 {
-    "username": "usuarioEjemplo2",
-    "password": "contraseñaEjemplo2",
+    "username":"asdfghjkll",
+    "password": "Asdfghj??a3kl",
     "role": "admin"
 }

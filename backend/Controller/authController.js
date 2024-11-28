@@ -2,44 +2,34 @@ import jwt from 'jsonwebtoken';
 import bcrypt from 'bcrypt';
 import { authConfig } from '../config/auth.config.js';
 import { UserSchema } from '../Models/UserSchema.js';
-import rateLimit from 'express-rate-limit';
 import { newUserId } from '../Utils/createId.js';
+import { standardizeDate } from '../Utils/dateUtils.js';
 import { 
     verifyPassword, 
     hashPassword, 
-    findUserByUsername,
-    createUser
+    findUserByUsername
 } from '../Utils/authUtils.js';
 
 
-export const loginLimiter = rateLimit({
-  windowMs: 15 * 60 * 1000, 
-  max: 5, 
-  message: { error: 'Demasiados intentos de inicio de sesión. Por favor, inténtelo más tarde.' }
-});
 
 export const login = async (req, res) => {
     try {
         const { username, password } = req.body;
-        
-        
         if (!username || !password) {
             return res.status(400).json({ 
                 error: 'El usuario y la contraseña son requeridos' 
             });
         }
         
-        
-        const user = findUserByUsername(username);
+        const user = await findUserByUsername(username);
         
         if (!user) {
-            
+            // Constant-time comparison to prevent timing attacks
             await bcrypt.compare(password, '$2b$10$' + 'a'.repeat(53));
             return res.status(401).json({ 
                 error: 'Credenciales inválidas' 
             });
         }
-        
         
         const isPasswordValid = await verifyPassword(user, password);
         
@@ -49,11 +39,17 @@ export const login = async (req, res) => {
             });
         }
         
+        // Update last login with standardized date
+        user.lastLogin = standardizeDate(new Date());
+        console.log('Último inicio de sesión:', user.lastLogin);
+        
+        await user.save();
         
         const token = jwt.sign(
             { 
                 sub: user._id,
-                role: user.role 
+                role: user.role,
+                username: user.username
             },
             authConfig.jwtSecret,
             { 
@@ -61,7 +57,6 @@ export const login = async (req, res) => {
                 algorithm: 'HS256'
             }
         );
-        
         
         res.cookie('token', token, {
             httpOnly: true,
@@ -75,7 +70,8 @@ export const login = async (req, res) => {
             user: {
                 id: user._id,
                 username: user.username,
-                role: user.role
+                role: user.role,
+                lastLogin: standardizeDate(user.lastLogin)
             }
         });
     } catch (error) {
@@ -88,8 +84,7 @@ export const login = async (req, res) => {
 
 export const register = async (req, res) => {
     try {
-        const { username, password, role} = req.body;
-        
+        const { username, password, role } = req.body;
         
         if (!username || !password) {
             return res.status(400).json({ 
@@ -97,36 +92,38 @@ export const register = async (req, res) => {
             });
         }
         
+        const existingUser = await findUserByUsername(username);
         
-        const existingUser = findUserByUsername(username);
         if (existingUser) {
             return res.status(400).json({ 
                 error: 'El usuario ya existe' 
             });
         }
         
-        
+        // Preparar los datos del usuario
         const userData = {
             _id: newUserId(), 
             username, 
             password,
-            role : role ? role : 'user'
+            role: role || 'user',
+            createdAt: standardizeDate(new Date()),
+            lastLogin: standardizeDate(new Date())
         };
-                
         
-        const userDataWithHashedPassword = await hashPassword(userData);
+        // Hashear la contraseña antes de guardar
+        const hashedUserData = await hashPassword(userData);
         
+        // Crear y guardar el nuevo usuario
+        const newUser = await UserSchema.create(hashedUserData).save();
+        console.log('Nuevo usuario:', newUser);
         
-        
-        const savedUser = createUser(userDataWithHashedPassword);
-        
-        
-        res.json({ 
+        res.status(201).json({ 
             success: true,
             user: {
-                id: savedUser._id,
-                username: savedUser.username,
-                role: savedUser.role
+                id: newUser._id,
+                username: newUser.username,
+                role: newUser.role,
+                createdAt: standardizeDate(newUser.createdAt)
             }
         });
     } catch (error) {

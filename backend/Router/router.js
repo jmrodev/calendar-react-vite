@@ -3,8 +3,6 @@ import authRouter from './authRouter.js';
 import appointmentRouter from './appointmentRouter.js';
 import userRouter from './userRouter.js';
 
-
-
 const router = Router();
 
 router.use('/auth', authRouter);
