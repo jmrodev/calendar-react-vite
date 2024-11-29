@@ -1,27 +1,36 @@
-import { UserSchema } from '../../Models/UserSchema.js';
-import { DeletionLogSchema } from '../../Models/LogSchema.js';
+import {loginAttemptSchema} from '../../Models/loginAttempt.js';
+import { standardizeDate } from '../../Utils/date/dateUtils.js';
 
-export const saveLoginAttempt = async (username, success) => {
+export const saveLoginAttempt = async (
+    username,
+     success,
+    //  ipAddress
+    ) => {
     try {
-        const log = await DeletionLogSchema.create({
+        const attempt = new loginAttemptSchema({
             username,
-            action: 'login_attempt',
             success,
-            timestamp: new Date()
+            // ipAddress,
+            timestamp: standardizeDate(new Date())
         });
-        return await log.save();
+        
+        await attempt.save();
+        return attempt;
     } catch (error) {
         throw new Error(`Error saving login attempt: ${error.message}`);
     }
 };
 
-export const getLoginAttempts = async (username, timeWindow) => {
+export const getLoginAttempts = async (username, minutes = 15) => {
     try {
-        return await DeletionLogSchema.find({
+        const timeLimit = new Date(Date.now() - minutes * 60 * 1000);
+        
+        const attempts = await loginAttemptSchema.find({
             username,
-            action: 'login_attempt',
-            timestamp: { $gte: timeWindow }
-        });
+            timestamp: { $gte: timeLimit }
+        }).sort({ timestamp: -1 });
+        
+        return attempts;
     } catch (error) {
         throw new Error(`Error getting login attempts: ${error.message}`);
     }

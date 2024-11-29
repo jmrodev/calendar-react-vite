@@ -2,7 +2,6 @@ import { findUserByUsername } from "./findUserByNameUtil";
 import { hashPassword } from "../auth/authHashPasswordUtil";
 import { newUserId } from "../id/idUserUtil";
 
-
 export const  createUser= async (username, password, role) => {
     if (!username || !password || !role) {
         throw new Error('All fields are required');

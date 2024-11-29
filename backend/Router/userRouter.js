@@ -5,12 +5,46 @@ import {
     getAllUsersController,
     getUserByIdController
 } from '../Controller/User/index.js';
+import { authToken } from '../Middleware/token/authToken.js';
+import { authorize } from '../Middleware/roles/authorize.js';
 
 const router = Router();
 
-router.post('/', createUserController);
-router.get('/', getAllUsersController);
-router.get('/:id', getUserByIdController);
-router.delete('/:id', deleteUserController);
+router.post(
+    '/',
+    authToken,
+    authorize(
+        'user',
+        'create'
+    ),
+     createUserController
+    );
+router.get(
+    '/',
+    authToken,
+    authorize(
+        'user',
+        'read'
+    ),
+     getAllUsersController
+    );
+router.get(
+    '/:id',
+    authToken,
+    authorize(
+        'user',
+        'read'
+    ),    
+    getUserByIdController
+);
+router.delete(
+    '/:id',
+    authToken,
+    authorize(
+        'user',
+        'delete'
+    ),
+     deleteUserController
+    );
 
 export default router;

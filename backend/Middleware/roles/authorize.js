@@ -3,7 +3,7 @@ import { checkPermission } from '../../config/role.config.js';
 export const authorize = (resource, action) => {
     return (req, res, next) => {
         try {
-            // Check if user and role exist
+            
             if (!req.user || !req.user.role) {
                 return res.status(401).json({
                     error: 'No autorizado - Usuario o rol no encontrado'

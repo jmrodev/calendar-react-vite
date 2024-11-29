@@ -4,7 +4,10 @@ import { standardizeDate } from "../Utils/date/dateUtils.js";
 const { Schema } = new dbLocal({ path: "../databases" });
 
 const UserSchema = Schema("User", {
-    _id: { type: Number, required: true },
+    _id: {
+        type: Number,
+        required: true
+    },
     username: {
         type: String,
         required: true,
@@ -33,14 +36,12 @@ const UserSchema = Schema("User", {
         default: ""
     },
     createdAt: {
-        type: String,
-        default:()=>standardizeDate(new Date()),
-        transform: standardizeDate
+        type: Date,
+        required: true,
     },
     lastLogin: {
-        type: String,
-        default: ()=>standardizeDate(new Date()),
-        transform: standardizeDate
+        type: Date,
+        default: ""
     }
 });
 

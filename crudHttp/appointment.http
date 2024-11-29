@@ -1,5 +1,5 @@
 @host = localhost:3001
-@tokenPrefix = Bearer
+@tokenPrefix = token
 
 # @name login
 POST http://{{host}}/api/auth/login
@@ -12,7 +12,7 @@ Content-Type: application/json
 }
 
 ###
-@authToken = {{login.response.body.token}}
+@authToken = {login.response.body.token}
 
 ### Obtener todas las citas
 GET http://{{host}}/api/appointments

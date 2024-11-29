@@ -1,6 +1,10 @@
+import bcrypt from 'bcrypt';
 import { standardizeDate } from '../date/dateUtils.js';
 
 export async function verifyPassword(user, password) {
+    if (!password || !user.password) {
+        throw new Error('Password is required');
+    }
 
     if (user.lockUntil && user.lockUntil > standardizeDate(new Date(Date.now()))) {
         throw new Error('Cuenta bloqueada temporalmente');
@@ -16,7 +20,6 @@ export async function verifyPassword(user, password) {
         user.save();
         return false;
     }
-
 
     if (user.loginAttempts > 0) {
         user.loginAttempts = 0;
