@@ -1,0 +1,14 @@
+# @name login
+POST http://{{host}}/api/auth/login
+Content-Type: application/json
+Request-Date: {{$datetime 'YYYY-MM-DD HH:mm:ss'}}
+
+{
+    "username": "{{username}}",
+    "password": "{{password}}",
+    "role": "{{role}}"
+}
+
+###
+@authToken = {{login.response.body.token}}
+@userId = {{login.response.body.userId}} 

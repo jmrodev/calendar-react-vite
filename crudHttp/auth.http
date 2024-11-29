@@ -1,22 +1,55 @@
-# @variableName = variableValue
 @host = localhost:3001
-@token =eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOjEsInJvbGUiOiJhZG1pbiIsInVzZXJuYW1lIjoidXN1YXJpb0VqZW1wbG8yIiwiaWF0IjoxNzMyNzM1MDI5LCJleHAiOjE3MzI3Mzg2Mjl9.y9P0a5Ut3Ey3lwdgDrBUn_Sh-SdKCPQKmv_U4gaKfX8
+@tokenPrefix = Bearer
 
-### Login admin
+# @name login
 POST http://{{host}}/api/auth/login
 Content-Type: application/json
 
 {
-    "username":"asdfghjklleee",
+    "username": "asdfghjklleee",
     "password": "Asdfghj??a3kl",
     "role": "admin"
 }
+
 ###
+@authToken = {login.response.body.token}
+
+### Registrar nuevo usuario
 POST http://{{host}}/api/auth/register
 Content-Type: application/json
 
 {
-    "username":"asdfghjkll",
+    "username": "newuser",
     "password": "Asdfghj??a3kl",
     "role": "admin"
+}
+
+### Verificar token
+GET http://{{host}}/api/auth/verify
+Authorization: {{tokenPrefix}} {{authToken}}
+
+### Refrescar token
+POST http://{{host}}/api/auth/refresh
+Authorization: {{tokenPrefix}} {{authToken}}
+
+### Cerrar sesión
+POST http://{{host}}/api/auth/logout
+Authorization: {{tokenPrefix}} {{authToken}}
+
+### Cambiar contraseña
+PUT http://{{host}}/api/auth/change-password
+Content-Type: application/json
+Authorization: {{tokenPrefix}} {{authToken}}
+
+{
+    "oldPassword": "Asdfghj??a3kl",
+    "newPassword": "NewPassword123!"
+}
+
+### Recuperar contraseña
+POST http://{{host}}/api/auth/forgot-password
+Content-Type: application/json
+
+{
+    "username": "asdfghjklleee"
 }

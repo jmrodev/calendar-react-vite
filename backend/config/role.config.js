@@ -28,14 +28,14 @@ export const PERMISSIONS = {
       users: {
           create: false,
           read: false,
-          update: true,  // Puede actualizar su propio perfil
+          update: true,  
           delete: false
       },
       appointments: {
           create: true,
           read: true,
-          update: true,  // Puede actualizar sus propias citas
-          delete: true   // Puede eliminar sus propias citas
+          update: true,  
+          delete: true   
       },
       system: {
           manageSettings: false,

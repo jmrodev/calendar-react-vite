@@ -1,18 +1,32 @@
-# @variableName = variableValue
 @host = localhost:3001
-@token =eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOjEsInJvbGUiOiJhZG1pbiIsImlhdCI6MTczMjcxMDUwMywiZXhwIjoxNzMyNzE0MTAzfQ.BdhqntAakA7CZWpnjNiTPmr48UUgrsZ0QsZUh5fIkBI
+@tokenPrefix = Bearer
 
-
-
-### Crear una cita
-POST http://{{host}}/api/appointments
+# @name login
+POST http://{{host}}/api/auth/login
 Content-Type: application/json
-Authorization: token {{token}}
 
 {
-    "date": "2024-11-23",
-    "appointmentTime": "8:00",
-    "realAppointmentTime": "15:00",
+    "username": "asdfghjklleee",
+    "password": "Asdfghj??a3kl",
+    "role": "admin"
+}
+
+###
+@authToken = {{login.response.body.token}}
+
+### Obtener todas las citas
+GET http://{{host}}/api/appointments
+Authorization: {{tokenPrefix}} {{authToken}}
+
+### Crear una cita
+POST http://{{host}}/api/appointments/
+Content-Type: application/json
+Authorization: {{tokenPrefix}} {{authToken}}
+
+{
+    "date": "{{$datetime 'YYYY-MM-DD'}}",
+    "appointmentTime": "{{$datetime 'HH:mm'}}",
+    "realAppointmentTime": "{{$datetime 'HH:mm' 1 h}}",
     "available": true,
     "appointment": {
         "confirmAppointment": false,
@@ -21,27 +35,48 @@ Authorization: token {{token}}
     }
 }
 
-### Obtener todas las citas
-GET http://{{host}}/api/appointments
-Authorization: token {{token}}
-
-###
-
 ### Obtener citas por fecha
-GET http://{{host}}/api/appointments/date/2024-11-22
-Authorization: token {{token}}
-###
+GET http://{{host}}/api/appointments/date/{{$datetime 'YYYY-MM-DD'}}
+Authorization: {{tokenPrefix}} {{authToken}}
 
-### Eliminar una cita
-DELETE http://{{{{host}}}}/api/appointments/2024-11-22/18:00
-Authorization: token {{token}}
-###
+### Obtener cita por ID
+GET http://{{host}}/api/appointments/{{appointmentId}}
+Authorization: {{tokenPrefix}} {{authToken}}
+
+### Actualizar una cita
+PUT http://{{host}}/api/appointments/{{appointmentId}}
+Content-Type: application/json
+Authorization: {{tokenPrefix}} {{authToken}}
+
+{
+    "date": "{{$datetime 'YYYY-MM-DD'}}",
+    "appointmentTime": "{{$datetime 'HH:mm'}}",
+    "realAppointmentTime": "{{$datetime 'HH:mm' 1 h}}",
+    "available": true,
+    "appointment": {
+        "confirmAppointment": true,
+        "name": "John Doe Updated",
+        "reason": "Follow-up Consultation"
+    }
+}
+
+### Eliminar una cita por fecha y hora
+DELETE http://{{host}}/api/appointments/{{$datetime 'YYYY-MM-DD'}}/{{$datetime 'HH:mm'}}
+Authorization: {{tokenPrefix}} {{authToken}}
 
 ### Confirmar una cita
-PUT http://{{host}}/api/appointments/confirm/3
+PUT http://{{host}}/api/appointments/confirm/{{appointmentId}}
 Content-Type: application/json
-Authorization: token {{token}}
+Authorization: {{tokenPrefix}} {{authToken}}
 
 {
     "confirmAppointment": true
 }
+
+### Obtener citas disponibles
+GET http://{{host}}/api/appointments/available
+Authorization: {{tokenPrefix}} {{authToken}}
+
+### Obtener citas confirmadas
+GET http://{{host}}/api/appointments/confirmed
+Authorization: {{tokenPrefix}} {{authToken}}

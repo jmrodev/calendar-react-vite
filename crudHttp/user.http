@@ -1,7 +1,75 @@
-# @variableName = variableValue
 @host = localhost:3001
-@token =eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOjEsInJvbGUiOiJhZG1pbiIsImlhdCI6MTczMjcxMDUwMywiZXhwIjoxNzMyNzE0MTAzfQ.BdhqntAakA7CZWpnjNiTPmr48UUgrsZ0QsZUh5fIkBI
+@tokenPrefix = Bearer
+@userId = 2
+@username = asdfghjklle
+@role = admin
+# @name login
+POST http://{{host}}/api/auth/login
+Content-Type: application/json
 
-# User
+{
+    "username": "asdfghjklleee",
+    "password": "Asdfghj??a3kl",
+    "role": "admin"
+}
+
+###
+@authToken = {{login.response.body.token}}
+
+### Obtener todos los usuarios
 GET http://{{host}}/api/users
-Authorization: token {{token}}
+Authorization: {{tokenPrefix}} {{authToken}}
+
+### Obtener un usuario por ID
+GET http://{{host}}/api/users/{{userId}}
+Authorization: {{tokenPrefix}} {{authToken}}
+
+### Obtener un usuario por username
+GET http://{{host}}/api/users/username/{{username}}
+Authorization: {{tokenPrefix}} {{authToken}}
+
+### Crear un usuario
+POST http://{{host}}/api/users
+Content-Type: application/json
+Authorization: {{tokenPrefix}} {{authToken}}
+
+{
+    "username": "newuser",
+    "password": "Asdfghj??a3kl",
+    "role": "admin"
+}
+
+### Actualizar un usuario por ID
+PUT http://{{host}}/api/users/{{userId}}
+Content-Type: application/json
+Authorization: {{tokenPrefix}} {{authToken}}
+
+{
+    "username": "updateduser",
+    "password": "NewPassword123!",
+    "role": "user"
+}
+
+### Actualizar un usuario por username
+PUT http://{{host}}/api/users/username/{{username}}
+Content-Type: application/json
+Authorization: {{tokenPrefix}} {{authToken}}
+
+{
+    "username": "updatedusername",
+    "password": "NewPassword123!",
+    "role": "user"
+}
+
+### Eliminar un usuario por ID
+DELETE http://{{host}}/api/users/{{userId}}
+Authorization: {{tokenPrefix}} {{authToken}}
+
+### Eliminar un usuario por username
+DELETE http://{{host}}/api/users/username/{{username}}
+Authorization: {{tokenPrefix}} {{authToken}}
+
+### Obtener usuarios por rol
+GET http://{{host}}/api/users/role/{{role}}
+Authorization: {{tokenPrefix}} {{authToken}}
+

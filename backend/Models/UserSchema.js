@@ -1,5 +1,5 @@
 import dbLocal from "db-local";
-import { standardizeDate } from "../Utils/dateUtils.js";
+import { standardizeDate } from "../Utils/date/dateUtils.js";
 
 const { Schema } = new dbLocal({ path: "../databases" });
 

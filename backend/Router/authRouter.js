@@ -1,10 +1,12 @@
 import { Router } from 'express';
-import { login, register } from '../Controller/authController.js';
-import { loginLimiter } from '../Utils/authUtils.js';
+import {
+    loginController,
+    logoutController
+} from '../Controller/Auth/index.js';
 
-const authRouter = Router();
+const router = Router();
 
-authRouter.post('/login', loginLimiter, login); // Aquí se asocia la ruta /login con la función login
-authRouter.post('/register', register);
+router.post('/login', loginController);
+router.post('/logout', logoutController);
 
-export default authRouter;
+export default router;
