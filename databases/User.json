@@ -1,1 +1,1 @@
-[]
+[{"_id":1,"username":"newuser","password":"$2b$10$WuhiqoWZ2Rjbedip9/2JGOJOAhVPkqpkvnGQOttwiz6DVFo/1cSu2","role":"admin","loginAttempts":0,"lockUntil":"","createdAt":"2024-11-30T10:53:06-03:00","lastLogin":"2024-11-30T10:56:53-03:00"}]

@@ -1,5 +1,4 @@
 import dbLocal from "db-local";
-import { standardizeDate } from "../Utils/date/dateUtils.js";
 
 const { Schema } = new dbLocal({ path: "../databases" });
 
@@ -11,12 +10,12 @@ const UserSchema = Schema("User", {
     username: {
         type: String,
         required: true,
-        validate: {
-            validator: function (v) {
-                return /^[a-zA-Z0-9_]{3,20}$/.test(v);
-            },
-            message: props => `${props.value} is not a valid username!`
-        }
+        // validate: {
+        //     validator: function (v) {
+        //         return /^[a-zA-Z0-9_]{3,20}$/.test(v);
+        //     },
+        //     message: props => `${props.value} is not a valid username!`
+        // }
     },
     password: {
         type: String,

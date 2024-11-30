@@ -1,12 +1,12 @@
 @host = localhost:3001
-@tokenPrefix = token
+@tokenPrefix = Bearer
 
 # @name login
 POST http://{{host}}/api/auth/login
 Content-Type: application/json
 
 {
-    "username": "asdfghjklleee",
+    "username": "newuser",
     "password": "Asdfghj??a3kl",
     "role": "admin"
 }
