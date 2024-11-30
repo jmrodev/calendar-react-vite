@@ -2,38 +2,45 @@ import { findUserByUsername } from '../../Utils/user/findUserByName.js';
 import { verifyPassword } from '../../Utils/auth/verifiPassword.js';
 import { loginLimiter } from '../../Utils/login/loginLimiter.js';
 import { saveLoginAttempt, getLoginAttempts } from '../../Repository/Auth/index.js';
+import { standardizeDate } from '../../Utils/date/dateUtils.js';
 
-export const loginService = async (
-    username,
-    password,
-    req // Pass the entire request object
-) => {
+export const loginService = async (username, password, req) => {
+    console.log('loginService', username, password);
+    
     try {
         if (!username || !password) {
-            throw new Error('Username and password are required');
+            throw new Error('Error en loginService: Usuario y contraseña son requeridos');
         }
-
-        // // Use a fallback IP method
-        // const ipAddress = req.ip || 
-        //                   req.connection?.remoteAddress || 
-        //                   req.socket?.remoteAddress || 
-        //                   '127.0.0.1';
-
-        // await loginLimiter(ipAddress); // Use IP address for rate limiting
 
         const user = await findUserByUsername(username);
         if (!user) {
-            await saveLoginAttempt(username, false, ipAddress);
-            throw new Error('User not found');
+            await saveLoginAttempt(username, false);
+            throw new Error('Error en loginService: Usuario no encontrado');
+        }
+
+        // Verificar si la cuenta está bloqueada
+        if (user.lockUntil && user.lockUntil > standardizeDate(new Date())) {
+            throw new Error('Error en loginService: Cuenta bloqueada temporalmente');
         }
 
         const isValidPassword = await verifyPassword(password, user.password);
         if (!isValidPassword) {
-            await saveLoginAttempt(username, false, ipAddress);
-            throw new Error('Invalid password');
+            // Incrementar intentos fallidos
+            user.loginAttempts = (user.loginAttempts || 0) + 1;
+            if (user.loginAttempts >= 5) {
+                user.lockUntil = standardizeDate(new Date(Date.now() + 15 * 60 * 1000)); // 15 minutos
+            }
+            await user.save();
+            await saveLoginAttempt(username, false);
+            throw new Error('Error en loginService: Contraseña inválida');
         }
 
-        await saveLoginAttempt(username, true, ipAddress);
+        // Resetear intentos fallidos después de un login exitoso
+        user.loginAttempts = 0;
+        user.lockUntil = "";
+        user.lastLogin = standardizeDate(new Date());
+        await user.save();
+        await saveLoginAttempt(username, true);
 
         return {
             success: true,
@@ -44,6 +51,6 @@ export const loginService = async (
             }
         };
     } catch (error) {
-        throw new Error(`Login error: ${error.message}`);
+        throw new Error(`Error en loginService: ${error.message}`);
     }
 };

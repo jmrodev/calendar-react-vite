@@ -3,21 +3,21 @@ import { standardizeDate } from '../../Utils/date/dateUtils.js';
 
 export const saveLoginAttempt = async (
     username,
-     success,
-    //  ipAddress
+    success,
+    ipAddress = '127.0.0.1'
     ) => {
     try {
-        const attempt = new loginAttemptSchema({
+        const attemptData = {
             username,
             success,
-            // ipAddress,
+            ipAddress,
             timestamp: standardizeDate(new Date())
-        });
+        };
         
-        await attempt.save();
+        const attempt = await loginAttemptSchema.create(attemptData);
         return attempt;
     } catch (error) {
-        throw new Error(`Error saving login attempt: ${error.message}`);
+        throw new Error(`Error en saveLoginAttempt: al guardar el intento de inicio de sesión: ${error.message}`);
     }
 };
 
@@ -32,6 +32,6 @@ export const getLoginAttempts = async (username, minutes = 15) => {
         
         return attempts;
     } catch (error) {
-        throw new Error(`Error getting login attempts: ${error.message}`);
+        throw new Error(`Error en getLoginAttempts: al obtener los intentos de inicio de sesión: ${error.message}`);
     }
 }; 

@@ -4,10 +4,10 @@ export const deleteAppointmentRepository = async (id) => {
     try {
         const appointment = await AppointmentSchema.delete({ _id: Number(id) });
         if (!appointment) {
-            throw new Error('Appointment not found');
+            throw new Error('Error en deleteAppointmentRepository: Cita no encontrada para eliminar');
         }
         return appointment;
     } catch (error) {
-        throw new Error(`Error deleting appointment in repository: ${error.message}`);
+        throw new Error(`Error en deleteAppointmentRepository: al eliminar la cita: ${error.message}`);
     }
 }; 

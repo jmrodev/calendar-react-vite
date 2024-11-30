@@ -7,11 +7,11 @@ class AppointmentService {
         try {
             const response = await fetch(`${this.baseUrl}/appointments`);
             if (!response.ok) {
-                throw new Error('Failed to fetch appointments');
+                throw new Error('Error en getAllAppointments: Error al obtener las citas');
             }
             return await response.json();
         } catch (error) {
-            throw new Error(`Error getting appointments: ${error.message}`);
+            throw new Error(`Error en getAllAppointments: ${error.message}`);
         }
     }
 
@@ -19,11 +19,11 @@ class AppointmentService {
         try {
             const response = await fetch(`${this.baseUrl}/appointments/date/${date}`);
             if (!response.ok) {
-                throw new Error('Failed to fetch appointments');
+                throw new Error('Error en getAppointmentsByDate: Error al obtener las citas');
             }
             return await response.json();
         } catch (error) {
-            throw new Error(`Error getting appointments: ${error.message}`);
+            throw new Error(`Error en getAppointmentsByDate: ${error.message}`);
         }
     }
 
@@ -39,12 +39,12 @@ class AppointmentService {
 
             if (!response.ok) {
                 const error = await response.json();
-                throw new Error(error.error || 'Failed to create appointment');
+                throw new Error(error.error || 'Error en createAppointment: Error al crear la cita');
             }
 
             return await response.json();
         } catch (error) {
-            throw new Error(`Error creating appointment: ${error.message}`);
+            throw new Error(`Error en createAppointment: ${error.message}`);
         }
     }
 
@@ -60,18 +60,17 @@ class AppointmentService {
 
             if (!response.ok) {
                 const errorData = await response.json().catch(() => ({
-                    error: `Server error: ${response.status}`
+                    error: `Error en deleteAppointment: Error del servidor: ${response.status}`
                 }));
-                throw new Error(errorData.error || 'Failed to delete appointment');
+                throw new Error(errorData.error || 'Error en deleteAppointment: Error al eliminar la cita');
             }
 
             const data = await response.json();
             return { success: true, message: data.message };
         } catch (error) {
-            return { success: false, message: error.message };
+            return { success: false, message: `Error en deleteAppointment: ${error.message}` };
         }
     }
-
 
     async updateAppointment(id, data) {
         try {
@@ -85,12 +84,12 @@ class AppointmentService {
 
             if (!response.ok) {
                 const error = await response.json();
-                throw new Error(error.error || 'Failed to update appointment');
+                throw new Error(error.error || 'Error en updateAppointment: Error al actualizar la cita');
             }
 
             return await response.json();
         } catch (error) {
-            throw new Error(`Error updating appointment: ${error.message}`);
+            throw new Error(`Error en updateAppointment: ${error.message}`);
         }
     }
 
@@ -106,12 +105,12 @@ class AppointmentService {
 
             if (!response.ok) {
                 const error = await response.json();
-                throw new Error(error.error || 'Failed to confirm appointment');
+                throw new Error(error.error || 'Error en confirmAppointment: Error al confirmar la cita');
             }
 
             return await response.json();
         } catch (error) {
-            throw new Error(`Error confirming appointment: ${error.message}`);
+            throw new Error(`Error en confirmAppointment: ${error.message}`);
         }
     }
 
@@ -126,12 +125,12 @@ class AppointmentService {
 
             if (!response.ok) {
                 const error = await response.json();
-                throw new Error(error.error || 'Failed to complete appointment');
+                throw new Error(error.error || 'Error en completeAppointment: Error al completar el servicio de cita');
             }
 
             return await response.json();
         } catch (error) {
-            throw new Error(`Error completing appointment: ${error.message}`);
+            throw new Error(`Error en completeAppointment: ${error.message}`);
         }
     }
 }

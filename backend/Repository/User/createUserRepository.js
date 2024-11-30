@@ -1,10 +1,9 @@
-import { UserSchema } from '../../Models/UserSchema.js';
+import { createUser } from '../../Utils/user/createUserUtil.js';
 
 export const createUserRepository = async (userData) => {
     try {
-        const user = await UserSchema.create(userData);
-        return await user.save();
+        return await createUser(userData.username, userData.password, userData.role);
     } catch (error) {
-        throw new Error(`Error creating user in repository: ${error.message}`);
+        throw new Error(`Error en createUserRepository: ${error.message}`);
     }
 }; 

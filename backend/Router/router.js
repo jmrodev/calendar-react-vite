@@ -11,7 +11,6 @@ router.use(
 );
 router.use(
     '/appointments',
-   
     appointmentRouter
 );
 router.use(

@@ -1,7 +1,5 @@
 import dbLocal from "db-local";
-import { standardizeDate } from "../Utils/date/dateUtils.js";
-const { Schema } = new dbLocal({ path: "../databases" });
-
+const { Schema } = new dbLocal({ path: "./databases" });
 
 const loginAttemptSchema = Schema("loginAttempt", {
     username: {
@@ -15,7 +13,8 @@ const loginAttemptSchema = Schema("loginAttempt", {
     },
     ipAddress: {
         type: String,
-        required: true
+        required: false,
+        default: '127.0.0.1'
     },
     timestamp: {
         type: Date,

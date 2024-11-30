@@ -1,31 +1,21 @@
 import bcrypt from 'bcrypt';
-import { standardizeDate } from '../date/dateUtils.js';
 
-export async function verifyPassword(user, password) {
-    if (!password || !user.password) {
-        throw new Error('Password is required');
+export async function verifyPassword(plainPassword, hashedPassword) {
+    console.log("verify plain password", plainPassword);
+    console.log("verify hashed password", hashedPassword);
+
+    if (!plainPassword || !hashedPassword) {
+        throw new Error('Error en verifyPassword: Las contraseñas son requeridas');
     }
 
-    if (user.lockUntil && user.lockUntil > standardizeDate(new Date(Date.now()))) {
-        throw new Error('Cuenta bloqueada temporalmente');
-    }
-
-    const isMatch = await bcrypt.compare(password, user.password);
-
-    if (!isMatch) {
-        user.loginAttempts = (user.loginAttempts || 0) + 1;
-        if (user.loginAttempts >= 5) {
-            user.lockUntil = standardizeDate(new Date(Date.now() + 15 * 60 * 1000));
+    try {
+        if (!hashedPassword.startsWith('$2b$')) {
+            return plainPassword === hashedPassword;
         }
-        user.save();
-        return false;
+        
+        const isMatch = await bcrypt.compare(plainPassword, hashedPassword);
+        return isMatch;
+    } catch (error) {
+        throw new Error(`Error en verifyPassword: al verificar la contraseña: ${error.message}`);
     }
-
-    if (user.loginAttempts > 0) {
-        user.loginAttempts = 0;
-        user.lockUntil = "";
-        user.save();
-    }
-
-    return true;
 }

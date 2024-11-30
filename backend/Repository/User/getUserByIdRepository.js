@@ -3,11 +3,11 @@ import { UserSchema } from '../../Models/UserSchema.js';
 export const getUserByIdRepository = async (id) => {
     try {
         const user = await UserSchema.find({ _id: Number(id) });
-        if (!user || user.length === 0) {
-            throw new Error('User not found');
+        if (!user) {
+            throw new Error('Error en getUserByIdRepository: Usuario no encontrado');
         }
-        return user[0];
+        return user;
     } catch (error) {
-        throw new Error(`Error getting user by id in repository: ${error.message}`);
+        throw new Error(`Error en getUserByIdRepository: al obtener el usuario por ID: ${error.message}`);
     }
 }; 
