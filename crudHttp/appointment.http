@@ -1,7 +1,7 @@
 @host = localhost:3001
 @tokenPrefix = Bearer
 @appointmentId = 1
-
+@datetime = "2024-12-01"
 # @name login
 POST http://{{host}}/api/auth/login
 Content-Type: application/json
@@ -13,7 +13,7 @@ Content-Type: application/json
 }
 
 ###
-@authToken = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6Miwicm9sZSI6ImFkbWluIiwiaWF0IjoxNzMzMDYzMTkyLCJleHAiOjE3MzMwNjY3OTJ9.QqPKQw72v95rNbbQYBvkL3eTKZgd6FITlZx1s8lKKOI
+@authToken = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6Miwicm9sZSI6ImFkbWluIiwiaWF0IjoxNzMzMDY3NDU3LCJleHAiOjE3MzMwNzEwNTd9.ykcxRRs5Xc1YuMMoOPZmz2jOTUyUo8XeqSzZnPcLSjo
 @appointmentId = 1
 ### Obtener todas las citas
 GET http://{{host}}/api/appointments
@@ -37,7 +37,7 @@ Authorization: {{tokenPrefix}} {{authToken}}
 }
 
 ### Obtener citas por fecha
-GET http://{{host}}/api/appointments/date/{{$datetime 'YYYY-MM-DD'}}
+GET http://{{host}}/api/appointments/date/{{datetime}}
 Authorization: {{tokenPrefix}} {{authToken}}
 
 ### Obtener cita por ID
