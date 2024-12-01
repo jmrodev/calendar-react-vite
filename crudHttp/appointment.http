@@ -1,19 +1,20 @@
 @host = localhost:3001
 @tokenPrefix = Bearer
+@appointmentId = 1
 
 # @name login
 POST http://{{host}}/api/auth/login
 Content-Type: application/json
 
 {
-    "username": "newuser",
+    "username": "newuser2",
     "password": "Asdfghj??a3kl",
     "role": "admin"
 }
 
 ###
-@authToken = {login.response.body.token}
-
+@authToken = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6Miwicm9sZSI6ImFkbWluIiwiaWF0IjoxNzMzMDYzMTkyLCJleHAiOjE3MzMwNjY3OTJ9.QqPKQw72v95rNbbQYBvkL3eTKZgd6FITlZx1s8lKKOI
+@appointmentId = 1
 ### Obtener todas las citas
 GET http://{{host}}/api/appointments
 Authorization: {{tokenPrefix}} {{authToken}}

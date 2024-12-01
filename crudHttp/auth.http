@@ -6,7 +6,7 @@ POST http://{{host}}/api/auth/login
 Content-Type: application/json
 
 {
-    "username": "newuser",
+    "username": "newuser2",
     "password": "Asdfghj??a3kl",
     "role": "admin"
 }
@@ -19,7 +19,7 @@ POST http://{{host}}/api/auth/register
 Content-Type: application/json
 
 {
-    "username": "newuser",
+    "username": "newuser2",
     "password": "Asdfghj??a3kl",
     "role": "admin"
 }

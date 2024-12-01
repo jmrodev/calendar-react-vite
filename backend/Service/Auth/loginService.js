@@ -1,3 +1,4 @@
+import jwt from 'jsonwebtoken';
 import { findUserByUsername } from '../../Utils/user/findUserByName.js';
 import { verifyPassword } from '../../Utils/auth/verifiPassword.js';
 import { loginLimiter } from '../../Utils/login/loginLimiter.js';
@@ -5,8 +6,6 @@ import { saveLoginAttempt, getLoginAttempts } from '../../Repository/Auth/index.
 import { standardizeDate } from '../../Utils/date/dateUtils.js';
 
 export const loginService = async (username, password, req) => {
-    console.log('loginService', username, password);
-    
     try {
         if (!username || !password) {
             throw new Error('Error en loginService: Usuario y contraseña son requeridos');
@@ -42,8 +41,16 @@ export const loginService = async (username, password, req) => {
         await user.save();
         await saveLoginAttempt(username, true);
 
+        // Generar el token
+        const token = jwt.sign(
+            { id: user._id, role: user.role }, // Payload
+            process.env.JWT_SECRET, // Secreto
+            { expiresIn: '1h' } // Opciones
+        );
+
         return {
             success: true,
+            token, // Devuelve el token
             user: {
                 id: user._id,
                 username: user.username,

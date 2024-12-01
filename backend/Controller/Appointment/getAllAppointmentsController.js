@@ -1,7 +1,7 @@
 import { getAllAppointments } from '../../Service/Appointment/getAllAppointmentsService.js';
 
 export const getAllAppointmentsController = async (req, res) => {
-    try {
+    try {        
         const appointments = await getAllAppointments();
         res.json(appointments);
     } catch (error) {

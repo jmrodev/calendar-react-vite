@@ -37,9 +37,7 @@ export const createUser = async (username, password, role) => {
             lastLogin: standardizeDate(new Date())
         };
         const hashedData = await hashPassword(userData);
-        console.log("hashedData", hashedData);
         const newUser = await UserSchema.create(hashedData).save();
-        console.log('Usuario creado:', newUser);
         return newUser;
     } catch (error) {
         throw new Error(`Error en createUser: ${error.message}`);

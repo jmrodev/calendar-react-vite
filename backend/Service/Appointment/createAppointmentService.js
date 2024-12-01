@@ -1,21 +1,20 @@
 import { createAppointmentRepository } from '../../Repository/Appointment/createAppointmentRepository.js';
 import { newAppointmentId } from '../../Utils/id/appointment.js';
 
-export const createAppointment = async (date, time, patientName, description) => {
+export const createAppointment = async (appointmentData) => {
     try {
-        if (!date || !time || !patientName) {
-            throw new Error('Date, time and patient name are required');
+        const { date, appointmentTime, appointment } = appointmentData;
+        
+        if (!date || !appointmentTime || !appointment.name) {
+            throw new Error('Date, appointment time and patient name are required');
         }
 
-        const appointmentData = {
+        const newAppointment = {
             _id: newAppointmentId(),
-            date,
-            time,
-            patientName,
-            description
+            ...appointmentData
         };
 
-        return await createAppointmentRepository(appointmentData);
+        return await createAppointmentRepository(newAppointment);
     } catch (error) {
         throw new Error(`Error in create appointment service: ${error.message}`);
     }

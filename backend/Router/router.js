@@ -15,10 +15,9 @@ router.use(
 );
 router.use(
     '/users',
-    //  (req, res, next) => {
-    //     console.log('GET /users - User:', req);
-    //     next();
-    // },
+     (req, res, next) => {
+        next();
+    },
     userRouter
 );
 

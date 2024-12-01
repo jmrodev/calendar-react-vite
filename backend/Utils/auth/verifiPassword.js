@@ -1,13 +1,11 @@
 import bcrypt from 'bcrypt';
 
 export async function verifyPassword(plainPassword, hashedPassword) {
-    console.log("verify plain password", plainPassword);
-    console.log("verify hashed password", hashedPassword);
 
     if (!plainPassword || !hashedPassword) {
         throw new Error('Error en verifyPassword: Las contraseñas son requeridas');
     }
-
+    
     try {
         if (!hashedPassword.startsWith('$2b$')) {
             return plainPassword === hashedPassword;
