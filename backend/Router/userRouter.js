@@ -17,24 +17,26 @@ router.post(
         'user',
         'create'
     ),
-     createUserController
-    );
+
+    createUserController
+);
 router.get(
     '/',
     authToken,
     authorize(
-        'user',
+        'users',
         'read'
     ),
-     getAllUsersController
-    );
+
+    getAllUsersController
+);
 router.get(
     '/:id',
     authToken,
     authorize(
         'user',
         'read'
-    ),    
+    ),
     getUserByIdController
 );
 router.delete(
@@ -44,7 +46,7 @@ router.delete(
         'user',
         'delete'
     ),
-     deleteUserController
-    );
+    deleteUserController
+);
 
 export default router;

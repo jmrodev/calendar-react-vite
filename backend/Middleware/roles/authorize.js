@@ -12,6 +12,9 @@ export const authorize = (resource, action) => {
             const userRole = req.user.role;
 
             if (checkPermission(userRole, resource, action)) {
+
+                console.log(userRole, resource, action);
+                
                 return next();
             } else {
                 return res.status(403).json({

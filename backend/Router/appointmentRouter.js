@@ -16,17 +16,15 @@ const router = Router();
 router.post(
     '/',
     authToken,
-    (req, res, next) => {
-        console.log(
-            'Request to create a new appointment raiz',
-        );
-
-        next();
-    },
     authorize(
         'appointments',
         'create'
     ),
+    (req, res, next) => {
+        console.log('Creating appointment');
+        console.log('User Info:', req.user);
+        next();
+    },
     createAppointmentController
 );
 
@@ -36,13 +34,14 @@ router.get(
     authorize(
         'appointments',
         'read'),
-    (req, res, next) => {
-        console.log(
-            'Request to get all appointments ',
-        );
-
-        next();
-    },
+        (req, res, next) => {
+            console.log('User Router');
+            console.log(req.body);
+            console.log(req.user);
+            console.log(req.role);
+            console.log(req.permissions);
+            console.log(req.token);
+        },
     getAllAppointmentsController
 );
 
@@ -54,11 +53,12 @@ router.put(
         'update'
     ),
     (req, res, next) => {
-        console.log(
-            'Request to confirm appointment ',
-        );
-
-        next();
+        console.log('User Router');
+        console.log(req.body);
+        console.log(req.user);
+        console.log(req.role);
+        console.log(req.permissions);
+        console.log(req.token);
     },
     confirmAppointmentController
 );

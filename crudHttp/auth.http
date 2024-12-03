@@ -19,27 +19,27 @@ POST http://{{host}}/api/auth/register
 Content-Type: application/json
 
 {
-    "username": "newuser2",
+    "username": "newuser23",
     "password": "Asdfghj??a3kl",
     "role": "admin"
 }
 
 ### Verificar token
 GET http://{{host}}/api/auth/verify
-Authorization: {{tokenPrefix}} {{authToken}}
+Authorization: {{tokenPrefix}} {{login.response.body.token}}
 
 ### Refrescar token
 POST http://{{host}}/api/auth/refresh
-Authorization: {{tokenPrefix}} {{authToken}}
+Authorization: {{tokenPrefix}} {{login.response.body.token}}
 
 ### Cerrar sesión
 POST http://{{host}}/api/auth/logout
-Authorization: {{tokenPrefix}} {{authToken}}
+Authorization: {{tokenPrefix}} {{login.response.body.token}}
 
 ### Cambiar contraseña
 PUT http://{{host}}/api/auth/change-password
 Content-Type: application/json
-Authorization: {{tokenPrefix}} {{authToken}}
+Authorization: {{tokenPrefix}} {{login.response.body.token}}
 
 {
     "oldPassword": "Asdfghj??a3kl",

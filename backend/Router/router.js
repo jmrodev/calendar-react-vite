@@ -7,15 +7,30 @@ const router = Router();
 
 router.use(
     '/auth',
+    (req, res, next) => {
+    console.log('Request to /auth');
+        next();
+    },
     authRouter
 );
 router.use(
     '/appointments',
+    (req, res, next) => {
+    console.log('Request to /router/appointment');
+    console.log(req.headers);
+    console.log(req.body);
+    console.log(req.user);
+    console.log(req.role);
+    console.log(req.permissions);
+    console.log(req.token);
+        next();
+    },
     appointmentRouter
 );
 router.use(
     '/users',
      (req, res, next) => {
+    console.log('Request to /users');
         next();
     },
     userRouter

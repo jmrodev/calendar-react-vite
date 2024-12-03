@@ -1,5 +1,5 @@
 @host = localhost:3001
-@tokenPrefix = token
+@tokenPrefix = Bearer
 @appointmentId = 2
 @datetime = '2024-05-03'
 
@@ -18,12 +18,12 @@ Content-Type: application/json
 @appointmentId = 1
 ### Obtener todas las citas
 GET http://{{host}}/api/appointments
-Authorization: {{tokenPrefix}} {{authToken}}
+Authorization: {{tokenPrefix}} {{login.response.body.token}}
 
 ### Crear una cita
 POST http://{{host}}/api/appointments/
 Content-Type: application/json
-Authorization: {{tokenPrefix}} {{authToken}}
+Authorization: {{tokenPrefix}} {{login.response.body.token}}
 
 {
     "date": "2024-05-04",
@@ -39,16 +39,16 @@ Authorization: {{tokenPrefix}} {{authToken}}
 
 ### Obtener citas por fecha
 GET http://{{host}}/api/appointments/date/{{datetime}}
-Authorization: {{tokenPrefix}} {{authToken}}
+Authorization: {{tokenPrefix}} {{login.response.body.token}}
 
 ### Obtener cita por ID
 GET http://{{host}}/api/appointments/{{appointmentId}}
-Authorization: {{tokenPrefix}} {{authToken}}
+Authorization: {{tokenPrefix}} {{login.response.body.token}}
 
 ### Actualizar una cita
 PUT http://{{host}}/api/appointments/{{appointmentId}}
 Content-Type: application/json
-Authorization: {{tokenPrefix}} {{authToken}}
+Authorization: {{tokenPrefix}} {{login.response.body.token}}
 
 {
     "date": "{{$datetime 'YYYY-MM-DD'}}",
@@ -64,12 +64,12 @@ Authorization: {{tokenPrefix}} {{authToken}}
 
 ### Eliminar una cita por fecha y hora
 DELETE http://{{host}}/api/appointments/{{$datetime 'YYYY-MM-DD'}}/{{$datetime 'HH:mm'}}
-Authorization: {{tokenPrefix}} {{authToken}}
+Authorization: {{tokenPrefix}} {{login.response.body.token}}
 
 ### Confirmar una cita
 PUT http://{{host}}/api/appointments/confirm/{{appointmentId}}
 Content-Type: application/json
-Authorization: {{tokenPrefix}} {{authToken}}
+Authorization: {{tokenPrefix}} {{login.response.body.token}}
 
 {
     "confirmAppointment": true
@@ -77,8 +77,8 @@ Authorization: {{tokenPrefix}} {{authToken}}
 
 ### Obtener citas disponibles
 GET http://{{host}}/api/appointments/available
-Authorization: {{tokenPrefix}} {{authToken}}
+Authorization: {{tokenPrefix}} {{login.response.body.token}}
 
 ### Obtener citas confirmadas
 GET http://{{host}}/api/appointments/confirmed
-Authorization: {{tokenPrefix}} {{authToken}}
+Authorization: {{tokenPrefix}} {{login.response.body.token}}

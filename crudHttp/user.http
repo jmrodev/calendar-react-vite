@@ -3,35 +3,36 @@
 @userId = 2
 @username = asdfghjklle
 @role = admin
+@authToken = {login.response.body.token}
 # @name login
 POST http://{{host}}/api/auth/login
 Content-Type: application/json
 
 {
-    "username": "asdfghjklleee",
+    "username": "newuser",
     "password": "Asdfghj??a3kl",
     "role": "admin"
 }
 
 ###
-@authToken = {{login.response.body.token}}
+
 
 ### Obtener todos los usuarios
 GET http://{{host}}/api/users
-Authorization: {{tokenPrefix}} {{authToken}}
+Authorization: {{tokenPrefix}} {{login.response.body.token}}
 
 ### Obtener un usuario por ID
 GET http://{{host}}/api/users/{{userId}}
-Authorization: {{tokenPrefix}} {{authToken}}
+Authorization: {{tokenPrefix}} {{login.response.body.token}}
 
 ### Obtener un usuario por username
 GET http://{{host}}/api/users/username/{{username}}
-Authorization: {{tokenPrefix}} {{authToken}}
+Authorization: {{tokenPrefix}} {{login.response.body.token}}
 
 ### Crear un usuario
 POST http://{{host}}/api/users
 Content-Type: application/json
-Authorization: {{tokenPrefix}} {{authToken}}
+Authorization: {{tokenPrefix}} {{login.response.body.token}}
 
 {
     "username": "newuser",
@@ -42,7 +43,7 @@ Authorization: {{tokenPrefix}} {{authToken}}
 ### Actualizar un usuario por ID
 PUT http://{{host}}/api/users/{{userId}}
 Content-Type: application/json
-Authorization: {{tokenPrefix}} {{authToken}}
+Authorization: {{tokenPrefix}} {{login.response.body.token}}
 
 {
     "username": "updateduser",
@@ -53,7 +54,7 @@ Authorization: {{tokenPrefix}} {{authToken}}
 ### Actualizar un usuario por username
 PUT http://{{host}}/api/users/username/{{username}}
 Content-Type: application/json
-Authorization: {{tokenPrefix}} {{authToken}}
+Authorization: {{tokenPrefix}} {{login.response.body.token}}
 
 {
     "username": "updatedusername",
@@ -63,13 +64,13 @@ Authorization: {{tokenPrefix}} {{authToken}}
 
 ### Eliminar un usuario por ID
 DELETE http://{{host}}/api/users/{{userId}}
-Authorization: {{tokenPrefix}} {{authToken}}
+Authorization: {{tokenPrefix}} {{login.response.body.token}}
 
 ### Eliminar un usuario por username
 DELETE http://{{host}}/api/users/username/{{username}}
-Authorization: {{tokenPrefix}} {{authToken}}
+Authorization: {{tokenPrefix}} {{login.response.body.token}}
 
 ### Obtener usuarios por rol
 GET http://{{host}}/api/users/role/{{role}}
-Authorization: {{tokenPrefix}} {{authToken}}
+Authorization: {{tokenPrefix}} {{login.response.body.token}}
 

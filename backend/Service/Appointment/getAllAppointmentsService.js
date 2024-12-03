@@ -1,6 +1,6 @@
 import { getAllAppointmentsRepository } from '../../Repository/Appointment/index.js';
 
-export const getAllAppointments = async () => {
+export const getAllAppointmentsService = async () => {
     try {
         return await getAllAppointmentsRepository();
     } catch (error) {
