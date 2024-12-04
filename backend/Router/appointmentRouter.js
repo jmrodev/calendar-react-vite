@@ -5,11 +5,11 @@ import {
     getAppointmentByIdController,
     deleteAppointmentController,
     getConfirmedAppointmentsController,
-    confirmAppointmentController
+    confirmAppointmentController,
+    getAppointmentByDateController
 } from '../Controller/Appointment/index.js';
 import { authorize } from '../Middleware/roles/authorize.js';
 import { authToken } from '../Middleware/token/authToken.js';
-import { getAppointmentByDateController } from '../Controller/Appointment/getAppointmentByDateController.js';
 
 const router = Router();
 
@@ -80,7 +80,11 @@ router.get(
         'appointments',
         'read'
     ),
-    getAppointmentByDateController
+    (req, res, next) => {
+        console.log(`Request received for appointments on date: ${req.params.date}`);
+        getAppointmentByDateController(req, res, next);
+        console.log(`Response sent for appointments on date: ${req.params.date}`);
+    }
 );
 
 export default router;

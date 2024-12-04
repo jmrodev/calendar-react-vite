@@ -1,17 +1,24 @@
 import { useState } from 'react'
 import { Header } from './src/components/header/header'
 import { Footer } from './src/components/footer/footer'
+import { Login } from './src/components/login/login'
+import { BrowserRouter as Router, Route, Routes } from 'react-router-dom'
 import './App.css'
-import Content  from './src/components/container/Content'
+import Content from './src/components/container/Content'
 
 function App() {
 
   return (
-    <div className='container'>
-      <Header />
-      <Content />
-      <Footer />
-    </div>
+    <Router>
+      <Routes>
+        <Route path='/login' element={<Login />} />
+      </Routes>
+      <div className='container'>
+        <Header />
+        <Content />
+        <Footer />
+      </div>
+    </Router>
   )
 }
 
