@@ -20,11 +20,6 @@ router.post(
         'appointments',
         'create'
     ),
-    (req, res, next) => {
-        console.log('Creating appointment');
-        console.log('User Info:', req.user);
-        next();
-    },
     createAppointmentController
 );
 
@@ -34,14 +29,6 @@ router.get(
     authorize(
         'appointments',
         'read'),
-        (req, res, next) => {
-            console.log('User Router');
-            console.log(req.body);
-            console.log(req.user);
-            console.log(req.role);
-            console.log(req.permissions);
-            console.log(req.token);
-        },
     getAllAppointmentsController
 );
 
@@ -52,14 +39,7 @@ router.put(
         'appointments',
         'update'
     ),
-    (req, res, next) => {
-        console.log('User Router');
-        console.log(req.body);
-        console.log(req.user);
-        console.log(req.role);
-        console.log(req.permissions);
-        console.log(req.token);
-    },
+
     confirmAppointmentController
 );
 
@@ -70,13 +50,6 @@ router.get(
         'appointments',
         'read'
     ),
-    (req, res, next) => {
-        console.log(
-            'Request to get all confirmed appointments ',
-        );
-
-        next();
-    },
     getConfirmedAppointmentsController
 );
 
@@ -87,13 +60,6 @@ router.get(
         'appointments',
         'read'
     ),
-    (req, res, next) => {
-        console.log(
-            'Request to get appointment by id ',
-        );
-
-        next()
-    },
     getAppointmentByIdController
 );
 
@@ -104,13 +70,6 @@ router.delete(
         'appointments',
         'delete'
     ),
-    (req, res, next) => {
-        console.log(
-            'Request to delete appointment by id ',
-        );
-
-        next()
-    },
     deleteAppointmentController
 );
 
@@ -121,12 +80,6 @@ router.get(
         'appointments',
         'read'
     ),
-    (req, res, next) => {
-        console.log(
-            'Request to get appointments by date',
-        );
-        next();
-    },
     getAppointmentByDateController
 );
 

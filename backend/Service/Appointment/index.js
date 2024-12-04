@@ -1,4 +1,4 @@
-export { createAppointment } from './createAppointmentService.js';
+export { createAppointmentService } from './createAppointmentService.js';
 export { deleteAppointment } from './deleteAppointmentService.js';
 export { getAllAppointmentsService } from './getAllAppointmentsService.js';
 export { getAppointmentById } from './getAppointmentByIdService.js'; 

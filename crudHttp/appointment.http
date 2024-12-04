@@ -26,7 +26,7 @@ Content-Type: application/json
 Authorization: {{tokenPrefix}} {{login.response.body.token}}
 
 {
-    "date": "2024-05-04",
+    "date": "2024-05-09",
     "appointmentTime": "{{$datetime 'HH:mm'}}",
     "realAppointmentTime": "{{$datetime 'HH:mm' 1 h}}",
     "available": true,

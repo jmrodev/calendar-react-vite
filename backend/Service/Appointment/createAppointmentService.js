@@ -1,7 +1,7 @@
 import { createAppointmentRepository } from '../../Repository/Appointment/createAppointmentRepository.js';
 import { newAppointmentId } from '../../Utils/id/appointment.js';
 
-export const createAppointment = async (appointmentData) => {
+export const createAppointmentService = async (appointmentData) => {
     try {
         const { date, appointmentTime, appointment } = appointmentData;
         

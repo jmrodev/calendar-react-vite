@@ -1,5 +1,5 @@
-import { createAppointment } from '../../Service/Appointment/index.js';
-
+import { createAppointmentService } from '../../Service/Appointment/index.js';
+import { findAppointment } from '../../Utils/appointment/findAppointment.js';
 export const createAppointmentController = async (req, res) => {
     try {
         const { 
@@ -9,8 +9,10 @@ export const createAppointmentController = async (req, res) => {
             available,
             appointment 
         } = req.body;
+
+        await findAppointment({ date, appointmentTime });
         
-        const newAppointment = await createAppointment({
+        const newAppointment = await createAppointmentService({
             date,
             appointmentTime,
             realAppointmentTime,
@@ -20,6 +22,7 @@ export const createAppointmentController = async (req, res) => {
         
         res.status(201).json(newAppointment);
     } catch (error) {
+        console.error('Error al crear cita:', error);
         res.status(400).json({ error: error.message });
     }
-}; 
+};
