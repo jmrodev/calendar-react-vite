@@ -1,7 +1,7 @@
 @host = localhost:3001
 @tokenPrefix = Bearer
-@appointmentId = 2
-@datetime = '2024-08-04'
+@appointmentId = 5
+@datetime = '2024-12-04'
 
 # @name login
 POST http://{{host}}/api/auth/login
@@ -82,3 +82,12 @@ Authorization: {{tokenPrefix}} {{login.response.body.token}}
 ### Obtener citas confirmadas
 GET http://{{host}}/api/appointments/confirmed
 Authorization: {{tokenPrefix}} {{login.response.body.token}}
+
+### Marcar como completada una cita
+PUT http://{{host}}/api/appointments/complete/{{appointmentId}}
+Content-Type: application/json
+Authorization: {{tokenPrefix}} {{login.response.body.token}}
+
+{
+    "completed": true
+}

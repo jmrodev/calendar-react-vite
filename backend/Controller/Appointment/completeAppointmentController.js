@@ -1,6 +1,6 @@
-import { confirmAppointmentService } from "../../Service/Appointment/index.js";
+import { completeAppointmentService } from "../../Service/Appointment/index.js";
 
-export const confirmAppointmentController = async (req, res) => {
+export const completeAppointmentController = async (req, res) => {
     try {
         
         const { appointmentId } = req.params;

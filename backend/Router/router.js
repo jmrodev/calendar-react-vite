@@ -7,10 +7,7 @@ const router = Router();
 
 router.use(
     '/auth',
-    (req, res, next) => {
-        console.log('Request to /auth');
-        next();
-    },
+   
     authRouter
 );
 router.use(
@@ -19,10 +16,6 @@ router.use(
 );
 router.use(
     '/users',
-    (req, res, next) => {
-        console.log('Request to /users');
-        next();
-    },
     userRouter
 );
 

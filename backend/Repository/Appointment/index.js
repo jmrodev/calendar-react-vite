@@ -5,3 +5,4 @@ export { getAppointmentByIdRepository } from './getAppointmentByIdRepository.js'
 export { getConfirmedAppointmentsRepository } from './getConfirmedAppointmentsRepository.js';
 export { confirmAppointmentRepository } from './confirmAppointmentRepository.js';
 export { getAppointmentByDateRepository } from './getAppointmentByDateRepository.js';
+export { completeAppointmentRepository } from './completeAppointmentRepository.js';

@@ -1,0 +1,28 @@
+[
+    {
+        "_id": 2,
+        "date": "2024-12-05",
+        "appointmentTime": "10:00",
+        "realAppointmentTime": "10:00",
+        "available": false,
+        "status": "pending",
+        "appointment": {
+            "confirmAppointment": true,
+            "name": "ffff",
+            "reason": "ffffff"
+        }
+    },
+    {
+        "_id": 1,
+        "date": "2024-12-05",
+        "appointmentTime": "09:00",
+        "realAppointmentTime": "09:00",
+        "available": false,
+        "status": "pending",
+        "appointment": {
+            "confirmAppointment": true,
+            "name": "ghj",
+            "reason": "ghj"
+        }
+    }
+]

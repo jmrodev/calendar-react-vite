@@ -19,7 +19,7 @@ POST http://{{host}}/api/auth/register
 Content-Type: application/json
 
 {
-    "username": "newuser23",
+    "username": "newuser2",
     "password": "Asdfghj??a3kl",
     "role": "admin"
 }

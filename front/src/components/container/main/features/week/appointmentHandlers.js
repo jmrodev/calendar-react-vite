@@ -1,5 +1,3 @@
-
-
 import AppointmentService from '../../../../../services/appointmentService';
 
 export const handleCreateAppointment = async (slot, selectedDate, setTimeSlots, setError) => {

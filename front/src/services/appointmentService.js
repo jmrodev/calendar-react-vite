@@ -1,11 +1,11 @@
-import Cookies from 'js-cookie'; // Consider using for token management
+import Cookies from 'js-cookie'; 
 
 class AppointmentService {
     constructor() {
         this.baseUrl = 'http://localhost:3001/api';
     }
 
-    // Helper method to get authentication headers
+    
     _getHeaders() {
         const token = localStorage.getItem('jwt') || Cookies.get('token');
         return {
@@ -14,10 +14,10 @@ class AppointmentService {
         };
     }
 
-    // Generic error handler
+    
     _handleError(method, error) {
         console.error(`Error in ${method}:`, error);
-        throw new Error(error.message || `Error en ${method}: Ocurrió un error inesperado`);
+        throw new Error(error.message || `Error en ${method}: Ocurrió un error inesperado`,error);
     }
 
     async getAllAppointments() {
@@ -73,7 +73,45 @@ class AppointmentService {
         }
     }
 
-    // Other methods remain similar, using this._getHeaders() and this._handleError()
+    async confirmAppointment(id,data={}) {
+        try {
+            const response = await fetch(`${this.baseUrl}/appointments/confirm/${id}`, {
+                method: 'PUT',
+                headers: this._getHeaders(),
+                body: JSON.stringify(data)
+            });
+
+            if (!response.ok) {
+                const errorData = await response.text();
+                throw new Error(errorData || 'Error al confirmar la cita');
+            }
+
+            const responseData = await response.json();
+            console.log('confirmAppointment successful:', responseData);
+            
+            return responseData;
+        } catch (error) {
+            this._handleError('confirmAppointment', error);
+        }
+    }
+
+    async completeAppointment(id) {
+        try {
+            const response = await fetch(`${this.baseUrl}/appointments/complete/${id}`, {
+                method: 'PUT',
+                headers: this._getHeaders()
+            });
+
+            if (!response.ok) {
+                const errorData = await response.text();
+                throw new Error(errorData || 'Error al completar la cita');
+            }
+
+            return await response.json();
+        } catch (error) {
+            this._handleError('completeAppointment', error);
+        }
+    }
 }
 
 export default new AppointmentService();
