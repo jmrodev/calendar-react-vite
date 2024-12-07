@@ -1,4 +1,5 @@
-import AppointmentService from '../../../../../services/appointmentService';
+import AppointmentService from '../../../../../services/appointments/index.js';
+import { toast } from 'react-hot-toast';
 
 export const handleCreateAppointment = async (slot, selectedDate, setTimeSlots, setError) => {
     try {
@@ -42,7 +43,9 @@ export const handleConfirmClick = async (event, slot, setTimeSlots, setError) =>
         const confirmation = window.confirm('¿Desea confirmar esta cita?');
         if (!confirmation) return;
 
-        await AppointmentService.confirmAppointment(slot.id, { confirmAppointment: true });
+        const appointmentId = slot._id || slot.id;
+        await AppointmentService.confirmAppointment(appointmentId, { confirmAppointment: true });
+        
         setTimeSlots(prevSlots =>
             prevSlots.map(s =>
                 s.id === slot.id
@@ -57,9 +60,10 @@ export const handleConfirmClick = async (event, slot, setTimeSlots, setError) =>
                     : s
             )
         );
+        toast.success('Cita confirmada exitosamente');
     } catch (err) {
         setError(err.message);
-        alert('Error confirmando la cita: ' + err.message);
+        toast.error('Error confirmando la cita: ' + err.message);
     }
 };
 
@@ -69,17 +73,27 @@ export const handleComplete = async (event, slot, setTimeSlots, setError) => {
         const confirmation = window.confirm('¿Confirmar que el paciente fue atendido?');
         if (!confirmation) return;
 
-        await AppointmentService.completeAppointment(slot.id);
+        const appointmentId = slot._id || slot.id;
+        await AppointmentService.completeAppointment(appointmentId);
+        
         setTimeSlots(prevSlots =>
             prevSlots.map(s =>
-                s.id === slot.id
-                    ? { ...s, status: 'completed' }
+                s.id === appointmentId
+                    ? { 
+                        ...s, 
+                        status: 'completed',
+                        appointment: {
+                            ...s.appointment,
+                            completed: true
+                        }
+                    }
                     : s
             )
         );
+        toast.success('Cita marcada como completada exitosamente');
     } catch (err) {
         setError(err.message);
-        alert('Error marcando la cita como completada: ' + err.message);
+        toast.error('Error al marcar la cita como completada: ' + err.message);
     }
 };
 
@@ -209,5 +223,17 @@ export const handleDelete = async (event, slot, setTimeSlots, setError) => {
         setError(err.message);
         alert('Error eliminando la cita: ' + err.message);
     }
+};
+
+export const handleConfirmAppointment = async (appointmentId) => {
+  try {
+    await confirmAppointmentService(appointmentId);
+    // Recargar las citas después de confirmar
+    await loadAppointments();
+    toast.success('Cita confirmada exitosamente');
+  } catch (error) {
+    toast.error('Error al confirmar la cita');
+    console.error('Error:', error);
+  }
 };
 
