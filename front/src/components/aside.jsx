@@ -1,5 +1,5 @@
 import React from 'react';
-import Calendar from "../main/features/calendar/calendar";
+import Calendar from "./calendar";
 
 export const Aside = ({ onDateSelect, selectedDate }) => {
     return (

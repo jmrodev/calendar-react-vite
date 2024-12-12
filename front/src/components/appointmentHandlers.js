@@ -1,5 +1,10 @@
-import AppointmentService from '../../../../../services/appointments/index.js';
-import { toast } from 'react-hot-toast';
+import {
+    completeAppointment,
+    createAppointment,
+    confirmAppointment,
+    updateAppointment,
+    deleteAppointment
+} from '../services/appointmentsService';
 
 export const handleCreateAppointment = async (slot, selectedDate, setTimeSlots, setError) => {
     try {
@@ -22,7 +27,7 @@ export const handleCreateAppointment = async (slot, selectedDate, setTimeSlots, 
             }
         };
 
-        const response = await AppointmentService.createAppointment(appointmentData);
+        const response = await createAppointment(appointmentData);
         setTimeSlots(prevSlots =>
             prevSlots.map(s =>
                 s.appointmentTime === slot.appointmentTime
@@ -44,8 +49,8 @@ export const handleConfirmClick = async (event, slot, setTimeSlots, setError) =>
         if (!confirmation) return;
 
         const appointmentId = slot._id || slot.id;
-        await AppointmentService.confirmAppointment(appointmentId, { confirmAppointment: true });
-        
+        await confirmAppointment(appointmentId, { confirmAppointment: true });
+
         setTimeSlots(prevSlots =>
             prevSlots.map(s =>
                 s.id === slot.id
@@ -74,13 +79,13 @@ export const handleComplete = async (event, slot, setTimeSlots, setError) => {
         if (!confirmation) return;
 
         const appointmentId = slot._id || slot.id;
-        await AppointmentService.completeAppointment(appointmentId);
-        
+        await completeAppointment(appointmentId);
+
         setTimeSlots(prevSlots =>
             prevSlots.map(s =>
                 s.id === appointmentId
-                    ? { 
-                        ...s, 
+                    ? {
+                        ...s,
                         status: 'completed',
                         appointment: {
                             ...s.appointment,
@@ -115,7 +120,7 @@ export const handleEdit = async (event, slot, setTimeSlots, setError) => {
             }
         };
 
-        await AppointmentService.updateAppointment(slot.id, updatedAppointmentData);
+        await updateAppointment(slot.id, updatedAppointmentData);
 
         setTimeSlots(prevSlots =>
             prevSlots.map(s =>
@@ -138,11 +143,11 @@ export const handleEdit = async (event, slot, setTimeSlots, setError) => {
 };
 export const handleReassignClick = async (event, slot, selectedDate, setTimeSlots, setError) => {
     event.stopPropagation();
-    try {        
+    try {
         const confirmation = window.confirm('¿Está seguro que desea reasignar esta cita?');
         if (!confirmation) return;
 
-        
+
         const newName = prompt('Ingrese el nombre del nuevo paciente:');
         if (!newName) {
             alert('El nombre del paciente no puede estar vacío.');
@@ -155,19 +160,19 @@ export const handleReassignClick = async (event, slot, selectedDate, setTimeSlot
             return;
         }
 
-        
+
         const appointmentId = slot._id || slot.id;
         if (!appointmentId) {
             throw new Error('ID de cita no válido');
         }
 
-        
-        const deleteResult = await AppointmentService.deleteAppointment(appointmentId);
+
+        const deleteResult = await deleteAppointment(appointmentId);
         if (!deleteResult.success) {
             throw new Error(`Error al eliminar la cita: ${deleteResult.message}`);
         }
 
-        
+
         const newAppointmentData = {
             date: selectedDate.toISOString().split('T')[0],
             appointmentTime: slot.appointmentTime,
@@ -181,9 +186,9 @@ export const handleReassignClick = async (event, slot, selectedDate, setTimeSlot
             }
         };
 
-        const response = await AppointmentService.createAppointment(newAppointmentData);
+        const response = await createAppointment(newAppointmentData);
 
-        
+
         setTimeSlots(prevSlots =>
             prevSlots.map(s =>
                 s.appointmentTime === slot.appointmentTime
@@ -210,7 +215,7 @@ export const handleDelete = async (event, slot, setTimeSlots, setError) => {
             throw new Error('No se encontró el ID de la cita');
         }
 
-        await AppointmentService.deleteAppointment(appointmentId);
+        await deleteAppointment(appointmentId);
         setTimeSlots(prevSlots =>
             prevSlots.map(s =>
                 s.appointmentTime === slot.appointmentTime
@@ -226,14 +231,14 @@ export const handleDelete = async (event, slot, setTimeSlots, setError) => {
 };
 
 export const handleConfirmAppointment = async (appointmentId) => {
-  try {
-    await confirmAppointmentService(appointmentId);
-    // Recargar las citas después de confirmar
-    await loadAppointments();
-    toast.success('Cita confirmada exitosamente');
-  } catch (error) {
-    toast.error('Error al confirmar la cita');
-    console.error('Error:', error);
-  }
+    try {
+        await confirmAppointment(appointmentId);
+        // Recargar las citas después de confirmar
+        await loadAppointments();
+        toast.success('Cita confirmada exitosamente');
+    } catch (error) {
+        toast.error('Error al confirmar la cita');
+        console.error('Error:', error);
+    }
 };
 

@@ -1,10 +1,10 @@
 import { useState } from 'react'
-import { Header } from './src/components/header/header'
-import { Footer } from './src/components/footer/footer'
-import { Login } from './src/components/login/login'
+import { Header } from './src/components/header'
+import { Footer } from './src/components/footer'
+import { Login } from './src/components/login'
 import { BrowserRouter as Router, Route, Routes } from 'react-router-dom'
 import './App.css'
-import Content from './src/components/container/Content'
+import Content from './src/components/Content'
 
 function App() {
 
