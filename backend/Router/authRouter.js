@@ -3,24 +3,11 @@ import {
     loginController,
     logoutController,
     registerController
-} from '../Controller/Auth/index.js';
-import { authToken } from '../Middleware/token/authToken.js';
-import { authorize } from '../Middleware/roles/authorize.js';
+} from '../Controller/authController.js';
 
 const router = Router();
-
-router.post(
-    '/login',
-    loginController
-)
-router.post(
-    '/logout',
-    logoutController
-);
-
-router.post(
-    '/register',
-    registerController
-);
+router.post('/login',loginController)
+router.post('/logout',logoutController);
+router.post('/register',registerController);
 
 export default router;

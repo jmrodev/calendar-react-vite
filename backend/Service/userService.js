@@ -1,4 +1,9 @@
-import { createUserRepository } from '../../Repository/User/createUserRepository.js';
+import {
+    createUserRepository,
+    deleteUserRepository,
+    getAllUsersRepository,
+    getUserByIdRepository
+} from '../../Repository/userRepository.js';
 import { findUserByUsername } from '../../Utils/user/findUserByName.js';
 import { hashPassword } from '../../Utils/auth/hashPassword.js';
 import { newUserId } from '../../Utils/id/user.js';
@@ -36,5 +41,31 @@ export const createUser = async (username, password, role) => {
         return await createUserRepository(hashedUser);
     } catch (error) {
         throw new Error(`Error in create user service: ${error.message}`);
+    }
+};
+
+
+export const deleteUser = async (id) => {
+    try {
+        await getUserByIdRepository(id);
+        return await deleteUserRepository(id);
+    } catch (error) {
+        throw new Error(`Error in delete user service: ${error.message}`);
+    }
+};
+
+export const getAllUsers = async () => {
+    try {
+        return await getAllUsersRepository();
+    } catch (error) {
+        throw new Error(`Error in get all users service: ${error.message}`);
+    }
+};
+
+export const getUserById = async (id) => {
+    try {
+        return await getUserByIdRepository(id);
+    } catch (error) {
+        throw new Error(`Error in get user by id service: ${error.message}`);
     }
 }; 

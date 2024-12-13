@@ -8,13 +8,8 @@ export const authorize = (resource, action) => {
                     error: 'No autorizado - Usuario o rol no encontrado'
                 });
             }
-
             const userRole = req.user.role;
-
             if (checkPermission(userRole, resource, action)) {
-
-                console.log(userRole, resource, action);
-                
                 return next();
             } else {
                 return res.status(403).json({
