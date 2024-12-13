@@ -1,15 +1,1 @@
-[
-    {
-        "_id": 1,
-        "date": "2024-12-12",
-        "appointmentTime": "09:00",
-        "realAppointmentTime": "09:00",
-        "available": false,
-        "status": "pending",
-        "appointment": {
-            "name": "ds",
-            "reason": "ds",
-            "confirmAppointment": false
-        }
-    }
-]
+[{"_id":1,"date":"2024-12-12","appointmentTime":"09:00","realAppointmentTime":"09:00","available":false,"status":"pending","appointment":{"name":"asdfasdfasdfasdf","reason":"asdfasdfasdfasdf","confirmAppointment":false}}]

@@ -3,7 +3,9 @@ import { useState } from "react";
 export const  useAuth = () => {
     const [isAuthenticated, setIsAuthenticated] = useState(false);
     
-    const login = async (credentials) => {        
+    const login = async (credentials) => {    
+        console.log(credentials);
+            
         const response = await fetch('http://localhost:3001/api/auth/login', {
             method: 'POST',
             headers: {
@@ -17,7 +19,9 @@ export const  useAuth = () => {
             localStorage.setItem('jwt', token);
             setIsAuthenticated(true);
         } else {
-            // Manejar error de autenticación
+            setIsAuthenticated(false);
+            const { error } = await response.json();
+            alert(error);
         }
     };
 

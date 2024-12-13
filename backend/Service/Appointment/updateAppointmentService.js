@@ -1,4 +1,4 @@
-import {updateAppointmentRepository} from '../../Repository/Appointment/index.js';
+import { updateAppointmentRepository } from '../../Repository/Appointment/index.js';
 
 export const updateAppointmentService = async (id, data) => {
     try {

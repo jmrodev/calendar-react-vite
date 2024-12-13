@@ -137,6 +137,7 @@ export const handleEdit = async (event, slot, setTimeSlots, setError) => {
                     : s
             )
         );
+        toast.success('Cita editada exitosamente');
     } catch (err) {
         setError(err.message);
         alert('Error editando la cita: ' + err.message);
