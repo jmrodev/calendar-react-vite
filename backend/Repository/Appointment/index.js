@@ -6,3 +6,4 @@ export { getConfirmedAppointmentsRepository } from './getConfirmedAppointmentsRe
 export { confirmAppointmentRepository } from './confirmAppointmentRepository.js';
 export { getAppointmentByDateRepository } from './getAppointmentByDateRepository.js';
 export { completeAppointmentRepository } from './completeAppointmentRepository.js';
+export { updateAppointmentRepository } from './updateAppointmentRepository.js';

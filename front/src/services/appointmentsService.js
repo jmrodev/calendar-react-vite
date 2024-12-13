@@ -69,10 +69,7 @@ export const confirmAppointment = async (id, data = {}) => {
             const errorData = await response.text();
             throw new Error(errorData || 'Error al confirmar la cita');
         }
-
-        const responseData = await response.json();
-        console.log('confirmAppointment successful:', responseData);
-        
+        const responseData = await response.json();        
         return responseData;
     } catch (error) {
         _handleError('confirmAppointment', error);

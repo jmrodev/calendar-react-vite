@@ -1,10 +1,13 @@
 import { AppointmentSchema } from '../../Models/AppointmentSchema.js';
 
 export const deleteAppointmentRepository = async (id) => {
+    
     try {
-        const appointment = await AppointmentSchema.delete({ _id: Number(id) });
+        const appointment = await AppointmentSchema.find({ _id: Number(id) });
         if (!appointment) {
             throw new Error('Error en deleteAppointmentRepository: Cita no encontrada para eliminar');
+        }else{
+            await AppointmentSchema.remove({ _id: Number(id) });
         }
         return appointment;
     } catch (error) {

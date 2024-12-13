@@ -1,9 +1,9 @@
-import { deleteAppointment } from '../../Service/Appointment/deleteAppointmentService.js';
+import { deleteAppointmentService } from '../../Service/Appointment/deleteAppointmentService.js';
 
 export const deleteAppointmentController = async (req, res) => {
     try {
         const { id } = req.params;
-        const deletedAppointment = await deleteAppointment(id);
+        const deletedAppointment = await deleteAppointmentService(id);
         res.json({
             success: true,
             deletedAppointment

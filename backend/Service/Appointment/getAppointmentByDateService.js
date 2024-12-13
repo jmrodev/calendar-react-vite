@@ -3,11 +3,6 @@ import { getAppointmentByDateRepository } from '../../Repository/Appointment/ind
 export const getAppointmentByDateService = async (date) => {
     try {
         const appointments = await getAppointmentByDateRepository(date);
-      
-        console.log('appointments', appointments);
-        console.log('dateservice', date);
-        
-        
         // if (!appointments.length) {
         //     return { status: 404, data: { message: 'No se encontraron citas para esta fecha' } };
         // }

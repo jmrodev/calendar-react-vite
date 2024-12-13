@@ -1,9 +1,9 @@
 import { useState } from "react";
 
-const  useAuth = () => {
+export const  useAuth = () => {
     const [isAuthenticated, setIsAuthenticated] = useState(false);
     
-    const login = async (credentials) => {
+    const login = async (credentials) => {        
         const response = await fetch('http://localhost:3001/api/auth/login', {
             method: 'POST',
             headers: {
@@ -33,4 +33,3 @@ const  useAuth = () => {
     };
 };
 
-export default useAuth;

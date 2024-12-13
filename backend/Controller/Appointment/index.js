@@ -6,3 +6,4 @@ export { getConfirmedAppointmentsController } from './getConfirmedAppointmentsCo
 export { confirmAppointmentController } from './confirmAppointmentController.js';
 export { getAppointmentByDateController } from './getAppointmentByDateController.js';
 export { completeAppointmentController } from './completeAppointmentController.js';
+export { updateAppointmentController } from './updateAppointmentController.js';

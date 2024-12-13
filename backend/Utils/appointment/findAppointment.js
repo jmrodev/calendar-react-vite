@@ -7,7 +7,6 @@ export async function findAppointment({ date, appointmentTime }) {
 
     try {
         const appointment = await AppointmentSchema.findOne({ date, appointmentTime });
-        console.log('appointment:', appointment);
         
         if (appointment) {
             throw new Error('La cita ya existe');

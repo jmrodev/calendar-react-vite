@@ -7,7 +7,8 @@ import {
     getConfirmedAppointmentsController,
     confirmAppointmentController,
     getAppointmentByDateController,
-    completeAppointmentController
+    completeAppointmentController,
+    updateAppointmentController
 } from '../Controller/Appointment/index.js';
 import { authorize } from '../Middleware/roles/authorize.js';
 import { authToken } from '../Middleware/token/authToken.js';
@@ -85,12 +86,23 @@ router.get(
 );
 
 router.put(
+    '/update/:id',
+    authToken,
+    authorize(
+        'appointments',
+        'update'
+    ),
+    updateAppointmentController
+);
+
+router.put(
     '/complete/:id',
     authToken,
     authorize(
         'appointments',
         'update'
-    )
+    ),
+    completeAppointmentController
 );
 
 export default router;

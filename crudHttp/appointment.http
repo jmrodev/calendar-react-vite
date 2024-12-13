@@ -1,6 +1,6 @@
 @host = localhost:3001
 @tokenPrefix = Bearer
-@appointmentId = 2
+@appointmentId =1
 @datetime = '2024-12-07'
 
 # @name login
@@ -46,7 +46,7 @@ GET http://{{host}}/api/appointments/{{appointmentId}}
 Authorization: {{tokenPrefix}} {{login.response.body.token}}
 
 ### Actualizar una cita
-PUT http://{{host}}/api/appointments/{{appointmentId}}
+PUT http://{{host}}/api/appointments/update/{{appointmentId}}
 Content-Type: application/json
 Authorization: {{tokenPrefix}} {{login.response.body.token}}
 
@@ -61,6 +61,11 @@ Authorization: {{tokenPrefix}} {{login.response.body.token}}
         "reason": "Follow-up Consultation"
     }
 }
+
+### Eliminar una cita por ID
+DELETE http://{{host}}/api/appointments/{{appointmentId}}
+Authorization: {{tokenPrefix}} {{login.response.body.token}}
+
 
 ### Eliminar una cita por fecha y hora
 DELETE http://{{host}}/api/appointments/{{$datetime 'YYYY-MM-DD'}}/{{$datetime 'HH:mm'}}

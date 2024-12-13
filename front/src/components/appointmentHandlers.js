@@ -5,6 +5,7 @@ import {
     updateAppointment,
     deleteAppointment
 } from '../services/appointmentsService';
+import toast from 'react-hot-toast';
 
 export const handleCreateAppointment = async (slot, selectedDate, setTimeSlots, setError) => {
     try {
