@@ -1,1 +1,15 @@
-[{"_id":1,"date":"2024-12-12","appointmentTime":"09:00","realAppointmentTime":"09:00","available":false,"status":"pending","appointment":{"name":"asdfasdfasdfasdf","reason":"asdfasdfasdfasdf","confirmAppointment":false}}]
+[
+    {
+        "_id": 1,
+        "date": "2024-12-13",
+        "appointmentTime": "02:31",
+        "realAppointmentTime": "03:31",
+        "available": true,
+        "status": "pending",
+        "appointment": {
+            "confirmAppointment": true,
+            "name": "John Doe Updated",
+            "reason": "Follow-up Consultation"
+        }
+    }
+]
