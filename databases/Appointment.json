@@ -1,15 +1,1 @@
-[
-    {
-        "_id": 1,
-        "date": "2024-12-13",
-        "appointmentTime": "02:31",
-        "realAppointmentTime": "03:31",
-        "available": true,
-        "status": "pending",
-        "appointment": {
-            "confirmAppointment": true,
-            "name": "John Doe Updated",
-            "reason": "Follow-up Consultation"
-        }
-    }
-]
+[]

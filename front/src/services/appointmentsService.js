@@ -3,7 +3,7 @@ import { _getHeaders, _handleError, baseUrl } from './utils';
 
 export const updateAppointment = async (id, appointment) => {   
     try {
-        const response = await fetch(`${baseUrl}/appointments/${id}`, {
+        const response = await fetch(`${baseUrl}/appointments/update/${id}`, {
             method: 'PUT',
             headers: _getHeaders(),
             body: JSON.stringify(appointment)
