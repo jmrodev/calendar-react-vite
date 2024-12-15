@@ -4,7 +4,7 @@ import {
   confirmAppointment,
   updateAppointment,
   deleteAppointment,
-} from "../services/appointmentsService";
+} from "./appointmentsService";
 import toast from "react-hot-toast";
 
 export const handleCreateAppointment = async (

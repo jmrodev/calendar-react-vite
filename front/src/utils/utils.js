@@ -1,4 +1,5 @@
 import Cookies from "js-cookie";
+import { errorMessages } from "../messages/ErrorMessage";
 
 export const baseUrl = "http://localhost:3001/api";
 
@@ -12,8 +13,5 @@ export const _getHeaders = () => {
 
 export const _handleError = (method, error) => {
   console.error(`Error in ${method}:`, error);
-  throw new Error(
-    error.message || `Error en ${method}: Ocurrió un error inesperado`,
-    error
-  );
+  return errorMessages[method];
 };

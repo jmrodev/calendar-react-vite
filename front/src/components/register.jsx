@@ -1,26 +1,23 @@
 import React, { useState } from "react";
 import { useAuth } from "../hooks/useAuth";
 
-export const Login = () => {
-  const { login } = useAuth();
+export const Register = () => {
+  const { register } = useAuth();
   const [credentials, setCredentials] = useState({
     username: "",
     password: "",
   });
-
   const handleChange = (e) => {
     const { name, value } = e.target;
     setCredentials((prev) => ({ ...prev, [name]: value }));
   };
-
   const handleSubmit = (e) => {
     e.preventDefault();
-    login(credentials);
+    register(credentials);
   };
-
   return (
     <div>
-      <h1>Login</h1>
+      <h1>Register</h1>
       <form>
         <input
           type="text"
@@ -35,7 +32,7 @@ export const Login = () => {
           onChange={handleChange}
         />
         <button onClick={handleSubmit} type="submit">
-          Iniciar sesión
+          Registrarse
         </button>
       </form>
     </div>

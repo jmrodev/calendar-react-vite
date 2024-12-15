@@ -1,10 +1,10 @@
-import React from 'react';
-import Week from './Week';
+import React from "react";
+import Week from "./Week";
 
 export const Main = ({ selectedDate }) => {
-    return (
-        <main>
-            <Week selectedDate={selectedDate} />
-        </main>
-    );
+  return (
+    <main>
+      <Week selectedDate={selectedDate} />
+    </main>
+  );
 };

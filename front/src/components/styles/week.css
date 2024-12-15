@@ -1,0 +1,160 @@
+.week-schedule {
+    max-width: 700px;
+    margin: 40px auto;
+    padding: 20px;
+    background-color: #e0b2b28c;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.week-schedule h2 {
+    color: #333;
+    margin-bottom: 20px;
+    text-align: center;
+}
+
+.time-slots {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 10px;
+}
+
+.time-slot {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 15px;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.time-slot.available {
+    background-color: #d7db96;
+    border: 1px solid #81c784;
+}
+
+.time-slot.booked {
+    background-color: #be8933;
+    border: 1px solid #ffb74d;
+}
+
+.time-slot.confirmed {
+    background-color: #e3f2fd;
+    border: 1px solid #64b5f6;
+}
+
+.time-slot:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.time {
+    font-weight: bold;
+    color: #333;
+    min-width: 80px;
+}
+
+.appointment-details {
+    flex-grow: 1;
+    margin-left: 20px;
+}
+
+.patient-name {
+    font-weight: 600;
+    color: #333;
+    margin-bottom: 4px;
+}
+
+.reason {
+    color: #666;
+    font-size: 0.9em;
+    margin-bottom: 8px;
+}
+
+.confirm-button {
+    background-color: #4caf50;
+    color: white;
+    border: none;
+    padding: 8px 16px;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+.confirm-button:hover {
+    background-color: #388e3c;
+}
+
+.error {
+    color: #d32f2f;
+    text-align: center;
+    padding: 20px;
+}
+
+.time-slot.completed {
+    background-color: #c8e6c9;
+    border: 1px solid #4caf50;
+}
+
+.appointment-actions {
+    display: flex;
+    gap: 8px;
+    margin-top: 8px;
+}
+
+.complete-button {
+    background-color: #2196f3;
+    color: white;
+    border: none;
+    padding: 8px 16px;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+.complete-button:hover {
+    background-color: #1976d2;
+}
+
+.edit-button {
+    background-color: #ff9800;
+    color: white;
+    border: none;
+    padding: 8px 16px;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+.edit-button:hover {
+    background-color: #f57c00;
+}
+
+.delete-button {
+    background-color: #f44336;
+    color: white;
+    border: none;
+    padding: 8px 16px;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+.delete-button:hover {
+    background-color: #d32f2f;
+}
+
+.reassign-button {
+    background-color: #ff5722;
+    color: white;
+    border: none;
+    padding: 8px 16px;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+.reassign-button:hover {
+    background-color: #e64a19;
+}
