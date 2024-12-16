@@ -5,10 +5,13 @@ import { Login } from "./src/components/login";
 import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
 import "./App.css";
 import Content from "./src/components/Content";
+import { Toaster } from 'react-hot-toast';
+import { toastConfig } from './src/config/toastConfig';
 
 function App() {
   return (
     <Router>
+      <Toaster {...toastConfig} />
       <Routes>
         <Route path="/login" element={<Login />} />
       </Routes>

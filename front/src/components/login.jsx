@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { useAuth } from "../hooks/useAuth";
+import showToast from "../utils/toastUtils";
 
 export const Login = () => {
   const { login } = useAuth();
@@ -13,15 +14,20 @@ export const Login = () => {
     setCredentials((prev) => ({ ...prev, [name]: value }));
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    login(credentials);
+    try {
+      await login(credentials);
+      showToast("Inicio de sesión exitoso", "success");
+    } catch (error) {
+      showToast("Error al iniciar sesión: " + error.message, "error");
+    }
   };
 
   return (
     <div>
       <h1>Login</h1>
-      <form>
+      <form onSubmit={handleSubmit}>
         <input
           type="text"
           name="username"
@@ -34,7 +40,7 @@ export const Login = () => {
           placeholder="Contraseña"
           onChange={handleChange}
         />
-        <button onClick={handleSubmit} type="submit">
+        <button type="submit">
           Iniciar sesión
         </button>
       </form>

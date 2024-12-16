@@ -1,8 +1,9 @@
-import { _getHeaders, _handleError, baseUrl } from "./utils";
+import { _getHeaders, _handleError } from "./utils";
+import config from "../config/env.cfg";
 
 export const updateAppointment = async (id, appointment) => {
   try {
-    const response = await fetch(`${baseUrl}/appointments/update/${id}`, {
+    const response = await fetch(`${config.baseUrl}/appointments/update/${id}`, {
       method: "PUT",
       headers: _getHeaders(),
       body: JSON.stringify(appointment),
@@ -21,7 +22,7 @@ export const updateAppointment = async (id, appointment) => {
 
 export const deleteAppointment = async (id) => {
   try {
-    const response = await fetch(`${baseUrl}/appointments/${id}`, {
+    const response = await fetch(`${config.baseUrl}/appointments/${id}`, {
       method: "DELETE",
       headers: _getHeaders(),
     });
@@ -39,7 +40,7 @@ export const deleteAppointment = async (id) => {
 
 export const completeAppointment = async (id) => {
   try {
-    const response = await fetch(`${baseUrl}/appointments/complete/${id}`, {
+    const response = await fetch(`${config.baseUrl}/appointments/complete/${id}`, {
       method: "PUT",
       headers: _getHeaders(),
       body: JSON.stringify({ completed: true }),
@@ -58,7 +59,7 @@ export const completeAppointment = async (id) => {
 
 export const confirmAppointment = async (id, data = {}) => {
   try {
-    const response = await fetch(`${baseUrl}/appointments/confirm/${id}`, {
+    const response = await fetch(`${config.baseUrl}/appointments/confirm/${id}`, {
       method: "PUT",
       headers: _getHeaders(),
       body: JSON.stringify(data),
@@ -77,7 +78,7 @@ export const confirmAppointment = async (id, data = {}) => {
 
 export const createAppointment = async (appointment) => {
   try {
-    const response = await fetch(`${baseUrl}/appointments`, {
+    const response = await fetch(`${config.baseUrl}/appointments`, {
       method: "POST",
       headers: _getHeaders(),
       body: JSON.stringify(appointment),
@@ -96,7 +97,7 @@ export const createAppointment = async (appointment) => {
 
 export const getAllAppointments = async () => {
   try {
-    const response = await fetch(`${baseUrl}/appointments`, {
+    const response = await fetch(`${config.baseUrl}/appointments`, {
       headers: _getHeaders(),
     });
 
@@ -113,7 +114,7 @@ export const getAllAppointments = async () => {
 
 export const getAppointmentsByDate = async (date) => {
   try {
-    const response = await fetch(`${baseUrl}/appointments/date/${date}`, {
+    const response = await fetch(`${config.baseUrl}/appointments/date/${date}`, {
       headers: _getHeaders(),
     });
 

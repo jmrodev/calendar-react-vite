@@ -6,7 +6,7 @@ import {
   handleEdit,
   handleDelete,
   handleReassignClick,
-} from "./appointmentHandlers";
+} from "../services/appointmentHandlers";
 
 const TimeSlot = ({ slot, selectedDate, setTimeSlots, setError }) => {
   if (!slot) {

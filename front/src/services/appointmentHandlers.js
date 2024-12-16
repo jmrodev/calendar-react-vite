@@ -5,7 +5,7 @@ import {
   updateAppointment,
   deleteAppointment,
 } from "./appointmentsService";
-import toast from "react-hot-toast";
+import showToast from "../utils/toastUtils";
 
 export const handleCreateAppointment = async (
   slot,
@@ -42,9 +42,15 @@ export const handleCreateAppointment = async (
           : s
       )
     );
+
+    if (response) {
+      showToast("Cita creada exitosamente", "success");
+    } else {
+      showToast("Error al crear la cita", "error");
+    }
   } catch (err) {
     setError(err.message);
-    alert("Error creando la cita: " + err.message);
+    showToast("Error al crear la cita: " + err.message, "error");
   }
 };
 
@@ -76,10 +82,10 @@ export const handleConfirmClick = async (
           : s
       )
     );
-    toast.success("Cita confirmada exitosamente");
+    showToast("Cita confirmada exitosamente", "success");
   } catch (err) {
     setError(err.message);
-    toast.error("Error confirmando la cita: " + err.message);
+    showToast("Error confirmando la cita: " + err.message, "error");
   }
 };
 
@@ -108,10 +114,10 @@ export const handleComplete = async (event, slot, setTimeSlots, setError) => {
           : s
       )
     );
-    toast.success("Cita marcada como completada exitosamente");
+    showToast("Cita marcada como completada exitosamente", "success");
   } catch (err) {
     setError(err.message);
-    toast.error("Error al marcar la cita como completada: " + err.message);
+    showToast("Error al marcar la cita como completada: " + err.message, "error");
   }
 };
 
@@ -154,7 +160,7 @@ export const handleEdit = async (event, slot, setTimeSlots, setError) => {
           : s
       )
     );
-    toast.success("Cita editada exitosamente");
+    showToast("Cita editada exitosamente", "success");
   } catch (err) {
     setError(err.message);
     alert("Error editando la cita: " + err.message);
@@ -218,10 +224,12 @@ export const handleReassignClick = async (
           : s
       )
     );
+
+    showToast("Cita reasignada exitosamente", "success");
   } catch (err) {
     console.error("Reassignment error:", err);
     setError(err.message);
-    alert("Error durante la reasignación: " + err.message);
+    showToast("Error durante la reasignación: " + err.message, "error");
   }
 };
 
@@ -247,10 +255,12 @@ export const handleDelete = async (event, slot, setTimeSlots, setError) => {
           : s
       )
     );
+
+    showToast("Cita eliminada exitosamente", "success");
   } catch (err) {
     console.error("Error completo:", err);
     setError(err.message);
-    alert("Error eliminando la cita: " + err.message);
+    showToast("Error eliminando la cita: " + err.message, "error");
   }
 };
 
@@ -259,9 +269,9 @@ export const handleConfirmAppointment = async (appointmentId) => {
     await confirmAppointment(appointmentId);
     // Recargar las citas después de confirmar
     await loadAppointments();
-    toast.success("Cita confirmada exitosamente");
+    showToast("Cita confirmada exitosamente", "success");
   } catch (error) {
-    toast.error("Error al confirmar la cita");
+    showToast("Error al confirmar la cita", "error");
     console.error("Error:", error);
   }
 };

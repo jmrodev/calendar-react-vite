@@ -1,10 +1,11 @@
 import { useState } from "react";
+import config from "../config/env.cfg";
 
 export const useAuth = () => {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
 
   const login = async (credentials) => {
-    const response = await fetch("http://localhost:3001/api/auth/login", {
+    const response = await fetch(config.url_login, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -24,7 +25,7 @@ export const useAuth = () => {
   };
 
   const register = async (credentials) => {
-    const response = await fetch("http://localhost:3001/api/auth/register", {
+    const response = await fetch(config.url_register, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",

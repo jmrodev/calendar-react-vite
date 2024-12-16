@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import TimeSlot from "./TimeSlot";
 import { generateTimeSlots } from "../utils/timeSlotUtils";
-import "./week.css";
+import "./styles/week.css";
 
 const Week = ({ selectedDate }) => {
   const [timeSlots, setTimeSlots] = useState([]);
