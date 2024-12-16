@@ -7,7 +7,9 @@ const secretKey = process.env.JWT_SECRET;
 export const authToken = async (req, res, next) => {
   const token = req.headers["authorization"]?.split(" ")[1];
 
-  if (!token) return res.status(401).json({ error: "No token provided" });
+  if (!token) {
+    return res.status(401).json({ error: "No token provided", message: "Por favor, inicie sesión." });
+  }
   try {
     const user = await new Promise((resolve, reject) => {
       jwt.verify(token, secretKey, (err, user) => {

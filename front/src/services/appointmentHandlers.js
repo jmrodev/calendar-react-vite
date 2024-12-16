@@ -117,7 +117,10 @@ export const handleComplete = async (event, slot, setTimeSlots, setError) => {
     showToast("Cita marcada como completada exitosamente", "success");
   } catch (err) {
     setError(err.message);
-    showToast("Error al marcar la cita como completada: " + err.message, "error");
+    showToast(
+      "Error al marcar la cita como completada: " + err.message,
+      "error"
+    );
   }
 };
 

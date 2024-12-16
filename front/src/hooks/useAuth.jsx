@@ -24,6 +24,25 @@ export const useAuth = () => {
     }
   };
 
+  const refreshToken = async () => {
+    const token = localStorage.getItem("jwt");
+    const response = await fetch(`${config.baseUrl}/auth/refresh-token`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "Authorization": `Bearer ${token}`,
+      },
+    });
+
+    if (response.ok) {
+      const { token: newToken } = await response.json();
+      localStorage.setItem("jwt", newToken);
+      return newToken; // Retorna el nuevo token
+    } else {
+      throw new Error("No se pudo refrescar el token");
+    }
+  };
+
   const register = async (credentials) => {
     const response = await fetch(config.url_register, {
       method: "POST",
@@ -50,5 +69,6 @@ export const useAuth = () => {
     login,
     logout,
     register,
+    refreshToken, // Exporta la función de refresco de token
   };
 };
