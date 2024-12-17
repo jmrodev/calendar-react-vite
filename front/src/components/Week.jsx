@@ -27,6 +27,10 @@ const Week = ({ selectedDate }) => {
     return <div className="error">{error}</div>;
   }
 
+  if (!selectedDate) {
+    return <h3>Debe seleccionar un día</h3>;
+  }
+
   return (
     <div className="week-schedule">
       {true && <h2>Horarios disponibles para el dia {standardizeDate(selectedDate)}</h2>}
