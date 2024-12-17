@@ -4,33 +4,44 @@ import showToast from "../utils/toastUtils";
 import Modal from "react-modal";
 import './styles/login.css';
 
-import { useSelector } from "react-redux";
-import { useDispatch } from "react-redux";
-import { loginSuccess, loginFailure } from "../redux/actions/authActions.js";
-
 export const Login = () => {
   const { login } = useAuth();
   const [credentials, setCredentials] = useState({
     username: "",
     password: "",
   });
+  const [error, setError] = useState(null);
+  const [modalIsOpen, setModalIsOpen] = useState(true);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
     setCredentials((prev) => ({ ...prev, [name]: value }));
+    setError(null);
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    
+    if (!credentials.username || !credentials.password) {
+      setError("Por favor, ingrese usuario y contraseña");
+      return;
+    }
+
     try {
-      await login(credentials);
-      showToast("Inicio de sesión exitoso", "success");
+      const result = await login(credentials);
+      
+      if (result.error) {
+        setError(result.error);
+        showToast(`Error al iniciar sesión: ${result.error}`, "error");
+      } else {
+        showToast("Inicio de sesión exitoso", "success");
+        handleCloseModal();
+      }
     } catch (error) {
-      showToast("Error al iniciar sesión: " + error.message, "error");
+      setError(error.message || "Error desconocido al iniciar sesión");
+      showToast(`Error al iniciar sesión: ${error.message}`, "error");
     }
   };
-
-  const [modalIsOpen, setModalIsOpen] = useState(true);
 
   const handleCloseModal = () => {
     setModalIsOpen(false);
@@ -44,24 +55,34 @@ export const Login = () => {
       ariaHideApp={false}
     >
       <div>
-        <form
-          onSubmit={async (e) => {
-            await handleSubmit(e);
-            handleCloseModal();
-          }}
-        >
+        <form onSubmit={handleSubmit}>
           <input
             type="text"
             name="username"
             placeholder="Usuario"
             onChange={handleChange}
+            value={credentials.username}
           />
           <input
             type="password"
             name="password"
             placeholder="Contraseña"
             onChange={handleChange}
+            value={credentials.password}
           />
+          {error && (
+            <div 
+              style={{ 
+                color: 'red', 
+                marginBottom: '10px',
+                padding: '5px',
+                backgroundColor: '#ffeeee',
+                borderRadius: '4px'
+              }}
+            >
+              {error}
+            </div>
+          )}
           <button type="submit">Iniciar sesión</button>
         </form>
       </div>
