@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import TimeSlot from "./TimeSlot";
 import { generateTimeSlots } from "../utils/timeSlotUtils";
 import "./styles/week.css";
+import { standardizeDate } from "../utils/dateUtils";
 
 const Week = ({ selectedDate }) => {
   const [timeSlots, setTimeSlots] = useState([]);
@@ -28,7 +29,7 @@ const Week = ({ selectedDate }) => {
 
   return (
     <div className="week-schedule">
-      <h2>Horarios disponibles</h2>
+      {true && <h2>Horarios disponibles para el dia {standardizeDate(selectedDate)}</h2>}
       <div className="time-slots">
         {timeSlots.map((slot) => (
           <TimeSlot

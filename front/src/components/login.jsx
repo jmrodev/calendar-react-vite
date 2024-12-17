@@ -1,6 +1,8 @@
 import React, { useState } from "react";
 import { useAuth } from "../hooks/useAuth";
 import showToast from "../utils/toastUtils";
+import Modal from "react-modal";
+import './styles/login.css';
 
 export const Login = () => {
   const { login } = useAuth();
@@ -24,26 +26,41 @@ export const Login = () => {
     }
   };
 
+  const [modalIsOpen, setModalIsOpen] = useState(true);
+
+  const handleCloseModal = () => {
+    setModalIsOpen(false);
+  };
+
   return (
-    <div>
-      <h1>Login</h1>
-      <form onSubmit={handleSubmit}>
-        <input
-          type="text"
-          name="username"
-          placeholder="Usuario"
-          onChange={handleChange}
-        />
-        <input
-          type="password"
-          name="password"
-          placeholder="Contraseña"
-          onChange={handleChange}
-        />
-        <button type="submit">
-          Iniciar sesión
-        </button>
-      </form>
-    </div>
+    <Modal
+      className="modal"
+      isOpen={modalIsOpen}
+      onRequestClose={handleCloseModal}
+      ariaHideApp={false}
+    >
+      <div>
+        <form
+          onSubmit={async (e) => {
+            await handleSubmit(e);
+            handleCloseModal();
+          }}
+        >
+          <input
+            type="text"
+            name="username"
+            placeholder="Usuario"
+            onChange={handleChange}
+          />
+          <input
+            type="password"
+            name="password"
+            placeholder="Contraseña"
+            onChange={handleChange}
+          />
+          <button type="submit">Iniciar sesión</button>
+        </form>
+      </div>
+    </Modal>
   );
 };

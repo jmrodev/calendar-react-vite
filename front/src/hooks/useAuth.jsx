@@ -37,7 +37,7 @@ export const useAuth = () => {
     if (response.ok) {
       const { token: newToken } = await response.json();
       localStorage.setItem("jwt", newToken);
-      return newToken; // Retorna el nuevo token
+      return newToken; 
     } else {
       throw new Error("No se pudo refrescar el token");
     }
@@ -69,6 +69,6 @@ export const useAuth = () => {
     login,
     logout,
     register,
-    refreshToken, // Exporta la función de refresco de token
+    refreshToken, 
   };
 };
