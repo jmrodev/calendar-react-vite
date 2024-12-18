@@ -5,7 +5,7 @@ export const LOGIN_FAILURE = 'LOGIN_FAILURE';
 
 export const loginSuccess = (user) => ({
   type: LOGIN_SUCCESS,
-  payload: user,
+  payload: user, 
 });
 
 export const loginFailure = (error) => ({
@@ -13,8 +13,9 @@ export const loginFailure = (error) => ({
   payload: error,
 });
 
-
 export const login = (credentials) => async (dispatch) => {
+  console.log('Login credentials:', credentials);
+
   try {
     const response = await fetch(`${config.url_login}`, {
       method: 'POST',
@@ -27,14 +28,16 @@ export const login = (credentials) => async (dispatch) => {
     const data = await response.json();
 
     if (response.ok) {
-      
       localStorage.setItem('jwt', data.token);
-      dispatch(loginSuccess(data.user)); 
+      dispatch(loginSuccess(data.user));
+      return data;
     } else {
       dispatch(loginFailure(data.message || 'Error al iniciar sesión'));
+      return { error: data.message };
     }
   } catch (error) {
     dispatch(loginFailure(error.message || 'Error desconocido'));
+    return { error: error.message };
   }
 };
 

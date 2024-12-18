@@ -1,7 +1,7 @@
 import { useState } from "react";
-import { Header } from "./src/components/header";
-import { Footer } from "./src/components/footer";
-import { Login } from "./src/components/login";
+import { Header } from "./src/components/Header";
+import { Footer } from "./src/components/Footer";
+import { Login } from "./src/components/Login";
 import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
 import "./App.css";
 import Content from "./src/components/Content";

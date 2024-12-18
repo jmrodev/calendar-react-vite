@@ -1,6 +1,6 @@
 import React, { useState } from "react";
-import { Main } from "./main";
-import { Aside } from "./aside";
+import { Main } from "./Main";
+import { Aside } from "./Aside";
 
 const Content = () => {
   const [selectedDate, setSelectedDate] = useState(null);

@@ -42,7 +42,7 @@ open_terminal() {
 echo -e "${BLUE}Iniciando el backend...${NC}"
 cd backend
 pnpm install
-open_terminal "pnpm start"
+open_terminal "pnpm startnormal"
 
 # Esperar un momento para asegurar que el backend esté corriendo
 sleep 3

@@ -3,15 +3,18 @@ import { useAuth } from "../hooks/useAuth";
 import showToast from "../utils/toastUtils";
 import Modal from "react-modal";
 import './styles/login.css';
+import { useDispatch } from 'react-redux';
+import { login } from '../redux/actions/authActions';
 
 export const Login = () => {
-  const { login } = useAuth();
+  const { login: authHookLogin } = useAuth();
   const [credentials, setCredentials] = useState({
     username: "",
     password: "",
   });
   const [error, setError] = useState(null);
   const [modalIsOpen, setModalIsOpen] = useState(true);
+  const dispatch = useDispatch();
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -28,7 +31,7 @@ export const Login = () => {
     }
 
     try {
-      const result = await login(credentials);
+      const result = await dispatch(login(credentials));
       
       if (result.error) {
         setError(result.error);
@@ -45,6 +48,11 @@ export const Login = () => {
 
   const handleCloseModal = () => {
     setModalIsOpen(false);
+  };
+
+  const handleLogin = (credentials) => {
+    console.log('Attempting to log in with:', credentials); // Log de las credenciales
+    dispatch(login(credentials)); // Asegúrate de que esta línea se ejecute
   };
 
   return (
@@ -83,7 +91,7 @@ export const Login = () => {
               {error}
             </div>
           )}
-          <button type="submit">Iniciar sesión</button>
+          <button type="submit" onClick={() => handleLogin(credentials)}>Iniciar sesión</button>
         </form>
       </div>
     </Modal>
