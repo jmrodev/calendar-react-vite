@@ -1,0 +1,101 @@
+.appointment-form-container {
+  background-color: #2d2d36;
+  padding: 2rem;
+  border-radius: 8px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  max-width: 500px;
+  margin: 2rem auto;
+}
+
+.appointment-form {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.appointment-form-container .appointment-form-title {
+  color: #95d495;
+  text-align: center;
+  margin-bottom: 1.5rem;
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.form-group label {
+  color: #f7f6f2;
+  font-size: 0.9rem;
+}
+
+.form-group input,
+.form-group textarea,
+.form-group select {
+  padding: 0.8rem;
+  border: 1px solid #3f3f46;
+  border-radius: 4px;
+  background-color: #18181b;
+  color: #f7f6f2;
+  font-size: 1rem;
+}
+
+.form-group textarea {
+  field-sizing: content;
+  min-height: 1rem;
+  resize: vertical;
+  padding: 1rem;
+  border: 2px solid #646cff;
+  border-radius: 6px;
+  background-color: #2d2d36;
+  color: #f7f6f2;
+  font-size: 1rem;
+}
+
+.form-actions {
+  display: flex;
+  gap: 1rem;
+  justify-content: flex-end;
+  margin-top: 1rem;
+}
+
+.submit-btn,
+.cancel-btn {
+  padding: 0.8rem 1.5rem;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-weight: 500;
+  transition: all 0.3s ease;
+}
+
+.submit-btn {
+  background-color: #646cff;
+  color: white;
+}
+
+.submit-btn:hover {
+  background-color: #5753e0;
+}
+
+.submit-btn:disabled {
+  background-color: #4b4b4b;
+  cursor: not-allowed;
+}
+
+.cancel-btn {
+  background-color: transparent;
+  border: 1px solid #646cff;
+  color: #f7f6f2;
+}
+
+.cancel-btn:hover {
+  background-color: rgba(100, 108, 255, 0.1);
+}
+
+.cancel-btn:disabled {
+  border-color: #4b4b4b;
+  color: #4b4b4b;
+  cursor: not-allowed;
+}

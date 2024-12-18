@@ -1,42 +1,41 @@
-import React, { useState } from "react";
-import { useAuth } from "../hooks/useAuth";
+import React, { useState, useEffect } from "react";
+import { useDispatch, useSelector } from 'react-redux';
+import { loginAsync } from '../redux/slices/authSlice';
 import showToast from "../utils/toastUtils";
 import Modal from "react-modal";
 import './styles/login.css';
 import { useNavigate } from 'react-router-dom';
 
-export const Login = () => {
-  const { login } = useAuth();
+export const Login = ({ onClose }) => {
+  const dispatch = useDispatch();
+  const { isAuthenticated, loading, error } = useSelector(state => state.auth);
   const [credentials, setCredentials] = useState({
     username: "",
     password: "",
   });
-  const [error, setError] = useState(null);
   const [modalIsOpen, setModalIsOpen] = useState(true);
   const navigate = useNavigate();
+
+  useEffect(() => {
+    if (isAuthenticated) {
+      onClose();
+    }
+  }, [isAuthenticated, onClose]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     
     if (!credentials.username || !credentials.password) {
-      setError("Por favor, ingrese usuario y contraseña");
       showToast("Por favor, ingrese usuario y contraseña", "error");
       return;
     }
 
     try {
-      const result = await login(credentials);
-      
-      if (result.success) {
-        showToast("Inicio de sesión exitoso", "success");
-        navigate('/');
-        setModalIsOpen(false);
-      } else {
-        setError(result.error);
-        showToast(result.error, "error");
-      }
+      await dispatch(loginAsync(credentials));
+      showToast("Inicio de sesión exitoso", "success");
+      navigate('/');
+      setModalIsOpen(false);
     } catch (error) {
-      setError("Error al iniciar sesión");
       showToast("Error al iniciar sesión", "error");
     }
   };

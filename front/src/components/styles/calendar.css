@@ -44,6 +44,8 @@
     font-size: 0.9rem;
     min-height: 1.3rem;
     min-width: 1.3rem;
+    
+
 }
 
 .calendar .day:not(.empty):hover {
@@ -169,6 +171,28 @@
   flex-direction: column;
   height: 100%;
   min-height: 2.5rem;
+  background-color: #373942;
+  border: 1px solid #ccc;
+  border-radius: 0.3rem;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.day-container:hover {
+  background-color: #2862c5;
+}
+
+.day-container.selected {
+  background-color: #646cff;
+  color: white;
+}
+
+.day-container.today {
+  border: 2px solid #646cff;
+}
+
+.day-container.weekend {
+  background-color: #9c4545;
 }
 
 .day-number {
@@ -176,6 +200,10 @@
   display: flex;
   align-items: center;
   justify-content: center;
+  padding: 0.2rem;
+  font-size: 0.9rem;
+  min-height: 1.8rem;
+  min-width: 1.8rem;
 }
 
 .occupancy-bar {
@@ -189,29 +217,11 @@
   overflow: hidden;
 }
 
-.weekday-occupancy-bar {
-  width: 100%;
-  height: 4px;
-  background-color: #444;
-  border-radius: 2px;
-  overflow: hidden;
-  margin-top: 2px;
-}
-
 .occupancy-fill {
   height: 100%;
-  background-color: #646cff;
   transition: width 0.3s ease;
 }
 
-.weekday-content {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  width: 100%;
-}
-
-/* Colores para diferentes niveles de ocupación */
 .occupancy-fill.low {
   background-color: #4caf50;
 }
@@ -222,4 +232,48 @@
 
 .occupancy-fill.high {
   background-color: #f44336;
+}
+
+.empty {
+  background-color: transparent;
+  border: none;
+}
+
+/* Ajustes para los días de la semana en el encabezado */
+.weekday-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 100%;
+  padding: 0.2rem;
+}
+
+.weekday-occupancy-bar {
+  width: 100%;
+  height: 4px;
+  background-color: #444;
+  border-radius: 2px;
+  overflow: hidden;
+  margin-top: 2px;
+}
+
+.calendar-error {
+  text-align: center;
+  padding: 20px;
+  color: #f44336;
+}
+
+.calendar-error button {
+  margin-top: 10px;
+  padding: 8px 16px;
+  background-color: #646cff;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.loading {
+  opacity: 0.5;
+  pointer-events: none;
 }

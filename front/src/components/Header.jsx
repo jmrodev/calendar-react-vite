@@ -1,22 +1,51 @@
 import React from "react";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { Link } from 'react-router-dom';
-import { LogoutButton } from './LogoutButton';
+import { logoutAsync } from '../redux/slices/authSlice';
+import showToast from "../utils/toastUtils";
+import './styles/header.css';
 
 export const Header = () => {
-  const isAuthenticated = useSelector(state => state.auth.isAuthenticated);
+  const dispatch = useDispatch();
+  const { isAuthenticated } = useSelector(state => state.auth);
+
+  const handleLogout = async () => {
+    try {
+      await dispatch(logoutAsync());
+      showToast("Sesión cerrada exitosamente", "success");
+    } catch (error) {
+      showToast("Error al cerrar sesión", "error");
+    }
+  };
 
   return (
     <header>
-      <nav>
-        <ul>
+      <nav className="navbar">
+        <div className="nav-brand">
+          <Link to="/">Sistema de Citas</Link>
+        </div>
+        <ul className="nav-links">
           <li>
-            <a href="/">Inicio</a>
+            <Link to="/">Inicio</Link>
           </li>
-          {isAuthenticated ? (
-            <LogoutButton />
-          ) : (
-            <Link to="/login">Iniciar Sesión</Link>
+          {isAuthenticated && (
+            <>
+              <li>
+                <Link to="/appointments">Citas</Link>
+              </li>
+              <li>
+                <button className="logout-btn" onClick={handleLogout}>
+                  Cerrar Sesión
+                </button>
+              </li>
+            </>
+          )}
+          {!isAuthenticated && (
+            <li>
+              <Link to="/login" className="login-link">
+                Iniciar Sesión
+              </Link>
+            </li>
           )}
         </ul>
       </nav>

@@ -1,7 +1,23 @@
 import { configureStore } from '@reduxjs/toolkit';
-import rootReducer from './reducers/rootReducer';
+import authReducer from './slices/authSlice';
+import appointmentsReducer from './slices/appointmentsSlice';
 
-export const store = configureStore({
-  reducer: rootReducer,
-  // No es necesario agregar redux-thunk manualmente, ya que se incluye por defecto
+const store = configureStore({
+  reducer: {
+    auth: authReducer,
+    appointments: appointmentsReducer
+  },
+  middleware: (getDefaultMiddleware) =>
+    getDefaultMiddleware({
+      serializableCheck: {
+        // Ignorar acciones específicas que pueden contener datos no serializables
+        ignoredActions: [
+          'appointments/fetchMonthAppointments/fulfilled',
+          'auth/login/fulfilled',
+          'auth/logout/fulfilled'
+        ]
+      }
+    })
 });
+
+export default store;

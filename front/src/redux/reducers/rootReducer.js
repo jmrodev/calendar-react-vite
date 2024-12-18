@@ -1,9 +1,10 @@
-import { combineReducers } from 'redux';
-import authReducer from './authReducer';
+import { combineReducers } from '@reduxjs/toolkit';
+import authReducer from '../slices/authSlice';
+import appointmentsReducer from '../slices/appointmentsSlice';
 
 const rootReducer = combineReducers({
   auth: authReducer,
-  // otros reducers aquí
+  appointments: appointmentsReducer,
 });
 
 export default rootReducer;

@@ -22,9 +22,14 @@ export const completeAppointmentService = async (appointmentId) => {
 
 export const confirmAppointmentService = async (appointmentId) => {
   try {
-    return await confirmAppointmentRepository(appointmentId);
+    const appointment = await confirmAppointmentRepository(appointmentId);
+    if (!appointment) {
+      throw new Error('No se encontró la cita');
+    }
+    return appointment;
   } catch (error) {
-    throw new Error(`Error in confirm appointment service: ${error.message}`);
+    console.error('Error en confirmAppointmentService:', error);
+    throw new Error(`Error al confirmar la cita: ${error.message}`);
   }
 };
 

@@ -1,11 +1,20 @@
 import React, { useState, useEffect } from "react";
-import { getAppointmentsByDate, getAppointmentsByWeekDay } from "../services/appointmentsService";
+import { useDispatch, useSelector } from 'react-redux';
+import { fetchMonthAppointments, fetchWeekDayAppointments } from '../redux/slices/appointmentsSlice';
 import "./styles/calendar.css";
 
 const Calendar = ({ onDateSelect, selectedDate }) => {
-  const [currentDate, setCurrentDate] = useState(new Date());
-  const [appointmentsCount, setAppointmentsCount] = useState({});
-  const [weekDayAppointments, setWeekDayAppointments] = useState({});
+  const [currentDate, setCurrentDate] = useState(() => {
+    const savedDate = localStorage.getItem('selectedDate');
+    return savedDate ? new Date(savedDate) : new Date();
+  });
+  const dispatch = useDispatch();
+  const { 
+    monthCounts, 
+    weekDayCounts, 
+    loading, 
+    error 
+  } = useSelector(state => state.appointments);
   const weekDays = [
     { name: 'Domingo', short: 'Dom', value: 0 },
     { name: 'Lunes', short: 'Lun', value: 1 },
@@ -16,46 +25,39 @@ const Calendar = ({ onDateSelect, selectedDate }) => {
     { name: 'Sábado', short: 'Sáb', value: 6 }
   ];
 
-  // Obtener conteo de citas para cada día del mes actual
   useEffect(() => {
-    const fetchMonthAppointments = async () => {
-      const month = currentDate.getMonth() + 1;
-      const year = currentDate.getFullYear();
-      const daysInMonth = getDaysInMonth(year, month - 1);
-      
-      const counts = {};
-      for (let day = 1; day <= daysInMonth; day++) {
-        const date = `${year}-${month.toString().padStart(2, '0')}-${day.toString().padStart(2, '0')}`;
-        try {
-          const appointments = await getAppointmentsByDate(date);
-          counts[date] = appointments.length;
-        } catch (error) {
-          console.error(`Error fetching appointments for ${date}:`, error);
-        }
+    const fetchData = async () => {
+      if (selectedDate) {
+        await Promise.all([
+          dispatch(fetchMonthAppointments({
+            year: currentDate.getFullYear(),
+            month: currentDate.getMonth()
+          })),
+          dispatch(fetchWeekDayAppointments())
+        ]);
       }
-      setAppointmentsCount(counts);
     };
+    fetchData();
+  }, [selectedDate, currentDate, dispatch]);
 
-    fetchMonthAppointments();
-  }, [currentDate]);
-
-  // Obtener conteo de citas para cada día de la semana
   useEffect(() => {
-    const fetchWeekDayAppointments = async () => {
-      const counts = {};
-      for (let day = 0; day < 7; day++) {
-        try {
-          const appointments = await getAppointmentsByWeekDay(day);
-          counts[day] = appointments.length;
-        } catch (error) {
-          console.error(`Error fetching appointments for weekday ${day}:`, error);
-        }
-      }
-      setWeekDayAppointments(counts);
+    const fetchInitialData = async () => {
+      await Promise.all([
+        dispatch(fetchMonthAppointments({
+          year: currentDate.getFullYear(),
+          month: currentDate.getMonth()
+        })),
+        dispatch(fetchWeekDayAppointments())
+      ]);
     };
+    fetchInitialData();
 
-    fetchWeekDayAppointments();
-  }, []);
+    // Si hay una fecha guardada, seleccionarla
+    const savedDate = localStorage.getItem('selectedDate');
+    if (savedDate && !selectedDate) {
+      onDateSelect(new Date(savedDate));
+    }
+  }, [currentDate, dispatch]);
 
   const handleWeekDayClick = (dayValue) => {
     const today = new Date();
@@ -74,6 +76,12 @@ const Calendar = ({ onDateSelect, selectedDate }) => {
     return new Date(year, month + 1, 0).getDate();
   };
 
+  const getOccupancyClass = (percentage) => {
+    if (percentage > 66) return 'high';
+    if (percentage > 33) return 'medium';
+    return 'low';
+  };
+
   const generateCalendar = () => {
     const month = currentDate.getMonth();
     const year = currentDate.getFullYear();
@@ -81,13 +89,20 @@ const Calendar = ({ onDateSelect, selectedDate }) => {
     const firstDay = getFirstDayOfMonth(year, month);
     const calendar = [];
 
-    
+    // Días vacíos al inicio del mes
     for (let i = 0; i < firstDay; i++) {
       calendar.push(<div key={`empty-${i}`} className="empty"></div>);
     }
 
+    // Días del mes
     for (let day = 1; day <= daysInMonth; day++) {
       const dateForDay = new Date(year, month, day);
+      const dateStr = dateForDay.toISOString().split('T')[0];
+      const count = monthCounts[dateStr] || 0;
+      const maxAppointments = 8; // Máximo de citas por día
+      const occupancyPercentage = (count / maxAppointments) * 100;
+      const occupancyClass = getOccupancyClass(occupancyPercentage);
+
       const isToday = day === new Date().getDate() &&
         month === new Date().getMonth() &&
         year === new Date().getFullYear();
@@ -100,10 +115,17 @@ const Calendar = ({ onDateSelect, selectedDate }) => {
       calendar.push(
         <div
           key={day}
-          className={`day ${isToday ? "today" : ""} ${isWeekend ? "weekend" : ""} ${isSelected ? "selected" : ""}`}
+          className={`day-container ${isToday ? "today" : ""} ${isWeekend ? "weekend" : ""} ${isSelected ? "selected" : ""}`}
           onClick={() => onDateSelect(dateForDay, false)}
+          title={`${count} citas programadas`}
         >
-          {day}
+          <div className="day-number">{day}</div>
+          <div className="occupancy-bar">
+            <div 
+              className={`occupancy-fill ${occupancyClass}`}
+              style={{ width: `${Math.min(occupancyPercentage, 100)}%` }}
+            />
+          </div>
         </div>
       );
     }
@@ -127,7 +149,7 @@ const Calendar = ({ onDateSelect, selectedDate }) => {
   const renderDay = (day, isWeekDay = false) => {
     const date = new Date(currentDate.getFullYear(), currentDate.getMonth(), day);
     const dateStr = date.toISOString().split('T')[0];
-    const count = appointmentsCount[dateStr] || 0;
+    const count = monthCounts[dateStr] || 0;
     const maxAppointments = 8; // Asumimos un máximo de 8 citas por día
     const occupancyPercentage = (count / maxAppointments) * 100;
 
@@ -146,9 +168,29 @@ const Calendar = ({ onDateSelect, selectedDate }) => {
 
   // Modificar el renderizado de los días de la semana para incluir la barra de ocupación
   const renderWeekDay = (day) => {
-    const count = weekDayAppointments[day.value] || 0;
-    const maxAppointments = 20; // Asumimos un máximo de 20 citas por día de la semana
+    if (loading) {
+      return (
+        <div 
+          key={day.value} 
+          className="day header-day loading"
+        >
+          <div className="weekday-content">
+            <span>{day.short}</span>
+          </div>
+        </div>
+      );
+    }
+
+    const count = weekDayCounts[day.value] || 0;
+    const maxAppointments = 20;
     const occupancyPercentage = (count / maxAppointments) * 100;
+
+    let occupancyClass = 'low';
+    if (occupancyPercentage > 66) {
+      occupancyClass = 'high';
+    } else if (occupancyPercentage > 33) {
+      occupancyClass = 'medium';
+    }
 
     return (
       <div 
@@ -163,7 +205,7 @@ const Calendar = ({ onDateSelect, selectedDate }) => {
           <span>{day.short}</span>
           <div className="weekday-occupancy-bar">
             <div 
-              className="occupancy-fill"
+              className={`occupancy-fill ${occupancyClass}`}
               style={{ width: `${Math.min(occupancyPercentage, 100)}%` }}
             />
           </div>
@@ -171,6 +213,16 @@ const Calendar = ({ onDateSelect, selectedDate }) => {
       </div>
     );
   };
+
+  // Renderizado condicional basado en el estado
+  if (error) {
+    return (
+      <div className="calendar-error">
+        <p>{error}</p>
+        <button onClick={() => window.location.reload()}>Reintentar</button>
+      </div>
+    );
+  }
 
   return (
     <div className="calendar">

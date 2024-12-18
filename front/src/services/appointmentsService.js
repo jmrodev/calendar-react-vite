@@ -63,23 +63,23 @@ export const completeAppointment = async (id) => {
   }
 };
 
-export const confirmAppointment = async (id, data = {}) => {
+export const confirmAppointment = async (appointmentId) => {
   try {
-    const response = await fetch(`${config.baseUrl}/appointments/confirm/${id}`, {
-      method: "PUT",
+    const response = await fetch(`${config.baseUrl}/appointments/confirm/${appointmentId}`, {
+      method: 'PUT',
       headers: _getHeaders(),
-      body: JSON.stringify(data),
     });
 
     handleUnauthorizedError(response);
 
     if (!response.ok) {
-      const errorData = await response.text();
-      throw new Error(errorData || "Error al confirmar la cita");
+      const errorData = await response.json();
+      throw new Error(errorData.message || 'Error al confirmar la cita');
     }
-    const responseData = await response.json();
-    return responseData;
+
+    return await response.json();
   } catch (error) {
+    console.error('Error en confirmAppointment:', error);
     throw error;
   }
 };

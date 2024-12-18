@@ -6,12 +6,15 @@ import {
   deleteAppointment,
 } from "./appointmentsService";
 import showToast from "../utils/toastUtils";
+import  store  from '../redux/store';
+import { fetchMonthAppointments, fetchWeekDayAppointments } from '../redux/slices/appointmentsSlice';
 
 export const handleCreateAppointment = async (
   slot,
   selectedDate,
   setTimeSlots,
-  setError
+  setError,
+  dispatch
 ) => {
   try {
     const patientName = prompt("Ingrese el nombre del paciente:");
@@ -35,15 +38,26 @@ export const handleCreateAppointment = async (
     };
 
     const response = await createAppointment(appointmentData);
-    setTimeSlots((prevSlots) =>
-      prevSlots.map((s) =>
-        s.appointmentTime === slot.appointmentTime
-          ? { ...response, id: response._id }
-          : s
-      )
-    );
 
     if (response) {
+      // Primero actualizamos el UI local
+      setTimeSlots((prevSlots) =>
+        prevSlots.map((s) =>
+          s.appointmentTime === slot.appointmentTime
+            ? { ...response, id: response._id }
+            : s
+        )
+      );
+
+      // Luego actualizamos Redux de forma inmediata
+      await Promise.all([
+        dispatch(fetchMonthAppointments({
+          year: selectedDate.getFullYear(),
+          month: selectedDate.getMonth()
+        })),
+        dispatch(fetchWeekDayAppointments())
+      ]);
+
       showToast("Cita creada exitosamente", "success");
     } else {
       showToast("Error al crear la cita", "error");
@@ -54,26 +68,17 @@ export const handleCreateAppointment = async (
   }
 };
 
-export const handleConfirmClick = async (
-  event,
-  slot,
-  setTimeSlots,
-  setError
-) => {
-  event.stopPropagation();
+export const handleConfirmClick = async (e, slot, setTimeSlots, setError) => {
+  e.stopPropagation();
   try {
-    const confirmation = window.confirm("¿Desea confirmar esta cita?");
-    if (!confirmation) return;
-
-    const appointmentId = slot._id || slot.id;
-    await confirmAppointment(appointmentId, { confirmAppointment: true });
-
+    await confirmAppointment(slot._id);
+    
+    // Actualizar el estado local
     setTimeSlots((prevSlots) =>
       prevSlots.map((s) =>
-        s.id === slot.id
+        s._id === slot._id
           ? {
               ...s,
-              status: "confirmed",
               appointment: {
                 ...s.appointment,
                 confirmAppointment: true,
@@ -82,6 +87,14 @@ export const handleConfirmClick = async (
           : s
       )
     );
+
+    // Actualizar Redux
+    store.dispatch(fetchMonthAppointments({
+      year: new Date(slot.date).getFullYear(),
+      month: new Date(slot.date).getMonth()
+    }));
+    store.dispatch(fetchWeekDayAppointments());
+
     showToast("Cita confirmada exitosamente", "success");
   } catch (err) {
     setError(err.message);
@@ -276,5 +289,23 @@ export const handleConfirmAppointment = async (appointmentId) => {
   } catch (error) {
     showToast("Error al confirmar la cita", "error");
     console.error("Error:", error);
+  }
+};
+
+export const handleAppointmentCreation = async (appointmentData) => {
+  try {
+    await createAppointment(appointmentData);
+    
+    // Refrescar los conteos
+    store.dispatch(fetchMonthAppointments({
+      year: new Date().getFullYear(),
+      month: new Date().getMonth()
+    }));
+    store.dispatch(fetchWeekDayAppointments());
+    
+    return { success: true };
+  } catch (error) {
+    console.error('Error creating appointment:', error);
+    return { success: false, error: error.message };
   }
 };

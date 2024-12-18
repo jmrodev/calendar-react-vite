@@ -13,12 +13,14 @@ const Week = ({ selectedDate, isWeekDayView }) => {
     const loadTimeSlots = async () => {
       try {
         if (isWeekDayView) {
-          // Cargar citas por día de la semana
           const dayOfWeek = selectedDate.getDay();
           const slots = await getAppointmentsByWeekDay(dayOfWeek);
-          setTimeSlots(slots);
+          const slotsWithDate = slots.map(slot => ({
+            ...slot,
+            date: selectedDate.toISOString().split('T')[0]
+          }));
+          setTimeSlots(slotsWithDate);
         } else {
-          // Cargar citas por fecha específica
           const slots = await generateTimeSlots(selectedDate);
           setTimeSlots(slots);
         }
@@ -42,7 +44,7 @@ const Week = ({ selectedDate, isWeekDayView }) => {
     <div className="week-schedule">
       <h2>
         {isWeekDayView 
-          ? `Horarios para ${dayName}s` 
+          ? `Horarios para ${dayName}` 
           : `Horarios para el ${standardizeDate(selectedDate)}`
         }
       </h2>
