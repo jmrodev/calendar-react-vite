@@ -9,6 +9,7 @@ import {
   getAppointmentByDateController,
   completeAppointmentController,
   updateAppointmentController,
+  getAppointmentsByWeekDayController,
 } from "../Controller/appointmentController.js";
 import { authorize } from "../Middleware/roles/authorize.js";
 import { authToken } from "../Middleware/token/authToken.js";
@@ -68,6 +69,16 @@ router.put(
   authToken,
   authorize("appointments", "update"),
   completeAppointmentController
+);
+router.get(
+  "/weekday/:dayOfWeek",
+  authToken,
+  (req,res,next) => {
+    console.log("router",req.params);
+    next();
+  },
+  authorize("appointments", "read"),
+  getAppointmentsByWeekDayController
 );
 
 export default router;

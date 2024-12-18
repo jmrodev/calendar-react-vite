@@ -140,3 +140,32 @@ export const updateAppointmentRepository = async (id, appointment) => {
     throw new Error(`Error in editAppointmentRepository: ${error.message}`);
   }
 };
+
+export const getAppointmentsByWeekDayRepository = async (dayOfWeek) => {
+  console.log("repository", dayOfWeek);
+  
+  try {
+    const allAppointments = await AppointmentSchema.find();
+    
+    const appointments = allAppointments.filter((appointment) => {
+      const appointmentDate = new Date(appointment.date);
+      let dayOfWeektransf = parseInt(dayOfWeek);
+      console.log(`Cita fecha: ${appointment.date}, día: ${appointmentDate.getDay() + 1}, buscando día: ${dayOfWeektransf}`);
+      
+      return (appointmentDate.getDay() + 1) === dayOfWeektransf;
+    });
+    
+    appointments.sort((a, b) => {
+      const dateA = new Date(a.date);
+      const dateB = new Date(b.date);
+      if (dateA.getTime() !== dateB.getTime()) {
+        return dateA - dateB;
+      }
+      return a.appointmentTime.localeCompare(b.appointmentTime);
+    });
+
+    return appointments;
+  } catch (error) {
+    throw new Error(`Error en repositorio: ${error.message}`);
+  }
+};

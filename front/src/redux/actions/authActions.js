@@ -2,10 +2,11 @@ import config from '../../config/env.cfg';
 
 export const LOGIN_SUCCESS = 'LOGIN_SUCCESS';
 export const LOGIN_FAILURE = 'LOGIN_FAILURE';
+export const LOGOUT = 'LOGOUT';
 
 export const loginSuccess = (user) => ({
   type: LOGIN_SUCCESS,
-  payload: user, 
+  payload: user
 });
 
 export const loginFailure = (error) => ({
@@ -13,9 +14,13 @@ export const loginFailure = (error) => ({
   payload: error,
 });
 
-export const login = (credentials) => async (dispatch) => {
-  console.log('Login credentials:', credentials);
+export const logout = () => {
+  return {
+    type: LOGOUT
+  };
+};
 
+export const login = (credentials) => async (dispatch) => {
   try {
     const response = await fetch(`${config.url_login}`, {
       method: 'POST',
@@ -30,7 +35,7 @@ export const login = (credentials) => async (dispatch) => {
     if (response.ok) {
       localStorage.setItem('jwt', data.token);
       dispatch(loginSuccess(data.user));
-      return data;
+      return { success: true };
     } else {
       dispatch(loginFailure(data.message || 'Error al iniciar sesión'));
       return { error: data.message };

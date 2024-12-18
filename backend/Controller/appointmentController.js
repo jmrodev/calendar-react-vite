@@ -8,6 +8,7 @@ import {
   updateAppointmentService,
   confirmAppointmentService,
   completeAppointmentService,
+  getAppointmentsByWeekDayService,
 } from "../Service/appointmentService.js";
 
 export const completeAppointmentController = async (req, res) => {
@@ -118,5 +119,36 @@ export const updateAppointmentController = async (req, res) => {
     });
   } catch (error) {
     res.status(500).json({ error: error.message });
+  }
+};
+
+export const getAppointmentsByWeekDayController = async (req, res) => {  
+  try {
+    const { dayOfWeek } = req.params;
+    console.log("controller", dayOfWeek);
+    
+    // Convertir el día de la semana en texto a número
+    const weekDays = {
+      'sunday': 0,
+      'monday': 1,
+      'tuesday': 2,
+      'wednesday': 3,
+      'thursday': 4,
+      'friday': 5,
+      'saturday': 6
+    };
+    
+    const dayNumber = weekDays[dayOfWeek.toLowerCase()];
+    
+    if (dayNumber === undefined) {
+      return res.status(400).json({ 
+        message: "Día de la semana inválido. Use: sunday, monday, tuesday, wednesday, thursday, friday, saturday" 
+      });
+    }
+
+    const appointments = await getAppointmentsByWeekDayService(dayNumber);
+    res.json(appointments);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
   }
 };

@@ -8,6 +8,7 @@ import {
   getAppointmentByIdRepository,
   getConfirmedAppointmentsRepository,
   updateAppointmentRepository,
+  getAppointmentsByWeekDayRepository,
 } from "../Repository/appointmentRepository.js";
 import { newAppointmentId } from "../Utils/id/appointment.js";
 
@@ -95,5 +96,14 @@ export const updateAppointmentService = async (id, data) => {
     return await updateAppointmentRepository(id, data);
   } catch (error) {
     throw new Error(`Error in update appointment service: ${error.message}`);
+  }
+};
+
+export const getAppointmentsByWeekDayService = async (dayOfWeek) => {
+  try {
+    const appointments = await getAppointmentsByWeekDayRepository(dayOfWeek);
+    return appointments;
+  } catch (error) {
+    throw new Error(`Error al obtener citas por día de la semana: ${error.message}`);
   }
 };

@@ -1,10 +1,10 @@
 import React from "react";
 import Week from "./Week";
 
-export const Main = ({ selectedDate }) => {
+export const Main = ({ selectedDate, isWeekDayView }) => {
   return (
     <main>
-      <Week selectedDate={selectedDate} />
+      <Week selectedDate={selectedDate} isWeekDayView={isWeekDayView} />
     </main>
   );
 };

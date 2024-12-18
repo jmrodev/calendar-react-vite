@@ -96,3 +96,11 @@ Authorization: {{tokenPrefix}} {{login.response.body.token}}
 {
     "completed": true
 }
+
+### Obtener citas por día de la semana
+GET http://{{host}}/api/appointments/weekday/monday
+Authorization: {{tokenPrefix}} {{login.response.body.token}}
+
+### Obtener citas para el martes
+GET http://{{host}}/api/appointments/weekday/tuesday
+Authorization: {{tokenPrefix}} {{login.response.body.token}}

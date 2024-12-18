@@ -3,63 +3,49 @@ import { useAuth } from "../hooks/useAuth";
 import showToast from "../utils/toastUtils";
 import Modal from "react-modal";
 import './styles/login.css';
-import { useDispatch } from 'react-redux';
-import { login } from '../redux/actions/authActions';
+import { useNavigate } from 'react-router-dom';
 
 export const Login = () => {
-  const { login: authHookLogin } = useAuth();
+  const { login } = useAuth();
   const [credentials, setCredentials] = useState({
     username: "",
     password: "",
   });
   const [error, setError] = useState(null);
   const [modalIsOpen, setModalIsOpen] = useState(true);
-  const dispatch = useDispatch();
-
-  const handleChange = (e) => {
-    const { name, value } = e.target;
-    setCredentials((prev) => ({ ...prev, [name]: value }));
-    setError(null);
-  };
+  const navigate = useNavigate();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     
     if (!credentials.username || !credentials.password) {
       setError("Por favor, ingrese usuario y contraseña");
+      showToast("Por favor, ingrese usuario y contraseña", "error");
       return;
     }
 
     try {
-      const result = await dispatch(login(credentials));
+      const result = await login(credentials);
       
-      if (result.error) {
-        setError(result.error);
-        showToast(`Error al iniciar sesión: ${result.error}`, "error");
-      } else {
+      if (result.success) {
         showToast("Inicio de sesión exitoso", "success");
-        handleCloseModal();
+        navigate('/');
+        setModalIsOpen(false);
+      } else {
+        setError(result.error);
+        showToast(result.error, "error");
       }
     } catch (error) {
-      setError(error.message || "Error desconocido al iniciar sesión");
-      showToast(`Error al iniciar sesión: ${error.message}`, "error");
+      setError("Error al iniciar sesión");
+      showToast("Error al iniciar sesión", "error");
     }
-  };
-
-  const handleCloseModal = () => {
-    setModalIsOpen(false);
-  };
-
-  const handleLogin = (credentials) => {
-    console.log('Attempting to log in with:', credentials); // Log de las credenciales
-    dispatch(login(credentials)); // Asegúrate de que esta línea se ejecute
   };
 
   return (
     <Modal
       className="modal"
       isOpen={modalIsOpen}
-      onRequestClose={handleCloseModal}
+      onRequestClose={() => navigate('/')}
       ariaHideApp={false}
     >
       <div>
@@ -68,30 +54,22 @@ export const Login = () => {
             type="text"
             name="username"
             placeholder="Usuario"
-            onChange={handleChange}
+            onChange={(e) => setCredentials(prev => ({...prev, username: e.target.value}))}
             value={credentials.username}
           />
           <input
             type="password"
             name="password"
             placeholder="Contraseña"
-            onChange={handleChange}
+            onChange={(e) => setCredentials(prev => ({...prev, password: e.target.value}))}
             value={credentials.password}
           />
           {error && (
-            <div 
-              style={{ 
-                color: 'red', 
-                marginBottom: '10px',
-                padding: '5px',
-                backgroundColor: '#ffeeee',
-                borderRadius: '4px'
-              }}
-            >
+            <div style={{ color: 'red', marginBottom: '10px' }}>
               {error}
             </div>
           )}
-          <button type="submit" onClick={() => handleLogin(credentials)}>Iniciar sesión</button>
+          <button type="submit">Iniciar sesión</button>
         </form>
       </div>
     </Modal>

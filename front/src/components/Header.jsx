@@ -1,16 +1,10 @@
 import React from "react";
-import { useSelector, useDispatch } from "react-redux";
-import { useAuth } from "../hooks/useAuth";
+import { useSelector } from "react-redux";
+import { Link } from 'react-router-dom';
+import { LogoutButton } from './LogoutButton';
 
 export const Header = () => {
-  const dispatch = useDispatch();
-  const { logout } = useAuth();
-  const isLoggedIn = useSelector((state) => state.auth.isLoggedIn);
-  const userName = useSelector((state) => state.auth.userName);
-
-  const handleLogout = () => {
-    logout();
-  };
+  const isAuthenticated = useSelector(state => state.auth.isAuthenticated);
 
   return (
     <header>
@@ -19,17 +13,10 @@ export const Header = () => {
           <li>
             <a href="/">Inicio</a>
           </li>
-          {isLoggedIn ? (
-            <>
-              <li>Bienvenido, {userName}</li>
-              <li>
-                <button onClick={handleLogout}>Cerrar sesión</button>
-              </li>
-            </>
+          {isAuthenticated ? (
+            <LogoutButton />
           ) : (
-            <li>
-              <a href="/login">Iniciar sesión</a>
-            </li>
+            <Link to="/login">Iniciar Sesión</Link>
           )}
         </ul>
       </nav>

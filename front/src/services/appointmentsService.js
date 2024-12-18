@@ -1,4 +1,4 @@
-import { _getHeaders, _handleError } from "./utils";
+import { _getHeaders, handleUnauthorizedError } from "./utils";
 import config from "../config/env.cfg";
 
 export const updateAppointment = async (id, appointment) => {
@@ -9,6 +9,8 @@ export const updateAppointment = async (id, appointment) => {
       body: JSON.stringify(appointment),
     });
 
+    handleUnauthorizedError(response);
+
     if (!response.ok) {
       const errorData = await response.text();
       throw new Error(errorData || "Error al actualizar la cita");
@@ -16,7 +18,7 @@ export const updateAppointment = async (id, appointment) => {
 
     return await response.json();
   } catch (error) {
-    _handleError("updateAppointment", error);
+    throw error;
   }
 };
 
@@ -27,6 +29,8 @@ export const deleteAppointment = async (id) => {
       headers: _getHeaders(),
     });
 
+    handleUnauthorizedError(response);
+
     if (!response.ok) {
       const errorData = await response.text();
       throw new Error(errorData || "Error al eliminar la cita");
@@ -34,7 +38,7 @@ export const deleteAppointment = async (id) => {
 
     return await response.json();
   } catch (error) {
-    _handleError("deleteAppointment", error);
+    throw error;
   }
 };
 
@@ -46,6 +50,8 @@ export const completeAppointment = async (id) => {
       body: JSON.stringify({ completed: true }),
     });
 
+    handleUnauthorizedError(response);
+
     if (!response.ok) {
       const errorData = await response.text();
       throw new Error(errorData || "Error al completar la cita");
@@ -53,7 +59,7 @@ export const completeAppointment = async (id) => {
 
     return await response.json();
   } catch (error) {
-    _handleError("completeAppointment", error);
+    throw error;
   }
 };
 
@@ -65,6 +71,8 @@ export const confirmAppointment = async (id, data = {}) => {
       body: JSON.stringify(data),
     });
 
+    handleUnauthorizedError(response);
+
     if (!response.ok) {
       const errorData = await response.text();
       throw new Error(errorData || "Error al confirmar la cita");
@@ -72,7 +80,7 @@ export const confirmAppointment = async (id, data = {}) => {
     const responseData = await response.json();
     return responseData;
   } catch (error) {
-    _handleError("confirmAppointment", error);
+    throw error;
   }
 };
 
@@ -84,6 +92,8 @@ export const createAppointment = async (appointment) => {
       body: JSON.stringify(appointment),
     });
 
+    handleUnauthorizedError(response);
+
     if (!response.ok) {
       const errorData = await response.json();
       throw new Error(errorData.message || "Error al crear la cita");
@@ -91,7 +101,7 @@ export const createAppointment = async (appointment) => {
 
     return await response.json();
   } catch (error) {
-    _handleError("createAppointment", error);
+    throw error;
   }
 };
 
@@ -101,6 +111,8 @@ export const getAllAppointments = async () => {
       headers: _getHeaders(),
     });
 
+    handleUnauthorizedError(response);
+
     if (!response.ok) {
       const errorData = await response.json();
       throw new Error(errorData.message || "Error al obtener las citas");
@@ -108,7 +120,7 @@ export const getAllAppointments = async () => {
 
     return await response.json();
   } catch (error) {
-    _handleError("getAllAppointments", error);
+    throw error;
   }
 };
 
@@ -117,6 +129,8 @@ export const getAppointmentsByDate = async (date) => {
     const response = await fetch(`${config.baseUrl}/appointments/date/${date}`, {
       headers: _getHeaders(),
     });
+
+    handleUnauthorizedError(response);
 
     if (!response.ok) {
       const errorData = await response.json();
@@ -127,6 +141,29 @@ export const getAppointmentsByDate = async (date) => {
 
     return await response.json();
   } catch (error) {
-    _handleError("getAppointmentsByDate", error);
+    throw error;
+  }
+};
+
+export const getAppointmentsByWeekDay = async (dayOfWeek) => {
+  try {
+    // Convertir número a nombre del día
+    const weekDays = ['sunday', 'monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday'];
+    const dayName = weekDays[dayOfWeek];
+
+    const response = await fetch(`${config.baseUrl}/appointments/weekday/${dayName}`, {
+      headers: _getHeaders(),
+    });
+
+    handleUnauthorizedError(response);
+
+    if (!response.ok) {
+      const errorData = await response.json();
+      throw new Error(errorData.message || "Error al obtener las citas por día de la semana");
+    }
+
+    return await response.json();
+  } catch (error) {
+    throw error;
   }
 };

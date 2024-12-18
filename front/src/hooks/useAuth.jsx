@@ -1,11 +1,14 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import config from "../config/env.cfg";
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { loginSuccess, loginFailure } from '../redux/actions/authActions';
+import { useNavigate } from 'react-router-dom';
+import { logout } from '../redux/actions/authActions';
 
 export const useAuth = () => {
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
   const dispatch = useDispatch();
+  const navigate = useNavigate();
+  const isAuthenticated = useSelector(state => state.auth.isAuthenticated);
 
   const login = async (credentials) => {
     try {
@@ -20,12 +23,11 @@ export const useAuth = () => {
       const data = await response.json();
 
       if (response.ok) {
-        const { token } = data;
+        const { token, user } = data;
         localStorage.setItem("jwt", token);
-        setIsAuthenticated(true);
+        dispatch(loginSuccess(user));
         return { success: true };
       } else {
-        setIsAuthenticated(false);
         return { 
           success: false, 
           error: data.error || 'Error de inicio de sesión'
@@ -106,17 +108,41 @@ export const useAuth = () => {
     }
   };
 
-  const logout = () => {
-    localStorage.removeItem("jwt");
-    dispatch(loginFailure(null));
-    setIsAuthenticated(false);
+  const handleLogout = () => {
+    try {
+      localStorage.removeItem("jwt");
+      dispatch(logout());
+      navigate('/login');
+    } catch (error) {
+      console.error('Error during logout:', error);
+    }
+  };
+
+  const checkAuthStatus = () => {
+    const token = localStorage.getItem('jwt');
+    if (!token) {
+      handleLogout();
+      return false;
+    }
+    try {
+      const payload = JSON.parse(atob(token.split('.')[1]));
+      if (payload.exp * 1000 < Date.now()) {
+        handleLogout();
+        return false;
+      }
+    } catch (error) {
+      handleLogout();
+      return false;
+    }
+    return true;
   };
 
   return {
     isAuthenticated,
     login,
-    logout,
+    logout: handleLogout,
     register,
     refreshToken, 
+    checkAuthStatus,
   };
 };
