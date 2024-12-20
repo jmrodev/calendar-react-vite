@@ -33,18 +33,20 @@ export const confirmAppointmentService = async (appointmentId) => {
   }
 };
 
-export const createAppointmentService = async (appointmentData) => {
+export const createAppointmentService = async (appointmentData, secretaryId, secretaryName) => {
   try {
     const { date, appointmentTime, appointment } = appointmentData;
 
     if (!date || !appointmentTime || !appointment.name) {
       throw new Error("Date, appointment time and patient name are required");
     }
+
     const newAppointment = {
       _id: newAppointmentId(),
       ...appointmentData,
     };
-    return await createAppointmentRepository(newAppointment);
+
+    return await createAppointmentRepository(newAppointment, secretaryId, secretaryName);
   } catch (error) {
     throw new Error(`Error in create appointment service: ${error.message}`);
   }
@@ -96,9 +98,9 @@ export const getConfirmedAppointmentsService = async () => {
   }
 };
 
-export const updateAppointmentService = async (id, data) => {
+export const updateAppointmentService = async (id, data, secretaryId) => {
   try {
-    return await updateAppointmentRepository(id, data);
+    return await updateAppointmentRepository(id, data, secretaryId);
   } catch (error) {
     throw new Error(`Error in update appointment service: ${error.message}`);
   }

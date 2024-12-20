@@ -1,1 +1,53 @@
-[{"_id":1,"username":"newuser2","password":"$2b$10$TKS5W2D9G.dtfxUuUCM4/.DxoXjRptkjpfrRX/n89p4EDQjaXb.gK","role":"admin","loginAttempts":0,"lockUntil":"","createdAt":"2024-12-05","lastLogin":"2024-12-18"}]
+[
+  {
+    "_id": 1,
+    "username": "newuser2",
+    "password": "$2b$10$TKS5W2D9G.dtfxUuUCM4/.DxoXjRptkjpfrRX/n89p4EDQjaXb.gK",
+    "role": "admin",
+    "personalInfo": {
+      "firstName": "Admin",
+      "lastName": "Principal",
+      "email": "admin@clinica.com",
+      "phone": "555-0001"
+    },
+    "loginAttempts": 0,
+    "lockUntil": "",
+    "createdAt": "2024-12-05T00:00:00.000Z",
+    "lastLogin": "2024-12-18T00:00:00.000Z",
+    "status": "active"
+  },
+  {
+    "_id": 2,
+    "username": "secretaria1",
+    "password": "$2b$10$TKS5W2D9G.dtfxUuUCM4/.DxoXjRptkjpfrRX/n89p4EDQjaXb.gK",
+    "role": "secretary",
+    "personalInfo": {
+      "firstName": "María",
+      "lastName": "González",
+      "email": "maria.gonzalez@clinica.com",
+      "phone": "555-0123"
+    },
+    "loginAttempts": 0,
+    "lockUntil": "",
+    "createdAt": "2024-12-05T00:00:00.000Z",
+    "lastLogin": "2024-12-18T00:00:00.000Z",
+    "status": "active"
+  },
+  {
+    "_id": 3,
+    "username": "doctor1",
+    "password": "$2b$10$TKS5W2D9G.dtfxUuUCM4/.DxoXjRptkjpfrRX/n89p4EDQjaXb.gK",
+    "role": "doctor",
+    "personalInfo": {
+      "firstName": "Juan",
+      "lastName": "Pérez",
+      "email": "juan.perez@clinica.com",
+      "phone": "555-0124"
+    },
+    "loginAttempts": 0,
+    "lockUntil": "",
+    "createdAt": "2024-12-05T00:00:00.000Z",
+    "lastLogin": "2024-12-18T00:00:00.000Z",
+    "status": "active"
+  }
+]

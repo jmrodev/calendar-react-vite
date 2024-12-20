@@ -1,4 +1,5 @@
 import { AppointmentSchema } from "../Models/AppointmentSchema.js";
+import { createLog } from "./logRepository.js";
 import { standardizeDate } from "../Utils/date/dateUtils.js";
 
 export const completeAppointmentRepository = async (appointmentId) => {
@@ -21,14 +22,38 @@ export const confirmAppointmentRepository = async (appointmentId) => {
   }
 };
 
-export const createAppointmentRepository = async (appointmentData) => {
+export const createAppointmentRepository = async (appointmentData, secretaryId, secretaryName) => {
   try {
-    const appointment = await AppointmentSchema.create(appointmentData);
+    const appointment = await AppointmentSchema.create({
+      ...appointmentData,
+      secretary: {
+        id: secretaryId,
+        name: secretaryName
+      },
+      changeLog: [{
+        date: new Date(),
+        action: "created",
+        description: "Cita creada",
+        secretaryId: secretaryId,
+        newStatus: appointmentData.status
+      }]
+    });
+
+    await createLog({
+      userId: secretaryId,
+      action: "create",
+      entityType: "appointment",
+      entityId: appointment._id,
+      description: "Creación de nueva cita",
+      details: {
+        patientName: appointmentData.appointment.name,
+        appointmentDate: appointmentData.date
+      }
+    });
+
     return await appointment.save();
   } catch (error) {
-    throw new Error(
-      `Error en createAppointmentRepository: al crear la cita: ${error.message}`
-    );
+    throw new Error(`Error en createAppointmentRepository: ${error.message}`);
   }
 };
 
@@ -113,31 +138,45 @@ export const getConfirmedAppointmentsRepository = async () => {
   }
 };
 
-export const updateAppointmentRepository = async (id, appointment) => {
-  console.log("updateAppointmentRepository", id);
-
+export const updateAppointmentRepository = async (id, appointment, secretaryId) => {
   try {
-    const numericId = Number(id);
-    const existingAppointments = await AppointmentSchema.findOne({
-      _id: numericId,
-    });
-
-    console.log("existingAppointments", existingAppointments);
-    if (!existingAppointments) {
+    const existingAppointment = await AppointmentSchema.findOne({ _id: Number(id) });
+    if (!existingAppointment) {
       throw new Error("Appointment not found");
     }
 
+    const logEntry = {
+      date: new Date(),
+      action: "updated",
+      description: "Cita actualizada",
+      secretaryId: secretaryId,
+      previousStatus: existingAppointment.status,
+      newStatus: appointment.status || existingAppointment.status
+    };
+
     const updatedAppointment = await AppointmentSchema.update(
-      { _id: numericId },
-      appointment
+      { _id: Number(id) },
+      {
+        ...appointment,
+        changeLog: [...existingAppointment.changeLog, logEntry]
+      }
     );
 
-    console.log("updatedAppointment", updatedAppointment);
+    await createLog({
+      userId: secretaryId,
+      action: "update",
+      entityType: "appointment",
+      entityId: id,
+      description: "Actualización de cita",
+      details: {
+        previousStatus: existingAppointment.status,
+        newStatus: appointment.status || existingAppointment.status
+      }
+    });
 
-    return updatedAppointment.save();
+    return updatedAppointment;
   } catch (error) {
-    console.error("Update Error:", error);
-    throw new Error(`Error in editAppointmentRepository: ${error.message}`);
+    throw new Error(`Error in updateAppointmentRepository: ${error.message}`);
   }
 };
 

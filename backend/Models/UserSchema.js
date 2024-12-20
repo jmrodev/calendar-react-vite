@@ -7,23 +7,38 @@ const UserSchema = Schema("User", {
   username: {
     type: String,
     required: true,
-    // validate: {
-    //     validator: function (v) {
-    //         return /^[a-zA-Z0-9_]{3,20}$/.test(v);
-    //     },
-    //     message: props => `${props.value} is not a valid username!`
-    // }
   },
   password: { type: String, required: true },
   role: {
     type: String,
     required: true,
-    enum: ["user", "admin", "staff", "guest"],
+    enum: ["admin", "doctor", "secretary", "guest"],
+  },
+  personalInfo: {
+    type: Object,
+    required: true,
+    schema: {
+      firstName: { type: String, required: true },
+      lastName: { type: String, required: true },
+      email: { type: String, required: true },
+      phone: { type: String, required: false }
+    }
   },
   loginAttempts: { type: Number, default: 0 },
-  lockUntil: { type: Date, default: "" },
-  createdAt: { type: Date, required: true },
-  lastLogin: { type: Date, default: "" },
+  lockUntil: { type: String, default: "" },
+  createdAt: { 
+    type: Date, 
+    required: true,
+    default: () => new Date(),
+    set: (value) => new Date(value)
+  },
+  lastLogin: { 
+    type: Date, 
+    required: true,
+    default: () => new Date(),
+    set: (value) => new Date(value)
+  },
+  status: { type: String, default: "active", enum: ["active", "inactive", "suspended"] }
 });
 
 export { UserSchema };

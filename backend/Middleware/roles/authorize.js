@@ -1,4 +1,4 @@
-import { checkPermission } from "../../config/role.config.js";
+import { PERMISSIONS } from "../../config/role.config.js";
 
 export const authorize = (resource, action) => {
   return (req, res, next) => {
@@ -8,14 +8,38 @@ export const authorize = (resource, action) => {
           error: "No autorizado - Usuario o rol no encontrado",
         });
       }
+
       const userRole = req.user.role;
-      if (checkPermission(userRole, resource, action)) {
-        return next();
-      } else {
+      const rolePermissions = PERMISSIONS[userRole];
+
+      if (!rolePermissions) {
         return res.status(403).json({
-          error: "No tienes permiso para realizar esta acción",
+          error: "Rol no válido",
         });
       }
+
+      const hasPermission = rolePermissions[resource]?.[action];
+
+      if (!hasPermission) {
+        return res.status(403).json({
+          error: `No tienes permiso para ${action} en ${resource}`,
+          requiredRole: Object.keys(PERMISSIONS).find(role => 
+            PERMISSIONS[role][resource]?.[action]
+          )
+        });
+      }
+
+      // Agregar información de auditoría
+      req.audit = {
+        userId: req.user.id,
+        username: req.user.username,
+        role: userRole,
+        action: action,
+        resource: resource,
+        timestamp: new Date()
+      };
+
+      return next();
     } catch (error) {
       console.error("Error en autorización:", error);
       return res.status(500).json({

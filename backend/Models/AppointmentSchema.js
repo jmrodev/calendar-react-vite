@@ -21,6 +21,27 @@ const AppointmentSchema = Schema("Appointment", {
       reason: { type: String, required: true },
     },
   },
+  secretary: {
+    type: Object,
+    required: true,
+    schema: {
+      id: { type: Number, required: true },
+      name: { type: String, required: true }
+    }
+  },
+  changeLog: {
+    type: Array,
+    required: false,
+    default: [],
+    schema: {
+      date: { type: Date, required: true },
+      action: { type: String, required: true },
+      description: { type: String, required: true },
+      secretaryId: { type: Number, required: true },
+      previousStatus: { type: String, required: false },
+      newStatus: { type: String, required: false }
+    }
+  }
 });
 
 export { AppointmentSchema };

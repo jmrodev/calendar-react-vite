@@ -44,6 +44,11 @@ export const createAppointmentController = async (req, res) => {
       available,
       appointment,
     } = req.body;
+
+    // Obtener información de la secretaria del token
+    const secretaryId = req.user.id;
+    const secretaryName = req.user.username;
+
     await findAppointment({ date, appointmentTime });
     const newAppointment = await createAppointmentService({
       date,
@@ -51,7 +56,8 @@ export const createAppointmentController = async (req, res) => {
       realAppointmentTime,
       available,
       appointment,
-    });
+    }, secretaryId, secretaryName);
+
     res.status(201).json(newAppointment);
   } catch (error) {
     console.error("Error al crear cita:", error);
@@ -113,7 +119,9 @@ export const getConfirmedAppointmentsController = async (req, res) => {
 export const updateAppointmentController = async (req, res) => {
   try {
     const { id } = req.params;
-    const updatedAppointment = await updateAppointmentService(id, req.body);
+    const secretaryId = req.user.id;
+    
+    const updatedAppointment = await updateAppointmentService(id, req.body, secretaryId);
     res.json({
       success: true,
       updatedAppointment,

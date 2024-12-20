@@ -1,8 +1,8 @@
 export const ROLES = {
   ADMIN: "admin",
-  USER: "user",
-  STAFF: "staff",
-  GUEST: "guest",
+  DOCTOR: "doctor",
+  SECRETARY: "secretary",
+  GUEST: "guest"
 };
 
 export const PERMISSIONS = {
@@ -19,16 +19,17 @@ export const PERMISSIONS = {
       update: true,
       delete: true,
     },
-    system: {
-      manageSettings: true,
-      viewLogs: true,
-    },
+    logs: {
+      create: true,
+      read: true,
+      delete: true
+    }
   },
-  [ROLES.USER]: {
+  [ROLES.DOCTOR]: {
     users: {
       create: false,
-      read: false,
-      update: true,
+      read: true,
+      update: false,
       delete: false,
     },
     appointments: {
@@ -37,12 +38,13 @@ export const PERMISSIONS = {
       update: true,
       delete: true,
     },
-    system: {
-      manageSettings: false,
-      viewLogs: false,
-    },
+    logs: {
+      create: true,
+      read: true,
+      delete: false
+    }
   },
-  [ROLES.STAFF]: {
+  [ROLES.SECRETARY]: {
     users: {
       create: false,
       read: true,
@@ -55,10 +57,11 @@ export const PERMISSIONS = {
       update: true,
       delete: false,
     },
-    system: {
-      manageSettings: false,
-      viewLogs: false,
-    },
+    logs: {
+      create: true,
+      read: true,
+      delete: false
+    }
   },
   [ROLES.GUEST]: {
     users: {
@@ -73,11 +76,12 @@ export const PERMISSIONS = {
       update: false,
       delete: false,
     },
-    system: {
-      manageSettings: false,
-      viewLogs: false,
-    },
-  },
+    logs: {
+      create: false,
+      read: false,
+      delete: false
+    }
+  }
 };
 
 export function checkPermission(role, resource, action) {

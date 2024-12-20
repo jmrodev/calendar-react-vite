@@ -4,12 +4,18 @@ export function standardizeDate(date) {
   if (date === null || date === undefined) {
     return null;
   }
+
+  if (date instanceof Date) {
+    return date;
+  }
+
   const dateString = String(date).trim();
   try {
     const directParse = new Date(dateString);
     if (!isNaN(directParse.getTime())) {
-      return directParse.toISOString().split("T")[0];
+      return directParse;
     }
+
     const tempoParse = parse(dateString, [
       "YYYY-MM-DD",
       "YYYY-MM-DDTHH:mm:ss",
@@ -19,9 +25,7 @@ export function standardizeDate(date) {
     ]);
 
     if (tempoParse) {
-      const formattedDate = format(tempoParse, "YYYY-MM-DD");
-      console.log("STANDARDIZE DATE - Formatted Date:", formattedDate);
-      return formattedDate;
+      return new Date(tempoParse);
     }
 
     console.error("STANDARDIZE DATE: All parsing methods failed");
