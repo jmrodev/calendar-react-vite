@@ -9,8 +9,21 @@ export const loginController = async (req, res) => {
   try {
     const { username, password } = req.body;
     const result = await loginService(username, password, req);
-    res.status(200).json(result);
+    
+    if (!result.token) {
+      throw new Error("Token no generado");
+    }
+
+    console.log("Login successful, token:", result.token);
+
+    res.status(200).json({
+      success: true,
+      message: "Login successful",
+      token: result.token,
+      user: result.user
+    });
   } catch (error) {
+    console.error("Login error:", error);
     res.status(400).json({
       success: false,
       message: error.message,
@@ -48,18 +61,51 @@ export const registerController = async (req, res) => {
 };
 
 export const refreshTokenController = async (req, res) => {
-  const token = req.headers["authorization"]?.split(" ")[1];
+  const authHeader = req.headers["authorization"];
+  console.log("Refresh token - Auth header:", authHeader);
+
+  if (!authHeader) {
+    return res.status(401).json({ message: "No authorization header" });
+  }
+
+  const token = authHeader.split(" ")[1];
   if (!token) {
     return res.status(401).json({ message: "No token provided" });
   }
 
   try {
-    const user = jwt.verify(token, process.env.JWT_SECRET, { ignoreExpiration: true });
-    const newToken = jwt.sign({ id: user.id, role: user.role }, process.env.JWT_SECRET, { expiresIn: "1h" });
-    res.json({ token: newToken });
+    const decoded = jwt.verify(token, process.env.JWT_SECRET, {
+      ignoreExpiration: true,
+    });
+
+    console.log("Refresh token - Decoded token:", decoded);
+
+    const newToken = jwt.sign(
+      { 
+        id: decoded.id, 
+        role: decoded.role,
+        username: decoded.username 
+      },
+      process.env.JWT_SECRET,
+      { expiresIn: "1h" }
+    );
+
+    console.log("Refresh token - New token generated:", newToken);
+
+    res.json({ 
+      success: true,
+      token: newToken,
+      user: {
+        id: decoded.id,
+        role: decoded.role,
+        username: decoded.username
+      }
+    });
   } catch (error) {
-    res.status(403).json({ message: "Invalid token" });
+    console.error("Refresh token error:", error);
+    res.status(403).json({ 
+      success: false,
+      message: "Token inválido o expirado" 
+    });
   }
 };
-
-

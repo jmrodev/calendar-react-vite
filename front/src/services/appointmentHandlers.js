@@ -8,6 +8,7 @@ import {
 import showToast from "../utils/toastUtils";
 import  store  from '../redux/store';
 import { fetchMonthAppointments, fetchWeekDayAppointments } from '../redux/slices/appointmentsSlice';
+import { standardizeDate } from '../utils/dateUtils';
 
 export const handleCreateAppointment = async (
   slot,
@@ -24,8 +25,14 @@ export const handleCreateAppointment = async (
     const reason = prompt("Ingrese la razón de la cita:");
     if (!reason) return alert("La razón de la cita no puede estar vacía.");
 
+    // Asegurarnos de que la fecha esté en el formato correcto
+    const formattedDate = standardizeDate(selectedDate);
+    if (!formattedDate) {
+      throw new Error("Fecha inválida");
+    }
+
     const appointmentData = {
-      date: selectedDate.toISOString().split("T")[0],
+      date: formattedDate,
       appointmentTime: slot.appointmentTime,
       realAppointmentTime: slot.appointmentTime,
       available: false,
@@ -37,6 +44,7 @@ export const handleCreateAppointment = async (
       },
     };
 
+    console.log("Sending appointment data:", appointmentData);
     const response = await createAppointment(appointmentData);
 
     if (response) {
@@ -219,7 +227,7 @@ export const handleReassignClick = async (
     }
 
     const newAppointmentData = {
-      date: selectedDate.toISOString().split("T")[0],
+      date: standardizeDate(selectedDate),
       appointmentTime: slot.appointmentTime,
       realAppointmentTime: slot.appointmentTime,
       available: false,

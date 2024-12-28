@@ -1,5 +1,6 @@
 import { _getHeaders, handleUnauthorizedError } from "./utils";
 import config from "../config/env.cfg";
+import { standardizeDate } from "../utils/dateUtils";
 
 export const updateAppointment = async (id, appointment) => {
   try {
@@ -126,21 +127,26 @@ export const getAllAppointments = async () => {
 
 export const getAppointmentsByDate = async (date) => {
   try {
-    const response = await fetch(`${config.baseUrl}/appointments/date/${date}`, {
+    console.log("Fecha a enviar al backend:", date);
+
+    const response = await fetch(`${config.baseUrl}/appointments/date/${encodeURIComponent(date)}`, {
       headers: _getHeaders(),
     });
 
-    handleUnauthorizedError(response);
-
     if (!response.ok) {
-      const errorData = await response.json();
-      throw new Error(
-        errorData.message || "Error al obtener las citas por fecha"
-      );
+      const text = await response.text();
+      try {
+        const errorData = JSON.parse(text);
+        throw new Error(errorData.message || "Error al obtener las citas por fecha");
+      } catch (e) {
+        console.error("Error response:", text);
+        throw new Error("Error al obtener las citas por fecha");
+      }
     }
 
     return await response.json();
   } catch (error) {
+    console.error("Error en getAppointmentsByDate:", error);
     throw error;
   }
 };

@@ -1,10 +1,18 @@
 import { getAppointmentsByDate } from "../services/appointmentsService";
+import { standardizeDate } from "./dateUtils";
 
 export const generateTimeSlots = async (selectedDate) => {
   try {
-    const dateStr = selectedDate
-      ? selectedDate.toISOString().split("T")[0]
-      : "";
+    if (!selectedDate) {
+      throw new Error("No se ha seleccionado una fecha");
+    }
+
+    const dateStr = standardizeDate(selectedDate);
+    if (!dateStr) {
+      throw new Error("Fecha inválida");
+    }
+    console.log("Fecha estandarizada:", dateStr);
+
     const existingSlots = await getAppointmentsByDate(dateStr);
     const slots = [];
     const initHour = 9;

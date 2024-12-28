@@ -3,7 +3,9 @@ import { logoutAsync } from '../redux/slices/authSlice';
 
 export const _getHeaders = () => {
     const state = store.getState();
-    const token = state.auth.token || localStorage.getItem('jwt');
+    const token = state.auth.token || localStorage.getItem('authToken');
+    
+    console.log('Current token:', token);
     
     return {
         'Content-Type': 'application/json',
@@ -18,6 +20,7 @@ export const _handleError = (method, error) => {
 
 export const handleUnauthorizedError = async (response) => {
     if (response.status === 401) {
+        localStorage.removeItem('authToken');
         await store.dispatch(logoutAsync());
         window.location.href = '/login';
         throw new Error('Sesión expirada');

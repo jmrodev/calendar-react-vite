@@ -40,6 +40,12 @@ const Week = ({ selectedDate, isWeekDayView }) => {
   const weekDays = ['Domingo', 'Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado'];
   const dayName = weekDays[selectedDate.getDay()];
 
+  const formatDate = (date) => {
+    if (!date) return '';
+    const d = new Date(date);
+    return `${d.getDate()}/${d.getMonth() + 1}/${d.getFullYear()}`;
+  };
+
   return (
     <div className="week-schedule">
       <h2>

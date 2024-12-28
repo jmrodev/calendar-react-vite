@@ -24,8 +24,14 @@ export const confirmAppointmentRepository = async (appointmentId) => {
 
 export const createAppointmentRepository = async (appointmentData, secretaryId, secretaryName) => {
   try {
+    const standardizedDate = standardizeDate(appointmentData.date);
+    if (!standardizedDate) {
+      throw new Error("Invalid appointment date format");
+    }
+
     const appointment = await AppointmentSchema.create({
       ...appointmentData,
+      date: standardizedDate,
       secretary: {
         id: secretaryId,
         name: secretaryName
@@ -47,7 +53,7 @@ export const createAppointmentRepository = async (appointmentData, secretaryId, 
       description: "Creación de nueva cita",
       details: {
         patientName: appointmentData.appointment.name,
-        appointmentDate: appointmentData.date
+        appointmentDate: standardizedDate
       }
     });
 
@@ -187,7 +193,7 @@ export const getAppointmentsByWeekDayRepository = async (dayOfWeek) => {
     const allAppointments = await AppointmentSchema.find();
     
     const appointments = allAppointments.filter((appointment) => {
-      const appointmentDate = new Date(appointment.date);
+      const appointmentDate = new Date(appointment.date.split('/').reverse().join('-'));
       let dayOfWeektransf = parseInt(dayOfWeek);
       console.log(`Cita fecha: ${appointment.date}, día: ${appointmentDate.getDay() + 1}, buscando día: ${dayOfWeektransf}`);
       
@@ -195,8 +201,8 @@ export const getAppointmentsByWeekDayRepository = async (dayOfWeek) => {
     });
     
     appointments.sort((a, b) => {
-      const dateA = new Date(a.date);
-      const dateB = new Date(b.date);
+      const dateA = new Date(a.date.split('/').reverse().join('-'));
+      const dateB = new Date(b.date.split('/').reverse().join('-'));
       if (dateA.getTime() !== dateB.getTime()) {
         return dateA - dateB;
       }

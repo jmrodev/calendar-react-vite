@@ -21,24 +21,28 @@ const UserSchema = Schema("User", {
       firstName: { type: String, required: true },
       lastName: { type: String, required: true },
       email: { type: String, required: true },
-      phone: { type: String, required: false }
-    }
+      phone: { type: String, required: false },
+    },
   },
   loginAttempts: { type: Number, default: 0 },
   lockUntil: { type: String, default: "" },
-  createdAt: { 
-    type: Date, 
+  createdAt: {
+    type: Date,
     required: true,
     default: () => new Date(),
-    set: (value) => new Date(value)
+    set: (value) => new Date(value),
   },
-  lastLogin: { 
-    type: Date, 
+  lastLogin: {
+    type: Date,
     required: true,
     default: () => new Date(),
-    set: (value) => new Date(value)
+    set: (value) => new Date(value),
   },
-  status: { type: String, default: "active", enum: ["active", "inactive", "suspended"] }
+  status: {
+    type: String,
+    default: "active",
+    enum: ["active", "inactive", "suspended"],
+  },
 });
 
 export { UserSchema };

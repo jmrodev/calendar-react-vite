@@ -1,55 +1,68 @@
 import jwt from "jsonwebtoken";
 import { findUserByUsername } from "../Utils/user/findUserByName.js";
 import { verifyPassword } from "../Utils/auth/verifiPassword.js";
-import { loginLimiter } from "../Utils/login/loginLimiter.js";
-import {
-  saveLoginAttempt,
-  getLoginAttempts,
-} from "../Repository/authRepository.js";
+import { saveLoginAttempt } from "../Repository/authRepository.js";
 import { standardizeDate } from "../Utils/date/dateUtils.js";
 import { createUser } from "../Utils/user/createUserUtil.js";
+import { handleLoginAttempts } from "../Utils/auth/loginUtils.js";
 
-export const loginService = async (username, password, req) => {
+export const loginService = async (username, password) => {
+  console.log("LOGIN SERVICE", username, password);
   try {
     if (!username || !password) {
-      throw new Error(
-        "Error en loginService: Usuario y contraseña son requeridos"
-      );
+      throw new Error("Usuario y contraseña son requeridos");
     }
 
     const user = await findUserByUsername(username);
+    console.log("USER", user);
     if (!user) {
       await saveLoginAttempt(username, false);
-      throw new Error("Error en loginService: Usuario no encontrado");
+      throw new Error("Usuario no encontrado");
     }
 
+    console.log("USER LOCK UNTIL", user.lockUntil);
+    console.log("STANDARDIZE DATE", standardizeDate(new Date()));
+    console.log(
+      "USER LOCK UNTIL > STANDARDIZE DATE",
+      user.lockUntil > standardizeDate(new Date())
+    );
+
     if (user.lockUntil && user.lockUntil > standardizeDate(new Date())) {
-      throw new Error("Error en loginService: Cuenta bloqueada temporalmente");
+      throw new Error("Cuenta bloqueada temporalmente");
     }
 
     const isValidPassword = await verifyPassword(password, user.password);
+    console.log("IS VALID PASSWORD", isValidPassword);
     if (!isValidPassword) {
-      user.loginAttempts = (user.loginAttempts || 0) + 1;
-      if (user.loginAttempts >= 5) {
-        user.lockUntil = standardizeDate(new Date(Date.now() + 15 * 60 * 1000));
-      }
-      await user.save();
+      await handleLoginAttempts(user);
       await saveLoginAttempt(username, false);
-      throw new Error("Error en loginService: Contraseña inválida");
+      throw new Error("Contraseña inválida");
     }
 
+    console.log("USER LOGIN ATTEMPTS", user.loginAttempts);
+    // Reset login attempts and update last login
     user.loginAttempts = 0;
+    console.log("USER LOGIN ATTEMPTS", user.loginAttempts);
     user.lockUntil = "";
+    console.log("USER LOCK UNTIL", user.lockUntil);
     user.lastLogin = standardizeDate(new Date());
+    console.log("USER LAST LOGIN", user.lastLogin);
     await user.save();
     await saveLoginAttempt(username, true);
 
+    // Crear token con información mínima necesaria
     const token = jwt.sign(
-      { id: user._id, role: user.role },
+      {
+        id: user._id,
+        role: user.role,
+        username: user.username
+      },
       process.env.JWT_SECRET,
       { expiresIn: "1h" }
     );
 
+    console.log("GENERATED TOKEN:", token);
+    
     return {
       success: true,
       token,
@@ -57,6 +70,7 @@ export const loginService = async (username, password, req) => {
         id: user._id,
         username: user.username,
         role: user.role,
+        lastLogin: user.lastLogin,
       },
     };
   } catch (error) {

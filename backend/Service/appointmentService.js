@@ -41,9 +41,13 @@ export const createAppointmentService = async (appointmentData, secretaryId, sec
       throw new Error("Date, appointment time and patient name are required");
     }
 
+    const dateObj = new Date(date);
+    const formattedDate = `${String(dateObj.getDate()).padStart(2, '0')}/${String(dateObj.getMonth() + 1).padStart(2, '0')}/${dateObj.getFullYear()}`;
+
     const newAppointment = {
       _id: newAppointmentId(),
       ...appointmentData,
+      date: formattedDate
     };
 
     return await createAppointmentRepository(newAppointment, secretaryId, secretaryName);

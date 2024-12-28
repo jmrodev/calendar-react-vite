@@ -4,14 +4,27 @@ import { fetchMonthAppointments, fetchWeekDayAppointments } from '../redux/slice
 import { createAppointment } from '../services/appointmentsService';
 import showToast from '../utils/toastUtils';
 import './styles/appointmentForm.css';
+import { standardizeDate } from '../utils/dateUtils';
 
 const AppointmentForm = ({ selectedDate, selectedTime, onSuccess, onCancel }) => {
   const dispatch = useDispatch();
+  
+  // Validar y formatear la fecha antes de usarla
+  const initialDate = React.useMemo(() => {
+    if (!selectedDate || !(selectedDate instanceof Date)) {
+      console.error("Invalid selectedDate:", selectedDate);
+      return null;
+    }
+    const formattedDate = standardizeDate(selectedDate);
+    console.log("Formatted date:", formattedDate);
+    return formattedDate;
+  }, [selectedDate]);
+
   const [formData, setFormData] = useState({
     patientName: '',
     reason: '',
     appointmentTime: selectedTime,
-    date: selectedDate.toISOString().split('T')[0]
+    date: initialDate
   });
 
   const [loading, setLoading] = useState(false);
@@ -26,6 +39,10 @@ const AppointmentForm = ({ selectedDate, selectedTime, onSuccess, onCancel }) =>
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    if (!formData.date) {
+      showToast("Fecha inválida", "error");
+      return;
+    }
     if (!formData.patientName.trim() || !formData.reason.trim()) {
       showToast("Por favor complete todos los campos", "error");
       return;

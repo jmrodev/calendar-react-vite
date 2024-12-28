@@ -19,6 +19,14 @@ export const loginService = async (credentials) => {
     }
 
     const data = await response.json();
+    console.log('Login response:', data);
+
+    if (!data.token) {
+      throw new Error('No se recibió el token de autenticación');
+    }
+
+    localStorage.setItem('authToken', data.token);
+    
     return {
       user: data.user,
       token: data.token
@@ -40,6 +48,7 @@ export const logoutService = async () => {
       throw new Error('Error al cerrar sesión');
     }
 
+    localStorage.removeItem('authToken');
     return await response.json();
   } catch (error) {
     console.error('Error en logoutService:', error);
