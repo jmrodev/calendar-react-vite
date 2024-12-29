@@ -1,5 +1,5 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
-import * as appointmentService from '../../services/appointmentService';
+import * as appointmentService from '../../services/appointmentsService';
 
 export const fetchWeekAppointments = createAsyncThunk(
   'appointments/fetchWeek',

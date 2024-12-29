@@ -28,25 +28,27 @@ const UserSchema = Schema("User", {
   lockUntil: { 
     type: Object,
     required: false,
+    default: null,
     schema: {
-      year: { type: Number, required: true },
-      month: { type: Number, required: true },
-      day: { type: Number, required: true },
-      hours: { type: Number, required: true },
-      minutes: { type: Number, required: true },
-      seconds: { type: Number, required: true }
+      year: { type: Number, required: false },
+      month: { type: Number, required: false },
+      day: { type: Number, required: false },
+      hours: { type: Number, required: false },
+      minutes: { type: Number, required: false },
+      seconds: { type: Number, required: false }
     }
   },
   lastLogin: { 
     type: Object,
     required: false,
+    default: null,
     schema: {
-      year: { type: Number, required: true },
-      month: { type: Number, required: true },
-      day: { type: Number, required: true },
-      hours: { type: Number, required: true },
-      minutes: { type: Number, required: true },
-      seconds: { type: Number, required: true }
+      year: { type: Number, required: false },
+      month: { type: Number, required: false },
+      day: { type: Number, required: false },
+      hours: { type: Number, required: false },
+      minutes: { type: Number, required: false },
+      seconds: { type: Number, required: false }
     }
   },
   status: { type: String, default: 'active' }

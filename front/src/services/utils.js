@@ -1,4 +1,4 @@
-import store from '../redux/store';
+import { store } from '../redux/store';
 import { logoutAsync } from '../redux/slices/authSlice';
 
 export const _getHeaders = () => {

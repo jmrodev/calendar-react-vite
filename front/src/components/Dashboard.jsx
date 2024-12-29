@@ -1,11 +1,21 @@
 import React from 'react';
 import { useSelector } from 'react-redux';
-import { Link } from 'react-router-dom';
+import { Link, Navigate } from 'react-router-dom';
 import { FaCalendarAlt, FaUserMd, FaUsers, FaCog } from 'react-icons/fa';
 import './styles/dashboard.css';
 
 const Dashboard = () => {
-  const { user } = useSelector(state => state.auth);
+  const { user, isLoading } = useSelector(state => state.auth);
+
+  // Redirect to login if no user
+  if (!user && !isLoading) {
+    return <Navigate to="/" replace />;
+  }
+
+  // Show loading state
+  if (isLoading) {
+    return <div>Loading...</div>;
+  }
 
   const adminMenuItems = [
     {
@@ -49,11 +59,11 @@ const Dashboard = () => {
     }
   ];
 
-  const menuItems = user.role === 'admin' ? adminMenuItems : userMenuItems;
+  const menuItems = user?.role === 'admin' ? adminMenuItems : userMenuItems;
 
   return (
     <div className="dashboard-container">
-      <h1>Bienvenido, {user.fullName}</h1>
+      <h1>Bienvenido, {user?.fullName}</h1>
       
       <div className="dashboard-grid">
         {menuItems.map((item, index) => (
@@ -69,7 +79,7 @@ const Dashboard = () => {
         ))}
       </div>
 
-      {user.role === 'admin' && (
+      {user?.role === 'admin' && (
         <div className="dashboard-stats">
           <h2>Estadísticas Generales</h2>
           <div className="stats-grid">

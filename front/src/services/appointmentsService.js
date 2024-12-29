@@ -182,3 +182,64 @@ export const getAppointmentsByWeekDay = async (dayOfWeek) => {
     throw error;
   }
 };
+
+export const getWeekAppointments = async (startDate, endDate) => {
+  try {
+    const response = await fetch(
+      `${config.baseUrl}/appointments/week?startDate=${startDate.toISOString()}&endDate=${endDate.toISOString()}`,
+      {
+        headers: _getHeaders()
+      }
+    );
+
+    handleUnauthorizedError(response);
+
+    if (!response.ok) {
+      const errorData = await response.json();
+      throw new Error(errorData.message || "Error al obtener las citas de la semana");
+    }
+
+    return await response.json();
+  } catch (error) {
+    throw error;
+  }
+};
+
+export const getUserAppointments = async () => {
+  try {
+    const response = await fetch(`${config.baseUrl}/appointments/user`, {
+      headers: _getHeaders()
+    });
+
+    handleUnauthorizedError(response);
+
+    if (!response.ok) {
+      const errorData = await response.json();
+      throw new Error(errorData.message || "Error al obtener las citas del usuario");
+    }
+
+    return await response.json();
+  } catch (error) {
+    throw error;
+  }
+};
+
+export const cancelAppointment = async (id) => {
+  try {
+    const response = await fetch(`${config.baseUrl}/appointments/${id}/cancel`, {
+      method: 'PUT',
+      headers: _getHeaders()
+    });
+
+    handleUnauthorizedError(response);
+
+    if (!response.ok) {
+      const errorData = await response.json();
+      throw new Error(errorData.message || "Error al cancelar la cita");
+    }
+
+    return await response.json();
+  } catch (error) {
+    throw error;
+  }
+};

@@ -1,5 +1,6 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 import { getAppointmentsByDate, getAppointmentsByWeekDay } from '../../services/appointmentsService';
+import * as appointmentService from '../../services/appointmentsService';
 
 export const fetchMonthAppointments = createAsyncThunk(
   'appointments/fetchMonthAppointments',
@@ -38,11 +39,24 @@ export const fetchWeekDayAppointments = createAsyncThunk(
   }
 );
 
+export const fetchAppointments = createAsyncThunk(
+  'appointments/fetchAll',
+  async (_, { rejectWithValue }) => {
+    try {
+      const appointments = await appointmentService.getUserAppointments();
+      return appointments;
+    } catch (error) {
+      return rejectWithValue(error.message);
+    }
+  }
+);
+
 const appointmentsSlice = createSlice({
   name: 'appointments',
   initialState: {
     monthCounts: {},
     weekDayCounts: {},
+    appointments: [],
     loading: false,
     error: null
   },
@@ -78,6 +92,18 @@ const appointmentsSlice = createSlice({
       .addCase(fetchWeekDayAppointments.rejected, (state, action) => {
         state.loading = false;
         state.error = action.error.message;
+      })
+      .addCase(fetchAppointments.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(fetchAppointments.fulfilled, (state, action) => {
+        state.appointments = action.payload;
+        state.loading = false;
+      })
+      .addCase(fetchAppointments.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload;
       });
   }
 });

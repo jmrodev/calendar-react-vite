@@ -19,9 +19,13 @@ export const loginService = async (username, password) => {
     }
 
     const currentDate = createStructuredDate(new Date());
-    const lockUntil = user.lockUntil ? createStructuredDate(user.lockUntil) : null;
-
-    if (lockUntil && compareStructuredDates(currentDate, lockUntil) <= 0) {
+    console.log("currentDate", currentDate);
+    console.log("user.lockUntil", user.lockUntil);
+    const lockUntil = user.lockUntil && user.lockUntil !== "" ? createStructuredDate(user.lockUntil) : null;
+    console.log("lockUntil", lockUntil);
+    
+    // Check if account is locked
+    if (lockUntil && compareStructuredDates(currentDate, lockUntil) < 0) {
       throw new Error("Cuenta bloqueada temporalmente");
     }
 
@@ -34,7 +38,7 @@ export const loginService = async (username, password) => {
 
     // Reset login attempts on successful login
     user.loginAttempts = 0;
-    user.lockUntil = null;
+    user.lockUntil = createStructuredDate(new Date());
     user.lastLogin = currentDate;
     await user.save();
 
@@ -51,12 +55,12 @@ export const loginService = async (username, password) => {
     );
 
     return {
+      success: true,
       token,
       user: {
         id: user._id,
         username: user.username,
         role: user.role,
-        lastLogin: user.lastLogin
       },
     };
   } catch (error) {

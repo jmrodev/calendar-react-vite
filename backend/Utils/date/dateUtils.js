@@ -78,6 +78,7 @@ export function formatDate(date, formatStr = "DD/MM/YYYY") {
 }
 
 export const createStructuredDate = (date) => {
+  console.log("createStructuredDate", date);
   if (!date) return null;
   
   const d = new Date(date);
@@ -113,11 +114,12 @@ export const formatStructuredDate = (structuredDate) => {
 };
 
 export const compareStructuredDates = (date1, date2) => {
-  if (!date1 || !date2) return false;
+  if (!date1 || !date2) return -1;
   
-  return date1.year === date2.year &&
-         date1.month === date2.month &&
-         date1.day === date2.day;
+  const d1 = new Date(date1.year, date1.month, date1.day).getTime();
+  const d2 = new Date(date2.year, date2.month, date2.day).getTime();
+  
+  return d1 - d2;
 };
 
 export const addMinutesToStructuredDate = (structuredDate, minutes) => {
