@@ -277,3 +277,121 @@
   opacity: 0.5;
   pointer-events: none;
 }
+
+.calendar-container {
+  background: white;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  padding: 2rem;
+  margin-bottom: 2rem;
+}
+
+.calendar-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 2rem;
+}
+
+.calendar-title {
+  font-size: 1.5rem;
+  color: var(--text-color);
+}
+
+.calendar-nav {
+  display: flex;
+  gap: 1rem;
+}
+
+.calendar-nav button {
+  padding: 0.5rem 1rem;
+  border: 1px solid var(--border-color);
+  border-radius: 4px;
+  background: white;
+  cursor: pointer;
+  transition: all 0.3s;
+}
+
+.calendar-nav button:hover {
+  background: var(--background-color);
+  border-color: var(--primary-color);
+}
+
+.calendar-grid {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 1px;
+  background: var(--border-color);
+  border: 1px solid var(--border-color);
+  border-radius: 4px;
+}
+
+.calendar-day {
+  background: white;
+  padding: 1rem;
+  min-height: 100px;
+  cursor: pointer;
+  transition: background-color 0.3s;
+}
+
+.calendar-day:hover {
+  background: var(--background-color);
+}
+
+.calendar-day.today {
+  background: rgba(52, 152, 219, 0.1);
+  font-weight: bold;
+}
+
+.calendar-day.selected {
+  background: rgba(46, 204, 113, 0.1);
+  border: 2px solid var(--secondary-color);
+}
+
+.calendar-day.other-month {
+  color: var(--border-color);
+}
+
+.calendar-day-header {
+  text-align: right;
+  margin-bottom: 0.5rem;
+  font-weight: 500;
+}
+
+.calendar-appointments {
+  font-size: 0.875rem;
+  color: var(--text-color);
+}
+
+.appointment-count {
+  display: inline-block;
+  padding: 0.25rem 0.5rem;
+  background: var(--primary-color);
+  color: white;
+  border-radius: 12px;
+  font-size: 0.75rem;
+}
+
+.weekday-header {
+  background: var(--text-color);
+  color: white;
+  padding: 0.5rem;
+  text-align: center;
+  font-weight: 500;
+}
+
+@media (max-width: 768px) {
+  .calendar-grid {
+    grid-template-columns: repeat(1, 1fr);
+  }
+
+  .weekday-header {
+    display: none;
+  }
+
+  .calendar-day {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+}

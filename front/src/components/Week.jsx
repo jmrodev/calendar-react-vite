@@ -1,70 +1,104 @@
-import React, { useState, useEffect } from "react";
-import TimeSlot from "./TimeSlot";
-import { generateTimeSlots } from "../utils/timeSlotUtils";
-import { getAppointmentsByWeekDay } from "../services/appointmentsService";
-import "./styles/week.css";
-import { standardizeDate } from "../utils/dateUtils";
+import React, { useEffect, useState } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
+import { fetchWeekAppointments } from '../redux/slices/appointmentSlice';
+import { getWeekDates, formatStructuredDate } from '../utils/dateUtils';
+import ErrorMessage from '../messages/ErrorMessage';
+import AppointmentForm from './AppointmentForm';
+import './styles/week.css';
 
-const Week = ({ selectedDate, isWeekDayView }) => {
-  const [timeSlots, setTimeSlots] = useState([]);
-  const [error, setError] = useState(null);
+const Week = () => {
+  const dispatch = useDispatch();
+  const { appointments, loading, error, selectedDate } = useSelector(state => state.appointments);
+  const [showForm, setShowForm] = useState(false);
+  const [selectedSlot, setSelectedSlot] = useState(null);
+
+  const weekDates = getWeekDates(selectedDate || new Date());
 
   useEffect(() => {
-    const loadTimeSlots = async () => {
-      try {
-        if (isWeekDayView) {
-          const dayOfWeek = selectedDate.getDay();
-          const slots = await getAppointmentsByWeekDay(dayOfWeek);
-          const slotsWithDate = slots.map(slot => ({
-            ...slot,
-            date: selectedDate.toISOString().split('T')[0]
-          }));
-          setTimeSlots(slotsWithDate);
-        } else {
-          const slots = await generateTimeSlots(selectedDate);
-          setTimeSlots(slots);
-        }
-      } catch (err) {
-        setError(err.message);
-      }
-    };
+    const startDate = weekDates[0];
+    const endDate = weekDates[6];
+    dispatch(fetchWeekAppointments({ startDate, endDate }));
+  }, [dispatch, selectedDate]);
 
-    if (selectedDate) {
-      loadTimeSlots();
-    }
-  }, [selectedDate, isWeekDayView]);
+  const getAppointmentsForDate = (date) => {
+    return appointments.filter(apt => 
+      new Date(apt.date).toDateString() === date.toDateString()
+    );
+  };
 
-  if (error) return <div className="error">{error}</div>;
-  if (!selectedDate) return <h3>Debe seleccionar un día</h3>;
+  const handleTimeSlotClick = (date, time) => {
+    setSelectedSlot({ date, time });
+    setShowForm(true);
+  };
 
-  const weekDays = ['Domingo', 'Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado'];
-  const dayName = weekDays[selectedDate.getDay()];
+  const timeSlots = [
+    '09:00', '09:30', '10:00', '10:30', '11:00', '11:30',
+    '12:00', '12:30', '13:00', '13:30', '14:00', '14:30',
+    '15:00', '15:30', '16:00', '16:30', '17:00', '17:30'
+  ];
 
-  const formatDate = (date) => {
-    if (!date) return '';
-    const d = new Date(date);
-    return `${d.getDate()}/${d.getMonth() + 1}/${d.getFullYear()}`;
+  const isSlotAvailable = (date, time) => {
+    const appointments = getAppointmentsForDate(date);
+    return !appointments.some(apt => apt.time === time);
   };
 
   return (
-    <div className="week-schedule">
-      <h2>
-        {isWeekDayView 
-          ? `Horarios para ${dayName}` 
-          : `Horarios para el ${standardizeDate(selectedDate)}`
-        }
-      </h2>
-      <div className="time-slots">
-        {timeSlots.map((slot) => (
-          <TimeSlot
-            key={slot._id}
-            slot={slot}
-            selectedDate={selectedDate}
-            setTimeSlots={setTimeSlots}
-            setError={setError}
-          />
+    <div className="week-container">
+      <h2>Calendario Semanal</h2>
+
+      {error && (
+        <ErrorMessage 
+          message={error}
+          onRetry={() => {
+            const startDate = weekDates[0];
+            const endDate = weekDates[6];
+            dispatch(fetchWeekAppointments({ startDate, endDate }));
+          }}
+        />
+      )}
+
+      <div className="week-grid">
+        {weekDates.map((date, index) => (
+          <div key={index} className="day-column">
+            <div className="day-header">
+              <h3>{formatStructuredDate(date, { weekday: 'short' })}</h3>
+              <span>{formatStructuredDate(date, { day: 'numeric', month: 'short' })}</span>
+            </div>
+
+            <div className="time-slots">
+              {timeSlots.map(time => {
+                const available = isSlotAvailable(date, time);
+                return (
+                  <div
+                    key={time}
+                    className={`time-slot ${available ? 'available' : 'occupied'}`}
+                    onClick={() => available && handleTimeSlotClick(date, time)}
+                  >
+                    <span className="time">{time}</span>
+                    {!available && (
+                      <div className="appointment-info">
+                        {getAppointmentsForDate(date)
+                          .find(apt => apt.time === time)?.patientName}
+                      </div>
+                    )}
+                  </div>
+                );
+              })}
+            </div>
+          </div>
         ))}
       </div>
+
+      {showForm && selectedSlot && (
+        <AppointmentForm
+          date={selectedSlot.date}
+          time={selectedSlot.time}
+          onClose={() => {
+            setShowForm(false);
+            setSelectedSlot(null);
+          }}
+        />
+      )}
     </div>
   );
 };

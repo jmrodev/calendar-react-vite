@@ -11,6 +11,7 @@ import {
   getAppointmentsByWeekDayRepository,
 } from "../Repository/appointmentRepository.js";
 import { newAppointmentId } from "../Utils/id/appointment.js";
+import { createStructuredDate, formatStructuredDate } from "../Utils/date/dateUtils.js";
 
 export const completeAppointmentService = async (appointmentId) => {
   try {
@@ -41,13 +42,15 @@ export const createAppointmentService = async (appointmentData, secretaryId, sec
       throw new Error("Date, appointment time and patient name are required");
     }
 
-    const dateObj = new Date(date);
-    const formattedDate = `${String(dateObj.getDate()).padStart(2, '0')}/${String(dateObj.getMonth() + 1).padStart(2, '0')}/${dateObj.getFullYear()}`;
+    const structuredDate = createStructuredDate(date);
+    if (!structuredDate) {
+      throw new Error("Invalid date format");
+    }
 
     const newAppointment = {
       _id: newAppointmentId(),
       ...appointmentData,
-      date: formattedDate
+      date: structuredDate
     };
 
     return await createAppointmentRepository(newAppointment, secretaryId, secretaryName);
@@ -73,14 +76,22 @@ export const getAllAppointmentsService = async () => {
 };
 
 export const getAppointmentByDateService = async (date) => {
-  try {
-    const appointments = await getAppointmentByDateRepository(date);
-    // if (!appointments.length) {
-    //     return { status: 404, data: { message: 'No se encontraron citas para esta fecha' } };
-    // }
-    return { status: 200, data: appointments };
+  try {    
+    const structuredDate = createStructuredDate(date);
+    if (!structuredDate) {
+      throw new Error("Invalid date format");
+    }
+
+    const appointments = await getAppointmentByDateRepository(structuredDate);
+    return { 
+      status: 200, 
+      data: appointments 
+    };
   } catch (error) {
-    return { status: 500, data: { message: error.message } };
+    return { 
+      status: 500, 
+      data: { message: error.message } 
+    };
   }
 };
 

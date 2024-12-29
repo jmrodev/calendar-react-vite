@@ -1,76 +1,94 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { loginAsync } from '../redux/slices/authSlice';
-import showToast from "../utils/toastUtils";
-import Modal from "react-modal";
-import './styles/login.css';
 import { useNavigate } from 'react-router-dom';
+import { loginAsync } from '../redux/slices/authSlice';
+import ErrorMessage from '../messages/ErrorMessage';
+import showToast from '../utils/toastUtils';
+import './styles/login.css';
 
-export const Login = ({ onClose }) => {
+const Login = () => {
   const dispatch = useDispatch();
-  const { isAuthenticated, loading, error } = useSelector(state => state.auth);
-  const [credentials, setCredentials] = useState({
-    username: "",
-    password: "",
-  });
-  const [modalIsOpen, setModalIsOpen] = useState(true);
   const navigate = useNavigate();
+  const { loading, error } = useSelector(state => state.auth);
 
-  useEffect(() => {
-    if (isAuthenticated) {
-      onClose();
-    }
-  }, [isAuthenticated, onClose]);
+  const [formData, setFormData] = useState({
+    username: '',
+    password: ''
+  });
+
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setFormData(prev => ({
+      ...prev,
+      [name]: value
+    }));
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     
-    if (!credentials.username || !credentials.password) {
-      showToast("Por favor, ingrese usuario y contraseña", "error");
+    if (!formData.username || !formData.password) {
+      showToast('Por favor complete todos los campos', 'error');
       return;
     }
 
     try {
-      await dispatch(loginAsync(credentials));
-      showToast("Inicio de sesión exitoso", "success");
-      navigate('/');
-      setModalIsOpen(false);
+      const resultAction = await dispatch(loginAsync(formData));
+      if (loginAsync.fulfilled.match(resultAction)) {
+        showToast('Inicio de sesión exitoso', 'success');
+        navigate('/dashboard');
+      }
     } catch (error) {
-      showToast("Error al iniciar sesión", "error");
+      showToast(error.message, 'error');
     }
   };
 
   return (
-    <Modal
-      className="modal"
-      isOpen={modalIsOpen}
-      onRequestClose={() => navigate('/')}
-      ariaHideApp={false}
-    >
-      <div>
-        <form onSubmit={handleSubmit}>
+    <div className="login-container">
+      <form className="login-form" onSubmit={handleSubmit}>
+        <h2>Iniciar Sesión</h2>
+
+        {error && (
+          <ErrorMessage 
+            message={error}
+            onDismiss={() => dispatch(clearError())}
+          />
+        )}
+
+        <div className="form-group">
+          <label htmlFor="username">Usuario:</label>
           <input
             type="text"
+            id="username"
             name="username"
-            placeholder="Usuario"
-            onChange={(e) => setCredentials(prev => ({...prev, username: e.target.value}))}
-            value={credentials.username}
+            value={formData.username}
+            onChange={handleChange}
+            required
           />
+        </div>
+
+        <div className="form-group">
+          <label htmlFor="password">Contraseña:</label>
           <input
             type="password"
+            id="password"
             name="password"
-            placeholder="Contraseña"
-            onChange={(e) => setCredentials(prev => ({...prev, password: e.target.value}))}
-            value={credentials.password}
+            value={formData.password}
+            onChange={handleChange}
+            required
           />
-          {error && (
-            <div style={{ color: 'red', marginBottom: '10px' }}>
-              {error}
-            </div>
-          )}
-          <button type="submit">Iniciar sesión</button>
-        </form>
-      </div>
-    </Modal>
+        </div>
+
+        <button 
+          type="submit" 
+          className="login-button"
+          disabled={loading}
+        >
+          {loading ? 'Iniciando sesión...' : 'Iniciar Sesión'}
+        </button>
+      </form>
+    </div>
   );
 };
+
+export default Login;

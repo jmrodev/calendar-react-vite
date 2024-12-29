@@ -1,33 +1,23 @@
 import React, { useState } from 'react';
 import { useDispatch } from 'react-redux';
-import { fetchMonthAppointments, fetchWeekDayAppointments } from '../redux/slices/appointmentsSlice';
-import { createAppointment } from '../services/appointmentsService';
+import { createNewAppointment } from '../redux/slices/appointmentSlice';
+import { formatStructuredDate } from '../utils/dateUtils';
+import ErrorMessage from '../messages/ErrorMessage';
 import showToast from '../utils/toastUtils';
 import './styles/appointmentForm.css';
-import { standardizeDate } from '../utils/dateUtils';
 
-const AppointmentForm = ({ selectedDate, selectedTime, onSuccess, onCancel }) => {
+const AppointmentForm = ({ date, time, onClose }) => {
   const dispatch = useDispatch();
-  
-  // Validar y formatear la fecha antes de usarla
-  const initialDate = React.useMemo(() => {
-    if (!selectedDate || !(selectedDate instanceof Date)) {
-      console.error("Invalid selectedDate:", selectedDate);
-      return null;
-    }
-    const formattedDate = standardizeDate(selectedDate);
-    console.log("Formatted date:", formattedDate);
-    return formattedDate;
-  }, [selectedDate]);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
 
   const [formData, setFormData] = useState({
     patientName: '',
+    patientEmail: '',
+    patientPhone: '',
     reason: '',
-    appointmentTime: selectedTime,
-    date: initialDate
+    notes: ''
   });
-
-  const [loading, setLoading] = useState(false);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -39,103 +29,128 @@ const AppointmentForm = ({ selectedDate, selectedTime, onSuccess, onCancel }) =>
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    if (!formData.date) {
-      showToast("Fecha inválida", "error");
-      return;
-    }
-    if (!formData.patientName.trim() || !formData.reason.trim()) {
-      showToast("Por favor complete todos los campos", "error");
-      return;
-    }
-
     setLoading(true);
+    setError(null);
+
     try {
       const appointmentData = {
-        date: formData.date,
-        appointmentTime: formData.appointmentTime,
-        realAppointmentTime: formData.appointmentTime,
-        available: false,
-        status: "pending",
-        appointment: {
-          confirmAppointment: false,
-          name: formData.patientName,
-          reason: formData.reason,
-        },
+        ...formData,
+        date,
+        time
       };
 
-      await createAppointment(appointmentData);
-
-      await Promise.all([
-        dispatch(fetchMonthAppointments({
-          year: selectedDate.getFullYear(),
-          month: selectedDate.getMonth()
-        })),
-        dispatch(fetchWeekDayAppointments())
-      ]);
-
-      showToast("Cita creada exitosamente", "success");
-      
-      if (onSuccess) {
-        await onSuccess();
-      }
-
-      setTimeout(() => {
-        window.location.reload();
-      }, 1000);
-
+      await dispatch(createNewAppointment(appointmentData)).unwrap();
+      showToast('Cita agendada exitosamente', 'success');
+      onClose();
     } catch (error) {
-      showToast(error.message || "Error al crear la cita", "error");
+      setError(error.message);
     } finally {
       setLoading(false);
     }
   };
 
   return (
-    <div className="appointment-form-container">
-      <form onSubmit={handleSubmit} className="appointment-form">
-        <h2 className='appointment-form-title'>Nueva Cita - {formData.appointmentTime}hs</h2>
-        
-        <div className="form-group">
-          <label htmlFor="patientName">Nombre del Paciente:</label>
-          <input
-            type="text"
-            id="patientName"
-            name="patientName"
-            value={formData.patientName}
-            onChange={handleChange}
-            required
-          />
+    <div className="modal-overlay">
+      <div className="appointment-form-container">
+        <div className="form-header">
+          <h2>Nueva Cita</h2>
+          <button className="close-button" onClick={onClose}>×</button>
         </div>
 
-        <div className="form-group">
-          <label htmlFor="reason">Motivo de la Cita:</label>
-          <textarea
-            id="reason"
-            name="reason"
-            value={formData.reason}
-            onChange={handleChange}
-            required
+        {error && (
+          <ErrorMessage 
+            message={error}
+            onDismiss={() => setError(null)}
           />
+        )}
+
+        <div className="appointment-info">
+          <p>
+            <strong>Fecha:</strong> {formatStructuredDate(date)}
+          </p>
+          <p>
+            <strong>Hora:</strong> {time}
+          </p>
         </div>
 
-        <div className="form-actions">
-          <button 
-            type="submit" 
-            className="submit-btn"
-            disabled={loading}
-          >
-            {loading ? 'Creando...' : 'Crear Cita'}
-          </button>
-          <button 
-            type="button" 
-            className="cancel-btn"
-            onClick={onCancel}
-            disabled={loading}
-          >
-            Cancelar
-          </button>
-        </div>
-      </form>
+        <form onSubmit={handleSubmit}>
+          <div className="form-group">
+            <label htmlFor="patientName">Nombre del Paciente:</label>
+            <input
+              type="text"
+              id="patientName"
+              name="patientName"
+              value={formData.patientName}
+              onChange={handleChange}
+              required
+            />
+          </div>
+
+          <div className="form-group">
+            <label htmlFor="patientEmail">Email:</label>
+            <input
+              type="email"
+              id="patientEmail"
+              name="patientEmail"
+              value={formData.patientEmail}
+              onChange={handleChange}
+              required
+            />
+          </div>
+
+          <div className="form-group">
+            <label htmlFor="patientPhone">Teléfono:</label>
+            <input
+              type="tel"
+              id="patientPhone"
+              name="patientPhone"
+              value={formData.patientPhone}
+              onChange={handleChange}
+              required
+            />
+          </div>
+
+          <div className="form-group">
+            <label htmlFor="reason">Motivo de la Consulta:</label>
+            <input
+              type="text"
+              id="reason"
+              name="reason"
+              value={formData.reason}
+              onChange={handleChange}
+              required
+            />
+          </div>
+
+          <div className="form-group">
+            <label htmlFor="notes">Notas Adicionales:</label>
+            <textarea
+              id="notes"
+              name="notes"
+              value={formData.notes}
+              onChange={handleChange}
+              rows="3"
+            />
+          </div>
+
+          <div className="form-actions">
+            <button 
+              type="button" 
+              className="cancel-button"
+              onClick={onClose}
+            >
+              Cancelar
+            </button>
+            <button 
+              type="submit" 
+              className="submit-button"
+              disabled={loading}
+            >
+              {loading ? 'Agendando...' : 'Agendar Cita'}
+            </button>
+          </div>
+        </form>
+      </div>
     </div>
   );
 };

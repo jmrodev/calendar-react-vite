@@ -1,32 +1,29 @@
-import { useState } from "react";
-import { Header } from "./src/components/Header";
-import { Footer } from "./src/components/Footer";
-import { Login } from "./src/components/Login";
-import { BrowserRouter as Router, Route, Routes, Navigate } from "react-router-dom";
+import { BrowserRouter as Router } from "react-router-dom";
+import { AppProvider } from "./src/providers/AppProvider";
+import AppContent from "./components/AppContent";
+import { ToastContainer } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 import "./App.css";
-import Content from "./src/components/Content";
-import { Toaster } from 'react-hot-toast';
-import { toastConfig } from './src/config/toastConfig';
-import { useSelector } from 'react-redux';
 
 function App() {
-  const isAuthenticated = useSelector(state => state.auth.isAuthenticated);
-
   return (
-    <Router>
-      <Toaster {...toastConfig} />
-      <div className="container">
-        <Header />
-        <Routes>
-          <Route path="/login" element={!isAuthenticated ? <Login /> : <Navigate to="/" />} />
-          <Route 
-            path="/" 
-            element={isAuthenticated ? <Content /> : <Navigate to="/login" />} 
-          />
-        </Routes>
-        <Footer />
-      </div>
-    </Router>
+    <AppProvider>
+      <Router>
+        <AppContent />
+        <ToastContainer 
+          position="top-right"
+          autoClose={3000}
+          hideProgressBar={false}
+          newestOnTop
+          closeOnClick
+          rtl={false}
+          pauseOnFocusLoss
+          draggable
+          pauseOnHover
+          theme="light"
+        />
+      </Router>
+    </AppProvider>
   );
 }
 

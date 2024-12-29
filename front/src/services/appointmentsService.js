@@ -1,6 +1,6 @@
 import { _getHeaders, handleUnauthorizedError } from "./utils";
 import config from "../config/env.cfg";
-import { standardizeDate } from "../utils/dateUtils";
+import { createStructuredDate, formatStructuredDate } from "../utils/dateUtils";
 
 export const updateAppointment = async (id, appointment) => {
   try {
@@ -87,17 +87,25 @@ export const confirmAppointment = async (appointmentId) => {
 
 export const createAppointment = async (appointment) => {
   try {
+    const structuredDate = createStructuredDate(appointment.date);
+    if (!structuredDate) {
+      throw new Error("Fecha inválida");
+    }
+
     const response = await fetch(`${config.baseUrl}/appointments`, {
       method: "POST",
       headers: _getHeaders(),
-      body: JSON.stringify(appointment),
+      body: JSON.stringify({
+        ...appointment,
+        date: structuredDate
+      }),
     });
 
     handleUnauthorizedError(response);
 
     if (!response.ok) {
       const errorData = await response.json();
-      throw new Error(errorData.message || "Error al crear la cita");
+      throw new Error(errorData.error || "Error al crear la cita");
     }
 
     return await response.json();
@@ -127,26 +135,27 @@ export const getAllAppointments = async () => {
 
 export const getAppointmentsByDate = async (date) => {
   try {
-    console.log("Fecha a enviar al backend:", date);
+    const structuredDate = createStructuredDate(date);
+    if (!structuredDate) {
+      throw new Error("Fecha inválida");
+    }
 
-    const response = await fetch(`${config.baseUrl}/appointments/date/${encodeURIComponent(date)}`, {
-      headers: _getHeaders(),
-    });
+    const response = await fetch(
+      `${config.baseUrl}/appointments/date/${encodeURIComponent(JSON.stringify(structuredDate))}`,
+      {
+        headers: _getHeaders(),
+      }
+    );
+
+    handleUnauthorizedError(response);
 
     if (!response.ok) {
-      const text = await response.text();
-      try {
-        const errorData = JSON.parse(text);
-        throw new Error(errorData.message || "Error al obtener las citas por fecha");
-      } catch (e) {
-        console.error("Error response:", text);
-        throw new Error("Error al obtener las citas por fecha");
-      }
+      const errorData = await response.json();
+      throw new Error(errorData.message || "Error al obtener las citas por fecha");
     }
 
     return await response.json();
   } catch (error) {
-    console.error("Error en getAppointmentsByDate:", error);
     throw error;
   }
 };

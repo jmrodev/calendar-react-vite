@@ -13,9 +13,6 @@ export const loginController = async (req, res) => {
     if (!result.token) {
       throw new Error("Token no generado");
     }
-
-    console.log("Login successful, token:", result.token);
-
     res.status(200).json({
       success: true,
       message: "Login successful",
@@ -62,8 +59,6 @@ export const registerController = async (req, res) => {
 
 export const refreshTokenController = async (req, res) => {
   const authHeader = req.headers["authorization"];
-  console.log("Refresh token - Auth header:", authHeader);
-
   if (!authHeader) {
     return res.status(401).json({ message: "No authorization header" });
   }
@@ -77,9 +72,6 @@ export const refreshTokenController = async (req, res) => {
     const decoded = jwt.verify(token, process.env.JWT_SECRET, {
       ignoreExpiration: true,
     });
-
-    console.log("Refresh token - Decoded token:", decoded);
-
     const newToken = jwt.sign(
       { 
         id: decoded.id, 
@@ -89,9 +81,6 @@ export const refreshTokenController = async (req, res) => {
       process.env.JWT_SECRET,
       { expiresIn: "1h" }
     );
-
-    console.log("Refresh token - New token generated:", newToken);
-
     res.json({ 
       success: true,
       token: newToken,

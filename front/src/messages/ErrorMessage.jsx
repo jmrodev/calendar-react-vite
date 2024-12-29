@@ -1,41 +1,39 @@
-import React, { useState } from "react";
+import React from 'react';
+import { FaExclamationCircle, FaTimes } from 'react-icons/fa';
+import './styles/errorMessage.css';
 
-const ErrorMessage = ({ message, onClose }) => {
-  const [visible, setVisible] = useState(true);
-
-  if (!visible || !message) return null;
-
-  const handleClose = () => {
-    setVisible(false);
-    if (onClose) {
-      onClose();
-    }
-  };
-
+const ErrorMessage = ({ message, onDismiss, onRetry }) => {
   return (
-    <div
-      style={{
-        color: "red",
-        margin: "10px 0",
-        padding: "10px",
-        border: "1px solid red",
-        borderRadius: "5px",
-        backgroundColor: "#ffe6e6",
-      }}
-    >
-      <span>{message}</span>
-      <button
-        onClick={handleClose}
-        style={{
-          marginLeft: "10px",
-          backgroundColor: "transparent",
-          border: "none",
-          color: "red",
-          cursor: "pointer",
-        }}
-      >
-        X
-      </button>
+    <div className="error-container">
+      <div className="error-icon">
+        <FaExclamationCircle />
+      </div>
+      
+      <div className="error-content">
+        <h4 className="error-title">Error</h4>
+        <p className="error-message">{message}</p>
+        
+        {(onRetry || onDismiss) && (
+          <div className="error-actions">
+            {onRetry && (
+              <button 
+                onClick={onRetry}
+                className="retry-button"
+              >
+                Reintentar
+              </button>
+            )}
+            {onDismiss && (
+              <button 
+                onClick={onDismiss}
+                className="dismiss-button"
+              >
+                <FaTimes />
+              </button>
+            )}
+          </div>
+        )}
+      </div>
     </div>
   );
 };

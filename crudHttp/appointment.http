@@ -8,9 +8,8 @@ POST http://{{host}}/api/auth/login
 Content-Type: application/json
 
 {
-    "username": "secretaria1",
-    "password": "SecretPass123!",
-    "role": "secretary"
+    "username": "newuser2",
+    "password": "Asdfghj??a3kl"
 }
 
 ###
@@ -185,3 +184,66 @@ Authorization: {{tokenPrefix}} {{login.response.body.token}}
 ### Eliminar una cita por ID
 DELETE http://{{host}}/api/appointments/{{appointmentId}}
 Authorization: {{tokenPrefix}} {{login.response.body.token}}
+
+### Crear una nueva cita
+POST http://localhost:3001/appointments
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+  "date": {
+    "year": 2024,
+    "month": 0,
+    "day": 15,
+    "hours": 9,
+    "minutes": 0,
+    "seconds": 0
+  },
+  "appointmentTime": "09:00",
+  "realAppointmentTime": "09:00",
+  "available": false,
+  "status": "pending",
+  "appointment": {
+    "name": "Juan Pérez",
+    "reason": "Consulta general",
+    "confirmAppointment": false
+  }
+}
+
+### Obtener citas por fecha
+GET http://localhost:3001/appointments/date/{"year":2024,"month":0,"day":15,"hours":0,"minutes":0,"seconds":0}
+Authorization: Bearer {{token}}
+
+### Obtener citas por día de la semana
+GET http://localhost:3001/appointments/weekday/monday
+Authorization: Bearer {{token}}
+
+### Actualizar una cita
+PUT http://localhost:3001/appointments/update/1
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+  "date": {
+    "year": 2024,
+    "month": 0,
+    "day": 15,
+    "hours": 10,
+    "minutes": 0,
+    "seconds": 0
+  },
+  "appointmentTime": "10:00",
+  "status": "rescheduled"
+}
+
+### Eliminar una cita
+DELETE http://localhost:3001/appointments/1
+Authorization: Bearer {{token}}
+
+### Confirmar una cita
+PUT http://localhost:3001/appointments/confirm/1
+Authorization: Bearer {{token}}
+
+### Completar una cita
+PUT http://localhost:3001/appointments/complete/1
+Authorization: Bearer {{token}}

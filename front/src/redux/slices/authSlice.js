@@ -1,12 +1,24 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
-import { loginService, logoutService } from '../../services/authService';
+import * as authService from '../../services/authService';
 
 export const loginAsync = createAsyncThunk(
   'auth/login',
   async (credentials, { rejectWithValue }) => {
     try {
-      const response = await loginService(credentials);
-      return response;
+      const data = await authService.login(credentials);
+      return data;
+    } catch (error) {
+      return rejectWithValue(error.message);
+    }
+  }
+);
+
+export const registerAsync = createAsyncThunk(
+  'auth/register',
+  async (userData, { rejectWithValue }) => {
+    try {
+      const data = await authService.register(userData);
+      return data;
     } catch (error) {
       return rejectWithValue(error.message);
     }
@@ -17,7 +29,19 @@ export const logoutAsync = createAsyncThunk(
   'auth/logout',
   async (_, { rejectWithValue }) => {
     try {
-      await logoutService();
+      await authService.logout();
+    } catch (error) {
+      return rejectWithValue(error.message);
+    }
+  }
+);
+
+export const getCurrentUserAsync = createAsyncThunk(
+  'auth/getCurrentUser',
+  async (_, { rejectWithValue }) => {
+    try {
+      const user = await authService.getCurrentUser();
+      return user;
     } catch (error) {
       return rejectWithValue(error.message);
     }
@@ -28,8 +52,7 @@ const authSlice = createSlice({
   name: 'auth',
   initialState: {
     user: null,
-    token: localStorage.getItem('jwt'),
-    isAuthenticated: !!localStorage.getItem('jwt'),
+    isAuthenticated: false,
     loading: false,
     error: null
   },
@@ -40,32 +63,48 @@ const authSlice = createSlice({
   },
   extraReducers: (builder) => {
     builder
+      // Login
       .addCase(loginAsync.pending, (state) => {
         state.loading = true;
         state.error = null;
       })
       .addCase(loginAsync.fulfilled, (state, action) => {
-        state.user = action.payload.user;
-        state.token = action.payload.token;
-        state.isAuthenticated = true;
         state.loading = false;
-        localStorage.setItem('jwt', action.payload.token);
+        state.isAuthenticated = true;
+        state.user = action.payload.user;
       })
       .addCase(loginAsync.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload;
       })
-      .addCase(logoutAsync.pending, (state) => {
+      // Register
+      .addCase(registerAsync.pending, (state) => {
         state.loading = true;
+        state.error = null;
       })
+      .addCase(registerAsync.fulfilled, (state) => {
+        state.loading = false;
+      })
+      .addCase(registerAsync.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload;
+      })
+      // Logout
       .addCase(logoutAsync.fulfilled, (state) => {
         state.user = null;
-        state.token = null;
         state.isAuthenticated = false;
-        state.loading = false;
-        localStorage.removeItem('jwt');
       })
-      .addCase(logoutAsync.rejected, (state, action) => {
+      // Get Current User
+      .addCase(getCurrentUserAsync.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(getCurrentUserAsync.fulfilled, (state, action) => {
+        state.loading = false;
+        state.isAuthenticated = true;
+        state.user = action.payload;
+      })
+      .addCase(getCurrentUserAsync.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload;
       });

@@ -1,6 +1,6 @@
 import { AppointmentSchema } from "../Models/AppointmentSchema.js";
 import { createLog } from "./logRepository.js";
-import { standardizeDate } from "../Utils/date/dateUtils.js";
+import { createStructuredDate, formatStructuredDate, compareStructuredDates } from "../Utils/date/dateUtils.js";
 
 export const completeAppointmentRepository = async (appointmentId) => {
   try {
@@ -24,26 +24,21 @@ export const confirmAppointmentRepository = async (appointmentId) => {
 
 export const createAppointmentRepository = async (appointmentData, secretaryId, secretaryName) => {
   try {
-    const standardizedDate = standardizeDate(appointmentData.date);
-    if (!standardizedDate) {
-      throw new Error("Invalid appointment date format");
-    }
-
     const appointment = await AppointmentSchema.create({
       ...appointmentData,
-      date: standardizedDate,
+      date: createStructuredDate(appointmentData.date),
       secretary: {
         id: secretaryId,
         name: secretaryName
       },
       changeLog: [{
-        date: new Date(),
+        date: createStructuredDate(new Date()),
         action: "created",
         description: "Cita creada",
         secretaryId: secretaryId,
         newStatus: appointmentData.status
       }]
-    });
+    }).save();
 
     await createLog({
       userId: secretaryId,
@@ -53,11 +48,11 @@ export const createAppointmentRepository = async (appointmentData, secretaryId, 
       description: "Creación de nueva cita",
       details: {
         patientName: appointmentData.appointment.name,
-        appointmentDate: standardizedDate
+        appointmentDate: formatStructuredDate(appointment.date)
       }
-    });
+    }).save();
 
-    return await appointment.save();
+    return appointment;
   } catch (error) {
     throw new Error(`Error en createAppointmentRepository: ${error.message}`);
   }
@@ -92,26 +87,18 @@ export const getAllAppointmentsRepository = async () => {
 };
 
 export const getAppointmentByDateRepository = async (date) => {
-  try {
-    const standardizedDate = standardizeDate(date);
-
-    if (!standardizedDate) {
-      console.error("Invalid date after standardization:", date);
-      throw new Error("Invalid date format");
+  try {    
+    const searchDate = createStructuredDate(date);
+    if (!searchDate) {
+      throw new Error("Invalid date");
     }
 
-    const appointments = await AppointmentSchema.find({
-      date: standardizedDate,
-    });
-
-    return appointments;
+    const appointments = await AppointmentSchema.find();
+    return appointments.filter(appointment => 
+      compareStructuredDates(appointment.date, searchDate)
+    );
   } catch (error) {
-    console.error("Repository Error:", {
-      message: error.message,
-      stack: error.stack,
-      originalDate: date,
-    });
-    throw error;
+    throw new Error(`Error in getAppointmentByDateRepository: ${error.message}`);
   }
 };
 
@@ -186,23 +173,23 @@ export const updateAppointmentRepository = async (id, appointment, secretaryId) 
   }
 };
 
-export const getAppointmentsByWeekDayRepository = async (dayOfWeek) => {
-  console.log("repository", dayOfWeek);
-  
+export const getAppointmentsByWeekDayRepository = async (dayOfWeek) => {  
   try {
     const allAppointments = await AppointmentSchema.find();
     
     const appointments = allAppointments.filter((appointment) => {
-      const appointmentDate = new Date(appointment.date.split('/').reverse().join('-'));
-      let dayOfWeektransf = parseInt(dayOfWeek);
-      console.log(`Cita fecha: ${appointment.date}, día: ${appointmentDate.getDay() + 1}, buscando día: ${dayOfWeektransf}`);
+      const appointmentDate = standardizeDate(appointment.date);
+      if (!appointmentDate) return false;
       
+      let dayOfWeektransf = parseInt(dayOfWeek);      
       return (appointmentDate.getDay() + 1) === dayOfWeektransf;
     });
     
     appointments.sort((a, b) => {
-      const dateA = new Date(a.date.split('/').reverse().join('-'));
-      const dateB = new Date(b.date.split('/').reverse().join('-'));
+      const dateA = standardizeDate(a.date);
+      const dateB = standardizeDate(b.date);
+      if (!dateA || !dateB) return 0;
+      
       if (dateA.getTime() !== dateB.getTime()) {
         return dateA - dateB;
       }

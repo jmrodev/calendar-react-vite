@@ -10,6 +10,8 @@ import {
   completeAppointmentService,
   getAppointmentsByWeekDayService,
 } from "../Service/appointmentService.js";
+import { standardizeDate, formatDate, createStructuredDate } from "../Utils/date/dateUtils.js";
+import { findAppointment } from "../Utils/appointment/findAppointment.js";
 
 export const completeAppointmentController = async (req, res) => {
   try {
@@ -34,7 +36,6 @@ export const confirmAppointmentController = async (req, res) => {
   }
 };
 
-import { findAppointment } from "../Utils/appointment/findAppointment.js";
 export const createAppointmentController = async (req, res) => {
   try {
     const {
@@ -43,18 +44,25 @@ export const createAppointmentController = async (req, res) => {
       realAppointmentTime,
       available,
       appointment,
+      status
     } = req.body;
 
-    // Obtener información de la secretaria del token
     const secretaryId = req.user.id;
     const secretaryName = req.user.username;
 
-    await findAppointment({ date, appointmentTime });
+    const structuredDate = createStructuredDate(date);
+    if (!structuredDate) {
+      throw new Error("Invalid date format");
+    }
+
+    await findAppointment({ date: structuredDate, appointmentTime });
+    
     const newAppointment = await createAppointmentService({
-      date,
+      date: structuredDate,
       appointmentTime,
       realAppointmentTime,
       available,
+      status: status || "pending",
       appointment,
     }, secretaryId, secretaryName);
 
@@ -89,9 +97,14 @@ export const getAllAppointmentsController = async (req, res) => {
 
 export const getAppointmentByDateController = async (req, res) => {
   try {
-    const { date } = req.params;
-    const { status, data } = await getAppointmentByDateService(date);
-    res.status(status).json(data);
+    const { date } = req.params;    
+    const structuredDate = createStructuredDate(decodeURIComponent(date));
+    if (!structuredDate) {
+      return res.status(400).json({ message: "Invalid date format" });
+    }
+
+    const result = await getAppointmentByDateService(structuredDate);
+    res.status(result.status).json(result.data);
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
@@ -133,9 +146,7 @@ export const updateAppointmentController = async (req, res) => {
 
 export const getAppointmentsByWeekDayController = async (req, res) => {  
   try {
-    const { dayOfWeek } = req.params;
-    console.log("controller", dayOfWeek);
-    
+    const { dayOfWeek } = req.params;    
     // Convertir el día de la semana en texto a número
     const weekDays = {
       'sunday': 0,

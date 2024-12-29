@@ -1,5 +1,5 @@
 import { getAppointmentsByDate } from "../services/appointmentsService";
-import { standardizeDate } from "./dateUtils";
+import { createStructuredDate } from "./dateUtils";
 
 export const generateTimeSlots = async (selectedDate) => {
   try {
@@ -7,13 +7,12 @@ export const generateTimeSlots = async (selectedDate) => {
       throw new Error("No se ha seleccionado una fecha");
     }
 
-    const dateStr = standardizeDate(selectedDate);
-    if (!dateStr) {
+    const structuredDate = createStructuredDate(selectedDate);
+    if (!structuredDate) {
       throw new Error("Fecha inválida");
     }
-    console.log("Fecha estandarizada:", dateStr);
 
-    const existingSlots = await getAppointmentsByDate(dateStr);
+    const existingSlots = await getAppointmentsByDate(structuredDate);
     const slots = [];
     const initHour = 9;
     const finishHour = 19;
@@ -23,6 +22,7 @@ export const generateTimeSlots = async (selectedDate) => {
       const existingSlot = existingSlots.find(
         (slot) => slot.appointmentTime === timeString
       );
+
       if (existingSlot) {
         slots.push({
           ...existingSlot,
@@ -31,9 +31,9 @@ export const generateTimeSlots = async (selectedDate) => {
         });
       } else {
         slots.push({
-          _id: `${dateStr}-${timeString}`,
-          id: `${dateStr}-${timeString}`,
-          date: dateStr,
+          _id: `${JSON.stringify(structuredDate)}-${timeString}`,
+          id: `${JSON.stringify(structuredDate)}-${timeString}`,
+          date: structuredDate,
           appointmentTime: timeString,
           realAppointmentTime: timeString,
           available: true,

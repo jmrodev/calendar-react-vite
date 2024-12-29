@@ -21,28 +21,35 @@ const UserSchema = Schema("User", {
       firstName: { type: String, required: true },
       lastName: { type: String, required: true },
       email: { type: String, required: true },
-      phone: { type: String, required: false },
-    },
+      phone: { type: String, required: true }
+    }
   },
   loginAttempts: { type: Number, default: 0 },
-  lockUntil: { type: String, default: "" },
-  createdAt: {
-    type: Date,
-    required: true,
-    default: () => new Date(),
-    set: (value) => new Date(value),
+  lockUntil: { 
+    type: Object,
+    required: false,
+    schema: {
+      year: { type: Number, required: true },
+      month: { type: Number, required: true },
+      day: { type: Number, required: true },
+      hours: { type: Number, required: true },
+      minutes: { type: Number, required: true },
+      seconds: { type: Number, required: true }
+    }
   },
-  lastLogin: {
-    type: Date,
-    required: true,
-    default: () => new Date(),
-    set: (value) => new Date(value),
+  lastLogin: { 
+    type: Object,
+    required: false,
+    schema: {
+      year: { type: Number, required: true },
+      month: { type: Number, required: true },
+      day: { type: Number, required: true },
+      hours: { type: Number, required: true },
+      minutes: { type: Number, required: true },
+      seconds: { type: Number, required: true }
+    }
   },
-  status: {
-    type: String,
-    default: "active",
-    enum: ["active", "inactive", "suspended"],
-  },
+  status: { type: String, default: 'active' }
 });
 
 export { UserSchema };

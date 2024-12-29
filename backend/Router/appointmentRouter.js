@@ -1,84 +1,31 @@
 import { Router } from "express";
 import {
   createAppointmentController,
-  getAllAppointmentsController,
-  getAppointmentByIdController,
   deleteAppointmentController,
-  getConfirmedAppointmentsController,
-  confirmAppointmentController,
+  getAllAppointmentsController,
   getAppointmentByDateController,
-  completeAppointmentController,
+  getAppointmentByIdController,
+  getConfirmedAppointmentsController,
   updateAppointmentController,
+  confirmAppointmentController,
+  completeAppointmentController,
   getAppointmentsByWeekDayController,
 } from "../Controller/appointmentController.js";
-import { authorize } from "../Middleware/roles/authorize.js";
 import { authToken } from "../Middleware/token/authToken.js";
 
 const router = Router();
 
-router.post(
-  "/",
-  authToken,
-  authorize("appointments", "create"),
-  createAppointmentController
-);
-router.get(
-  "/",
-  authToken,
-  authorize("appointments", "read"),
-  getAllAppointmentsController
-);
-router.put(
-  "/confirm/:id",
-  authToken,
-  authorize("appointments", "update"),
-  confirmAppointmentController
-);
-router.get(
-  "/confirmed",
-  authToken,
-  authorize("appointments", "read"),
-  getConfirmedAppointmentsController
-);
-router.get(
-  "/:id",
-  authToken,
-  authorize("appointments", "read"),
-  getAppointmentByIdController
-);
-router.delete(
-  "/:id",
-  authToken,
-  authorize("appointments", "delete"),
-  deleteAppointmentController
-);
-router.get(
-  "/date/:date",
-  authToken,
-  authorize("appointments", "read"),
-  getAppointmentByDateController
-);
-router.put(
-  "/update/:id",
-  authToken,
-  authorize("appointments", "update"),
-  updateAppointmentController
-);
-router.put(
-  "/complete/:id",
-  authToken,
-  authorize("appointments", "update"),
-  completeAppointmentController
-);
-router.get(
-  "/weekday/:dayOfWeek",
-  authToken,
-  (req,res,next) => {
-    console.log("router",req.params);
-    next();
-  },
-  authorize("appointments", "read"),
-  getAppointmentsByWeekDayController
-);
+router.use(authToken);
+
+router.post("/", createAppointmentController);
+router.delete("/:id", deleteAppointmentController);
+router.get("/", getAllAppointmentsController);
+router.get("/date/:date", getAppointmentByDateController);
+router.get("/id/:id", getAppointmentByIdController);
+router.get("/confirmed", getConfirmedAppointmentsController);
+router.put("/update/:id", updateAppointmentController);
+router.put("/confirm/:appointmentId", confirmAppointmentController);
+router.put("/complete/:appointmentId", completeAppointmentController);
+router.get("/weekday/:dayOfWeek", getAppointmentsByWeekDayController);
 
 export default router;
