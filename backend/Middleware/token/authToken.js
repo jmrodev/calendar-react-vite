@@ -6,48 +6,32 @@ dotenv.config();
 const secretKey = process.env.JWT_SECRET;
 
 export const authToken = async (req, res, next) => {
-  const authHeader = req.headers["authorization"];
-  if (!authHeader) {
-    return res.status(401).json({ 
-      error: "Unauthorized", 
-      message: "Token no proporcionado" 
-    });
-  }
-
-  const token = authHeader.split(" ")[1];
+  const token = req.header('Authorization');
+  
+  console.log('Token recibido:', token); // Log para debugging
+  
   if (!token) {
-    return res.status(401).json({ 
-      error: "Unauthorized", 
-      message: "Token no válido" 
+    console.log('No se proporcionó token'); // Log para debugging
+    return res.status(403).json({
+      error: 'Forbidden error',
+      message: 'No token provided'
     });
   }
 
   try {
-    const decoded = jwt.verify(token, secretKey);
+    const tokenValue = token.startsWith('Bearer ') ? token.slice(7) : token;
+    console.log('Token a verificar:', tokenValue); // Log para debugging
     
-    // Verificar si el token ha expirado
-    const currentDate = createStructuredDate(new Date());
-    const expDate = createStructuredDate(new Date(decoded.exp * 1000));
+    const decoded = jwt.verify(tokenValue, secretKey);
+    console.log('Token decodificado:', decoded); // Log para debugging
     
-    if (compareStructuredDates(currentDate, expDate) > 0) {
-      return res.status(401).json({ 
-        error: "Token Expired", 
-        message: "La sesión ha expirado, por favor inicie sesión nuevamente" 
-      });
-    }
-
     req.user = decoded;
     next();
   } catch (error) {
-    if (error.name === "TokenExpiredError") {
-      return res.status(401).json({ 
-        error: "Token Expired", 
-        message: "La sesión ha expirado, por favor inicie sesión nuevamente" 
-      });
-    }
-    return res.status(403).json({ 
-      error: "Forbidden", 
-      message: "Error de autenticación" 
+    console.error('Error de verificación:', error); // Log para debugging
+    return res.status(403).json({
+      error: 'Forbidden error',
+      message: 'Error de autenticación authtoken'
     });
   }
 };

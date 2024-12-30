@@ -129,13 +129,18 @@ export const createAppointment = async (appointment) => {
 
 export const getAllAppointments = async () => {
   try {
+    const headers = getAuthHeaders();
+    console.log('Headers de la petición:', headers); // Debug
+
     const response = await fetch(`${config.baseUrl}/appointments`, {
-      headers: getAuthHeaders()
+      headers
     });
+
+    console.log('Status de la respuesta:', response.status); // Debug
 
     if (!response.ok) {
       if (response.status === 401 || response.status === 403) {
-        throw new Error('Error de autenticación');
+        throw new Error('Error de autenticación en respuesta');
       }
       throw new Error('Error al obtener las citas');
     }
@@ -149,23 +154,14 @@ export const getAllAppointments = async () => {
 
 export const getAppointmentsByDate = async (date) => {
   try {
-    const token = getAuthToken();
-    if (!token) {
-      throw new Error('No hay token de autenticación');
-    }
-
     const response = await fetch(`${config.baseUrl}/appointments/date/${date}`, {
       method: 'GET',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${token}`
-      }
+      headers: getAuthHeaders()
     });
 
+    handleUnauthorizedError(response);
+
     if (!response.ok) {
-      if (response.status === 401) {
-        throw new Error('Error de autenticación');
-      }
       throw new Error('Error al obtener las citas');
     }
 
@@ -197,7 +193,7 @@ export const getAppointmentsByWeekDay = async (dayOfWeek) => {
 
     if (!response.ok) {
       if (response.status === 401 || response.status === 403) {
-        throw new Error('Error de autenticación');
+        throw new Error('Error de autenticación by week day');
       }
       throw new Error('Error al obtener las citas por día de la semana');
     }
@@ -220,7 +216,7 @@ export const getWeekAppointments = async (startDate, endDate) => {
 
     if (!response.ok) {
       if (response.status === 401 || response.status === 403) {
-        throw new Error('Error de autenticación');
+        throw new Error('Error de autenticación getWeekAppointments');
       }
       throw new Error('Error al obtener las citas de la semana');
     }

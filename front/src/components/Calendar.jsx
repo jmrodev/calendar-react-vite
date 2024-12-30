@@ -33,6 +33,9 @@ const Calendar = ({ onDateSelect, selectedDate }) => {
   useEffect(() => {
     const fetchData = async () => {
       try {
+        console.log('Token actual:', localStorage.getItem('token'));
+        console.log('Auth headers:', getAuthHeaders());
+        
         if (!isTokenValid()) {
           throw new Error('Sesión expirada');
         }
@@ -45,7 +48,7 @@ const Calendar = ({ onDateSelect, selectedDate }) => {
           dispatch(fetchWeekDayAppointments())
         ]);
       } catch (error) {
-        console.error('Error fetching data:', error);
+        console.error('Error completo:', error);
         if (error.message.includes('autenticación') || error.message.includes('expirada')) {
           dispatch(logout());
           navigate('/login');

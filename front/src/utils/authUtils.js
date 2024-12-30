@@ -1,17 +1,17 @@
 export const setAuthToken = (token) => {
   if (token) {
-    localStorage.setItem('authToken', token);
+    localStorage.setItem('token', token);
   } else {
-    localStorage.removeItem('authToken');
+    localStorage.removeItem('token');
   }
 };
 
 export const getAuthToken = () => {
-  return localStorage.getItem('authToken');
+  return localStorage.getItem('token');
 };
 
 export const removeAuthToken = () => {
-  localStorage.removeItem('authToken');
+  localStorage.removeItem('token');
 };
 
 export const isTokenValid = () => {
