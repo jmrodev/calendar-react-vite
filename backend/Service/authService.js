@@ -65,11 +65,12 @@ export const loginService = async (username, password) => {
         id: user._id,
         username: user.username,
         role: user.role,
-        lockUntil: user.lockUntil
       },
       process.env.JWT_SECRET,
       { expiresIn: "1h" }
     );
+
+    console.log('Token generado:', token); // Para debugging
 
     return {
       success: true,

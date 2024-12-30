@@ -7,40 +7,33 @@ Content-Type: application/json
 
 {
     "username": "newuser2",
-    "password": "Asdfghj??a3kl",
-    "role": "admin"
+    "password": "Asdfghj??a3kl"
 }
 
 ###
-@authToken = {login.response.body.token}
+# Guarda el token de la respuesta anterior
+@token = {{login.response.body.token}}
 
-### Registrar nuevo usuario
-POST http://{{host}}/api/auth/register
-Content-Type: application/json
-
-{
-    "username": "newuser",
-    "password": "Asdfghj??a3kl",
-    "role": "admin",
-
-}
+### Obtener todas las citas
+GET http://{{host}}/api/appointments
+Authorization: {{tokenPrefix}} {{token}}
 
 ### Verificar token
 GET http://{{host}}/api/auth/verify
-Authorization: {{tokenPrefix}} {{login.response.body.token}}
+Authorization: {{tokenPrefix}} {{token}}
 
 ### Refrescar token
 POST http://{{host}}/api/auth/refresh
-Authorization: {{tokenPrefix}} {{login.response.body.token}}
+Authorization: {{tokenPrefix}} {{token}}
 
 ### Cerrar sesión
 POST http://{{host}}/api/auth/logout
-Authorization: {{tokenPrefix}} {{login.response.body.token}}
+Authorization: {{tokenPrefix}} {{token}}
 
 ### Cambiar contraseña
 PUT http://{{host}}/api/auth/change-password
 Content-Type: application/json
-Authorization: {{tokenPrefix}} {{login.response.body.token}}
+Authorization: {{tokenPrefix}} {{token}}
 
 {
     "oldPassword": "Asdfghj??a3kl",
