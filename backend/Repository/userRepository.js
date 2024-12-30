@@ -1,13 +1,8 @@
-import UserSchema from "../models/userModel.js";
+import UserSchema from "../Models/UserSchema.js";
 
 export const createUserRepository = async (userData) => {
   try {
-    const newUser = await createUser(
-      userData.username,
-      userData.password,
-      userData.role
-    );
-
+    const newUser = await UserSchema.create(userData).save();
     return newUser;
   } catch (error) {
     throw new Error(`Error en createUserRepository: ${error.message}`);
@@ -42,7 +37,7 @@ export const getAllUsersRepository = async () => {
 
 export const getUserByIdRepository = async (id) => {
   try {
-    const user = await UserSchema.find({ _id: Number(id) });
+    const user = await UserSchema.findOne({ _id: Number(id) });
     if (!user) {
       throw new Error("Error en getUserByIdRepository: Usuario no encontrado");
     }

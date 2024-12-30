@@ -1,31 +1,13 @@
 .notification-container {
   position: fixed;
-  top: 1rem;
-  right: 1rem;
-  z-index: 1000;
+  top: var(--spacing-md);
+  right: var(--spacing-md);
+  z-index: var(--z-index-tooltip);
 }
 
 .notification {
-  padding: 1rem;
-  margin-bottom: 0.5rem;
-  border-radius: 4px;
   min-width: 300px;
   animation: slideIn 0.3s ease-out;
-}
-
-.notification.success {
-  background-color: var(--success-color);
-  color: white;
-}
-
-.notification.error {
-  background-color: var(--danger-color);
-  color: white;
-}
-
-.notification.info {
-  background-color: var(--primary-color);
-  color: white;
 }
 
 @keyframes slideIn {

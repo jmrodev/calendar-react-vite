@@ -13,22 +13,18 @@
 .week-grid {
   display: grid;
   grid-template-columns: repeat(7, 1fr);
-  gap: 1rem;
+  gap: var(--spacing-md);
   overflow-x: auto;
 }
 
 .day-column {
   min-width: 180px;
-  background: white;
-  border-radius: 8px;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
 .day-header {
-  padding: 1rem;
   background-color: var(--primary-color);
-  color: white;
-  border-radius: 8px 8px 0 0;
+  border-radius: var(--border-radius-sm) var(--border-radius-sm) 0 0;
+  padding: var(--spacing-md);
   text-align: center;
 }
 
@@ -43,29 +39,23 @@
 }
 
 .time-slots {
-  padding: 1rem;
+  padding: var(--spacing-md);
 }
 
 .time-slot {
-  padding: 0.75rem;
-  margin-bottom: 0.5rem;
-  border-radius: 4px;
-  cursor: pointer;
-  transition: all 0.3s;
   display: flex;
   justify-content: space-between;
   align-items: center;
+  padding: var(--spacing-sm);
+  margin-bottom: var(--spacing-xs);
+  border-radius: var(--border-radius-sm);
+  cursor: pointer;
+  transition: all var(--transition-speed);
 }
 
 .time-slot.available {
-  background-color: var(--background-color);
-  border: 1px solid var(--border-color);
-}
-
-.time-slot.available:hover {
-  background-color: var(--primary-color);
-  color: white;
-  transform: translateY(-2px);
+  background-color: rgba(46, 204, 113, 0.1);
+  border: 1px solid var(--success-color);
 }
 
 .time-slot.occupied {
@@ -75,13 +65,10 @@
 }
 
 .time {
-  font-size: 0.875rem;
   font-weight: 500;
 }
 
 .appointment-info {
-  font-size: 0.75rem;
-  color: var(--danger-color);
   max-width: 100px;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -95,10 +82,6 @@
 }
 
 @media (max-width: 768px) {
-  .week-container {
-    padding: 1rem;
-  }
-
   .week-grid {
     grid-template-columns: repeat(2, 1fr);
   }

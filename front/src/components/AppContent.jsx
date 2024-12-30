@@ -1,12 +1,12 @@
 import React from 'react';
 import { useSelector } from 'react-redux';
 import { Routes, Route, Navigate } from 'react-router-dom';
-import Header from "./Header";
-import Footer from "./Footer";
-import Login from "./Login";
-import Content from "./Content";
+import {Header} from "./Header";
+import {Footer} from "./Footer";
+import {Login} from "./Login";
+import {Content} from "./Content";
 
-const AppContent = () => {
+export const AppContent = () => {
   const isAuthenticated = useSelector(state => state.auth.isAuthenticated);
 
   return (
@@ -24,4 +24,3 @@ const AppContent = () => {
   );
 };
 
-export default AppContent; 

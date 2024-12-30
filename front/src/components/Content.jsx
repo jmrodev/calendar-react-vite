@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import { Main } from "./Main";
 import { Aside } from "./Aside";
 
-const Content = () => {
+export const Content = () => {
   const [selectedDate, setSelectedDate] = useState(() => {
     const savedDate = localStorage.getItem('selectedDate');
     return savedDate ? new Date(savedDate) : null;
@@ -29,4 +29,3 @@ const Content = () => {
   );
 };
 
-export default Content;

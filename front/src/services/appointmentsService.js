@@ -1,6 +1,19 @@
 import { _getHeaders, handleUnauthorizedError } from "./utils";
 import config from "../config/env.cfg";
 import { createStructuredDate, formatStructuredDate } from "../utils/dateUtils";
+import { getAuthToken } from '../utils/authUtils';
+
+// Función helper para headers con auth
+const getAuthHeaders = () => {
+  const token = getAuthToken();
+  if (!token) {
+    throw new Error('No hay token de autenticación');
+  }
+  return {
+    'Content-Type': 'application/json',
+    'Authorization': `Bearer ${token}`
+  };
+};
 
 export const updateAppointment = async (id, appointment) => {
   try {
@@ -117,68 +130,81 @@ export const createAppointment = async (appointment) => {
 export const getAllAppointments = async () => {
   try {
     const response = await fetch(`${config.baseUrl}/appointments`, {
-      headers: _getHeaders(),
+      headers: getAuthHeaders()
     });
 
-    handleUnauthorizedError(response);
-
     if (!response.ok) {
-      const errorData = await response.json();
-      throw new Error(errorData.message || "Error al obtener las citas");
+      if (response.status === 401 || response.status === 403) {
+        throw new Error('Error de autenticación');
+      }
+      throw new Error('Error al obtener las citas');
     }
 
     return await response.json();
   } catch (error) {
+    console.error('Error en getAllAppointments:', error);
     throw error;
   }
 };
 
 export const getAppointmentsByDate = async (date) => {
   try {
-    const structuredDate = createStructuredDate(date);
-    if (!structuredDate) {
-      throw new Error("Fecha inválida");
+    const token = getAuthToken();
+    if (!token) {
+      throw new Error('No hay token de autenticación');
     }
 
-    const response = await fetch(
-      `${config.baseUrl}/appointments/date/${encodeURIComponent(JSON.stringify(structuredDate))}`,
-      {
-        headers: _getHeaders(),
+    const response = await fetch(`${config.baseUrl}/appointments/date/${date}`, {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token}`
       }
-    );
-
-    handleUnauthorizedError(response);
+    });
 
     if (!response.ok) {
-      const errorData = await response.json();
-      throw new Error(errorData.message || "Error al obtener las citas por fecha");
+      if (response.status === 401) {
+        throw new Error('Error de autenticación');
+      }
+      throw new Error('Error al obtener las citas');
     }
 
-    return await response.json();
+    const data = await response.json();
+    return data;
   } catch (error) {
+    console.error('Error en getAppointmentsByDate:', error);
     throw error;
   }
 };
 
 export const getAppointmentsByWeekDay = async (dayOfWeek) => {
   try {
+    const token = getAuthToken();
+    if (!token) {
+      throw new Error('No hay token de autenticación');
+    }
+
     // Convertir número a nombre del día
     const weekDays = ['sunday', 'monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday'];
     const dayName = weekDays[dayOfWeek];
 
     const response = await fetch(`${config.baseUrl}/appointments/weekday/${dayName}`, {
-      headers: _getHeaders(),
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token}`
+      }
     });
 
-    handleUnauthorizedError(response);
-
     if (!response.ok) {
-      const errorData = await response.json();
-      throw new Error(errorData.message || "Error al obtener las citas por día de la semana");
+      if (response.status === 401 || response.status === 403) {
+        throw new Error('Error de autenticación');
+      }
+      throw new Error('Error al obtener las citas por día de la semana');
     }
 
     return await response.json();
   } catch (error) {
+    console.error('Error en getAppointmentsByWeekDay:', error);
     throw error;
   }
 };
@@ -188,19 +214,20 @@ export const getWeekAppointments = async (startDate, endDate) => {
     const response = await fetch(
       `${config.baseUrl}/appointments/week?startDate=${startDate.toISOString()}&endDate=${endDate.toISOString()}`,
       {
-        headers: _getHeaders()
+        headers: getAuthHeaders()
       }
     );
 
-    handleUnauthorizedError(response);
-
     if (!response.ok) {
-      const errorData = await response.json();
-      throw new Error(errorData.message || "Error al obtener las citas de la semana");
+      if (response.status === 401 || response.status === 403) {
+        throw new Error('Error de autenticación');
+      }
+      throw new Error('Error al obtener las citas de la semana');
     }
 
     return await response.json();
   } catch (error) {
+    console.error('Error en getWeekAppointments:', error);
     throw error;
   }
 };

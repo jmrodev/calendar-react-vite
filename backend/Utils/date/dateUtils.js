@@ -59,17 +59,28 @@ export function standardizeDate(date) {
 
 // Función auxiliar para formatear fechas para visualización
 export function formatDate(date, formatStr = "DD/MM/YYYY") {
-  console.log("formatDate", date, formatStr);
   if (!date) return '';
   
   try {
+    if (typeof date === 'object' && !date instanceof Date) {
+      // Si es un objeto estructurado
+      const structuredDate = date;
+      date = new Date(
+        structuredDate.year,
+        structuredDate.month,
+        structuredDate.day,
+        structuredDate.hours || 0,
+        structuredDate.minutes || 0,
+        structuredDate.seconds || 0
+      );
+    }
+
     const dateObj = date instanceof Date ? date : new Date(date);
     if (isNaN(dateObj.getTime())) {
       console.error("Invalid date for formatting:", date);
       return '';
     }
 
-    console.log(dateObj, formatStr);
     return format(dateObj, formatStr);
   } catch (error) {
     console.error("Error formatting date:", error);
@@ -77,21 +88,38 @@ export function formatDate(date, formatStr = "DD/MM/YYYY") {
   }
 }
 
-export const createStructuredDate = (date) => {
-  console.log("createStructuredDate", date);
-  if (!date) return null;
-  
-  const d = new Date(date);
-  if (isNaN(d.getTime())) return null;
+export const createStructuredDate = (dateString) => {
+  try {
+    // Si es una fecha ISO
+    const date = new Date(dateString);
+    if (!isNaN(date.getTime())) {
+      return {
+        year: date.getFullYear(),
+        month: date.getMonth(),
+        day: date.getDate(),
+        hours: date.getHours(),
+        minutes: date.getMinutes(),
+        seconds: date.getSeconds()
+      };
+    }
 
-  return {
-    year: d.getFullYear(),
-    month: d.getMonth(),
-    day: d.getDate(),
-    hours: d.getHours(),
-    minutes: d.getMinutes(),
-    seconds: d.getSeconds()
-  };
+    // Si es un objeto de fecha estructurado
+    if (typeof dateString === 'object' && dateString !== null) {
+      return {
+        year: parseInt(dateString.year),
+        month: parseInt(dateString.month),
+        day: parseInt(dateString.day),
+        hours: parseInt(dateString.hours || 0),
+        minutes: parseInt(dateString.minutes || 0),
+        seconds: parseInt(dateString.seconds || 0)
+      };
+    }
+
+    throw new Error('Formato de fecha inválido');
+  } catch (error) {
+    console.error('Error en createStructuredDate:', error);
+    return null;
+  }
 };
 
 export const structuredDateToDate = (structuredDate) => {
@@ -116,10 +144,30 @@ export const formatStructuredDate = (structuredDate) => {
 export const compareStructuredDates = (date1, date2) => {
   if (!date1 || !date2) return -1;
   
-  const d1 = new Date(date1.year, date1.month, date1.day).getTime();
-  const d2 = new Date(date2.year, date2.month, date2.day).getTime();
-  
-  return d1 - d2;
+  try {
+    const d1 = new Date(
+      date1.year, 
+      date1.month, 
+      date1.day, 
+      date1.hours || 0, 
+      date1.minutes || 0, 
+      date1.seconds || 0
+    ).getTime();
+    
+    const d2 = new Date(
+      date2.year, 
+      date2.month, 
+      date2.day, 
+      date2.hours || 0, 
+      date2.minutes || 0, 
+      date2.seconds || 0
+    ).getTime();
+    
+    return d1 - d2;
+  } catch (error) {
+    console.error('Error en compareStructuredDates:', error);
+    return -1;
+  }
 };
 
 export const addMinutesToStructuredDate = (structuredDate, minutes) => {
@@ -130,4 +178,56 @@ export const addMinutesToStructuredDate = (structuredDate, minutes) => {
   
   date.setMinutes(date.getMinutes() + minutes);
   return createStructuredDate(date);
+};
+
+export const compareDates = (date1, date2) => {
+  if (!date1 || !date2) return false;
+
+  return (
+    date1.year === date2.year &&
+    date1.month === date2.month &&
+    date1.day === date2.day &&
+    date1.hours === date2.hours &&
+    date1.minutes === date2.minutes
+  );
+};
+
+export const isDateLocked = (currentDate, lockUntil) => {
+  if (!lockUntil) return false;
+
+  const current = new Date(
+    currentDate.year,
+    currentDate.month,
+    currentDate.day,
+    currentDate.hours,
+    currentDate.minutes,
+    currentDate.seconds
+  );
+
+  const lock = new Date(
+    lockUntil.year,
+    lockUntil.month,
+    lockUntil.day,
+    lockUntil.hours,
+    lockUntil.minutes,
+    lockUntil.seconds
+  );
+
+  return current < lock;
+};
+
+// Función auxiliar para convertir fecha a ISO string
+export const toISOString = (structuredDate) => {
+  if (!structuredDate) return null;
+
+  const date = new Date(
+    structuredDate.year,
+    structuredDate.month,
+    structuredDate.day,
+    structuredDate.hours || 0,
+    structuredDate.minutes || 0,
+    structuredDate.seconds || 0
+  );
+
+  return date.toISOString();
 };

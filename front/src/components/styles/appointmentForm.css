@@ -1,151 +1,28 @@
 .modal-overlay {
   position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background-color: rgba(0, 0, 0, 0.5);
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  padding: 1rem;
-  z-index: 1000;
+  inset: 0;
+  background-color: rgba(4, 9, 34, 0.76);
+  z-index: var(--z-index-modal-backdrop);
 }
 
 .appointment-form-container {
-  background: white;
-  border-radius: 8px;
-  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-  width: 100%;
-  max-width: 500px;
+  max-width: 800px;
   max-height: 90vh;
   overflow-y: auto;
 }
 
 .form-header {
-  padding: 1.5rem;
   border-bottom: 1px solid var(--border-color);
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-}
-
-.form-header h2 {
-  margin: 0;
-  color: var(--text-color);
-  font-size: 1.5rem;
 }
 
 .close-button {
-  background: none;
-  border: none;
-  font-size: 1.5rem;
-  color: var(--text-secondary);
-  cursor: pointer;
-  padding: 0.5rem;
+  font-size: var(--font-size-xl);
   line-height: 1;
-}
-
-.close-button:hover {
-  color: var(--danger-color);
-}
-
-.appointment-info {
-  padding: 1rem 1.5rem;
-  background-color: var(--background-color);
-  border-bottom: 1px solid var(--border-color);
-}
-
-.appointment-info p {
-  margin: 0.5rem 0;
-  color: var(--text-color);
-}
-
-form {
-  padding: 1.5rem;
-}
-
-.form-group {
-  margin-bottom: 1.5rem;
-}
-
-.form-group label {
-  display: block;
-  margin-bottom: 0.5rem;
-  color: var(--text-color);
-  font-weight: 500;
-}
-
-.form-group input,
-.form-group textarea {
-  width: 100%;
-  padding: 0.75rem;
-  border: 1px solid var(--border-color);
-  border-radius: 4px;
-  font-size: 1rem;
-  transition: border-color 0.3s;
-}
-
-.form-group input:focus,
-.form-group textarea:focus {
-  outline: none;
-  border-color: var(--primary-color);
-  box-shadow: 0 0 0 2px rgba(52, 152, 219, 0.2);
-}
-
-.form-actions {
-  display: flex;
-  gap: 1rem;
-  margin-top: 2rem;
-}
-
-.cancel-button,
-.submit-button {
-  flex: 1;
-  padding: 0.75rem;
-  border: none;
-  border-radius: 4px;
-  font-size: 1rem;
-  cursor: pointer;
-  transition: background-color 0.3s;
-}
-
-.cancel-button {
-  background-color: var(--background-color);
-  border: 1px solid var(--border-color);
-  color: var(--text-color);
-}
-
-.cancel-button:hover {
-  background-color: var(--border-color);
-}
-
-.submit-button {
-  background-color: var(--primary-color);
-  color: white;
-}
-
-.submit-button:hover {
-  background-color: #2980b9;
-}
-
-.submit-button:disabled {
-  background-color: var(--border-color);
-  cursor: not-allowed;
 }
 
 @media (max-width: 768px) {
   .appointment-form-container {
     max-height: 100vh;
     border-radius: 0;
-  }
-
-  .form-actions {
-    flex-direction: column;
-  }
-
-  .cancel-button,
-  .submit-button {
-    width: 100%;
   }
 }

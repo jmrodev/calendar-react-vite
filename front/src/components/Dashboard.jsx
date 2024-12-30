@@ -7,14 +7,12 @@ import './styles/dashboard.css';
 const Dashboard = () => {
   const { user, isLoading } = useSelector(state => state.auth);
 
-  // Redirect to login if no user
   if (!user && !isLoading) {
     return <Navigate to="/" replace />;
   }
 
-  // Show loading state
   if (isLoading) {
-    return <div>Loading...</div>;
+    return <div className="loading">Loading...</div>;
   }
 
   const adminMenuItems = [
@@ -62,42 +60,44 @@ const Dashboard = () => {
   const menuItems = user?.role === 'admin' ? adminMenuItems : userMenuItems;
 
   return (
-    <div className="dashboard-container">
-      <h1>Bienvenido, {user?.fullName}</h1>
-      
-      <div className="dashboard-grid">
-        {menuItems.map((item, index) => (
-          <Link to={item.link} key={index} className="dashboard-card">
-            <div className="card-icon">
-              {item.icon}
-            </div>
-            <div className="card-content">
-              <h3>{item.title}</h3>
-              <p>{item.description}</p>
-            </div>
-          </Link>
-        ))}
-      </div>
-
-      {user?.role === 'admin' && (
-        <div className="dashboard-stats">
-          <h2>Estadísticas Generales</h2>
-          <div className="stats-grid">
-            <div className="stat-card">
-              <h4>Citas Hoy</h4>
-              <p className="stat-number">12</p>
-            </div>
-            <div className="stat-card">
-              <h4>Pacientes Totales</h4>
-              <p className="stat-number">150</p>
-            </div>
-            <div className="stat-card">
-              <h4>Doctores Activos</h4>
-              <p className="stat-number">8</p>
-            </div>
-          </div>
+    <div className="page-container">
+      <div className="container">
+        <h1 className="section-title">Bienvenido, {user?.fullName}</h1>
+        
+        <div className="grid dashboard-grid">
+          {menuItems.map((item, index) => (
+            <Link to={item.link} key={index} className="card dashboard-card">
+              <div className="card-icon">
+                {item.icon}
+              </div>
+              <div className="card-content">
+                <h3 className="mb-2">{item.title}</h3>
+                <p className="text-secondary">{item.description}</p>
+              </div>
+            </Link>
+          ))}
         </div>
-      )}
+
+        {user?.role === 'admin' && (
+          <section className="section">
+            <h2 className="section-title">Estadísticas Generales</h2>
+            <div className="grid stats-grid">
+              <div className="card">
+                <h4 className="mb-2">Citas Hoy</h4>
+                <p className="stat-number">12</p>
+              </div>
+              <div className="card">
+                <h4 className="mb-2">Pacientes Totales</h4>
+                <p className="stat-number">15</p>
+              </div>
+              <div className="card">
+                <h4 className="mb-2">Doctores Activos</h4>
+                <p className="stat-number">8</p>
+              </div>
+            </div>
+          </section>
+        )}
+      </div>
     </div>
   );
 };

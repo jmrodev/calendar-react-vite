@@ -8,11 +8,20 @@ import jwt from "jsonwebtoken";
 export const loginController = async (req, res) => {
   try {
     const { username, password } = req.body;
-    const result = await loginService(username, password, req);
+    
+    if (!username || !password) {
+      return res.status(400).json({
+        success: false,
+        message: "Usuario y contraseña son requeridos"
+      });
+    }
+
+    const result = await loginService(username, password);
     
     if (!result.token) {
       throw new Error("Token no generado");
     }
+
     res.status(200).json({
       success: true,
       message: "Login successful",
@@ -24,6 +33,7 @@ export const loginController = async (req, res) => {
     res.status(400).json({
       success: false,
       message: error.message,
+      details: process.env.NODE_ENV === 'development' ? error.stack : undefined
     });
   }
 };

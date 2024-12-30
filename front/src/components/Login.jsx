@@ -6,7 +6,7 @@ import ErrorMessage from '../messages/ErrorMessage';
 import showToast from '../utils/toastUtils';
 import './styles/login.css';
 
-const Login = () => {
+export const Login = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const { loading, error } = useSelector(state => state.auth);
@@ -91,4 +91,3 @@ const Login = () => {
   );
 };
 
-export default Login;

@@ -1,51 +1,33 @@
 import { toast } from 'react-toastify';
 
-const defaultConfig = {
-  position: "top-right",
-  autoClose: 3000,
-  hideProgressBar: false,
-  closeOnClick: true,
-  pauseOnHover: true,
-  draggable: true
-};
-
-const showToast = (message, type = 'info', config = {}) => {
-  const toastConfig = {
-    ...defaultConfig,
-    ...config
+export const showToast = (message, type = 'info') => {
+  const options = {
+    position: "top-right",
+    autoClose: 3000,
+    hideProgressBar: false,
+    closeOnClick: true,
+    pauseOnHover: true,
+    draggable: true,
+    progress: undefined,
   };
 
   switch (type) {
     case 'success':
-      toast.success(message, toastConfig);
+      toast.success(message, options);
       break;
     case 'error':
-      toast.error(message, toastConfig);
+      toast.error(message, options);
       break;
     case 'warning':
-      toast.warning(message, toastConfig);
+      toast.warning(message, options);
       break;
     case 'info':
     default:
-      toast.info(message, toastConfig);
+      toast.info(message, options);
       break;
   }
 };
 
-export const showSuccessToast = (message, config = {}) => {
-  showToast(message, 'success', config);
-};
-
-export const showErrorToast = (message, config = {}) => {
-  showToast(message, 'error', config);
-};
-
-export const showWarningToast = (message, config = {}) => {
-  showToast(message, 'warning', config);
-};
-
-export const showInfoToast = (message, config = {}) => {
-  showToast(message, 'info', config);
-};
-
-export default showToast;
+// Mantener la exportación por defecto para compatibilidad hacia atrás
+const showToastDefault = showToast;
+export default showToastDefault;

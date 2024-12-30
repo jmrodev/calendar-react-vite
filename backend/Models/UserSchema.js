@@ -1,4 +1,5 @@
 import dbLocal from "db-local";
+import { createStructuredDate } from '../Utils/date/dateUtils.js';
 
 const { Schema } = new dbLocal({ path: "../databases" });
 
@@ -7,12 +8,16 @@ const UserSchema = Schema("User", {
   username: {
     type: String,
     required: true,
+    unique: true
   },
-  password: { type: String, required: true },
+  password: { 
+    type: String, 
+    required: true 
+  },
   role: {
     type: String,
     required: true,
-    enum: ["admin", "doctor", "secretary", "guest"],
+    enum: ["admin", "doctor", "secretary", "guest"]
   },
   personalInfo: {
     type: Object,
@@ -24,34 +29,40 @@ const UserSchema = Schema("User", {
       phone: { type: String, required: true }
     }
   },
-  loginAttempts: { type: Number, default: 0 },
+  loginAttempts: { 
+    type: Number, 
+    default: 0 
+  },
   lockUntil: { 
     type: Object,
     required: false,
-    default: null,
+    default: () => createStructuredDate(new Date()),
     schema: {
-      year: { type: Number, required: false },
-      month: { type: Number, required: false },
-      day: { type: Number, required: false },
-      hours: { type: Number, required: false },
-      minutes: { type: Number, required: false },
-      seconds: { type: Number, required: false }
+      year: { type: Number, required: true },
+      month: { type: Number, required: true },
+      day: { type: Number, required: true },
+      hours: { type: Number, required: true },
+      minutes: { type: Number, required: true },
+      seconds: { type: Number, required: true }
     }
   },
   lastLogin: { 
     type: Object,
     required: false,
-    default: null,
+    default: () => createStructuredDate(new Date()),
     schema: {
-      year: { type: Number, required: false },
-      month: { type: Number, required: false },
-      day: { type: Number, required: false },
-      hours: { type: Number, required: false },
-      minutes: { type: Number, required: false },
-      seconds: { type: Number, required: false }
+      year: { type: Number, required: true },
+      month: { type: Number, required: true },
+      day: { type: Number, required: true },
+      hours: { type: Number, required: true },
+      minutes: { type: Number, required: true },
+      seconds: { type: Number, required: true }
     }
   },
-  status: { type: String, default: 'active' }
+  status: { 
+    type: String, 
+    default: 'active' 
+  }
 });
 
-export { UserSchema };
+export default UserSchema;

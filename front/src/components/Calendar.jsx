@@ -1,6 +1,10 @@
 import React, { useState, useEffect } from "react";
 import { useDispatch, useSelector } from 'react-redux';
 import { fetchMonthAppointments, fetchWeekDayAppointments } from '../redux/slices/appointmentsSlice';
+import { logout } from '../redux/slices/authSlice';
+import { isTokenValid } from '../utils/authUtils';
+import { useNavigate } from 'react-router-dom';
+import showToast from '../utils/toastUtils';
 import "./styles/calendar.css";
 
 const Calendar = ({ onDateSelect, selectedDate }) => {
@@ -24,10 +28,15 @@ const Calendar = ({ onDateSelect, selectedDate }) => {
     { name: 'Viernes', short: 'Vie', value: 5 },
     { name: 'Sábado', short: 'Sáb', value: 6 }
   ];
+  const navigate = useNavigate();
 
   useEffect(() => {
     const fetchData = async () => {
-      if (selectedDate) {
+      try {
+        if (!isTokenValid()) {
+          throw new Error('Sesión expirada');
+        }
+
         await Promise.all([
           dispatch(fetchMonthAppointments({
             year: currentDate.getFullYear(),
@@ -35,29 +44,24 @@ const Calendar = ({ onDateSelect, selectedDate }) => {
           })),
           dispatch(fetchWeekDayAppointments())
         ]);
+      } catch (error) {
+        console.error('Error fetching data:', error);
+        if (error.message.includes('autenticación') || error.message.includes('expirada')) {
+          dispatch(logout());
+          navigate('/login');
+          showToast('Su sesión ha expirado, por favor inicie sesión nuevamente', 'warning');
+        } else {
+          showToast('Error al cargar los datos', 'error');
+        }
       }
     };
-    fetchData();
-  }, [selectedDate, currentDate, dispatch]);
 
-  useEffect(() => {
-    const fetchInitialData = async () => {
-      await Promise.all([
-        dispatch(fetchMonthAppointments({
-          year: currentDate.getFullYear(),
-          month: currentDate.getMonth()
-        })),
-        dispatch(fetchWeekDayAppointments())
-      ]);
-    };
-    fetchInitialData();
-
-    // Si hay una fecha guardada, seleccionarla
-    const savedDate = localStorage.getItem('selectedDate');
-    if (savedDate && !selectedDate) {
-      onDateSelect(new Date(savedDate));
+    if (isTokenValid()) {
+      fetchData();
+    } else {
+      navigate('/login');
     }
-  }, [currentDate, dispatch]);
+  }, [currentDate, dispatch, navigate]);
 
   const handleWeekDayClick = (dayValue) => {
     const today = new Date();

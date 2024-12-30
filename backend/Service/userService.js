@@ -8,10 +8,10 @@ import { findUserByUsername } from "../../Utils/user/findUserByName.js";
 import { hashPassword } from "../../Utils/auth/hashPassword.js";
 import { newUserId } from "../../Utils/id/user.js";
 
-export const createUser = async (username, password, role) => {
+export const createUser = async (username, password, role, personalInfo) => {
   try {
     // Validaciones
-    if (!username || !password || !role) {
+    if (!username || !password || !role || !personalInfo) {
       throw new Error("All fields are required");
     }
 
@@ -34,6 +34,8 @@ export const createUser = async (username, password, role) => {
       username,
       password,
       role,
+      personalInfo,
+      status: 'active'
     };
 
     // Hashear contraseña y crear usuario

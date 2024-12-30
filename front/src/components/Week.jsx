@@ -42,9 +42,13 @@ const Week = () => {
     return !appointments.some(apt => apt.time === time);
   };
 
+  if (loading) {
+    return <div className="loading">Cargando calendario...</div>;
+  }
+
   return (
-    <div className="week-container">
-      <h2>Calendario Semanal</h2>
+    <section className="section week-container">
+      <h2 className="section-title">Calendario Semanal</h2>
 
       {error && (
         <ErrorMessage 
@@ -59,10 +63,10 @@ const Week = () => {
 
       <div className="week-grid">
         {weekDates.map((date, index) => (
-          <div key={index} className="day-column">
+          <div key={index} className="card day-column">
             <div className="day-header">
-              <h3>{formatStructuredDate(date, { weekday: 'short' })}</h3>
-              <span>{formatStructuredDate(date, { day: 'numeric', month: 'short' })}</span>
+              <h3 className="text-light">{formatStructuredDate(date, { weekday: 'short' })}</h3>
+              <span className="text-light">{formatStructuredDate(date, { day: 'numeric', month: 'short' })}</span>
             </div>
 
             <div className="time-slots">
@@ -76,7 +80,7 @@ const Week = () => {
                   >
                     <span className="time">{time}</span>
                     {!available && (
-                      <div className="appointment-info">
+                      <div className="appointment-info text-danger">
                         {getAppointmentsForDate(date)
                           .find(apt => apt.time === time)?.patientName}
                       </div>
@@ -99,7 +103,7 @@ const Week = () => {
           }}
         />
       )}
-    </div>
+    </section>
   );
 };
 

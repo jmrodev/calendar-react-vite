@@ -19,9 +19,10 @@ POST http://{{host}}/api/auth/register
 Content-Type: application/json
 
 {
-    "username": "newuser2",
+    "username": "newuser",
     "password": "Asdfghj??a3kl",
-    "role": "admin"
+    "role": "admin",
+
 }
 
 ### Verificar token

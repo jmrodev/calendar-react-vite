@@ -7,7 +7,7 @@ import './styles/header.css';
 
 export const Header = () => {
   const dispatch = useDispatch();
-  const { isAuthenticated } = useSelector(state => state.auth);
+  const { isAuthenticated, user } = useSelector(state => state.auth);
 
   const handleLogout = async () => {
     try {
@@ -19,35 +19,48 @@ export const Header = () => {
   };
 
   return (
-    <header>
-      <nav className="navbar">
-        <div className="nav-brand">
-          <Link to="/">Sistema de Citas</Link>
-        </div>
-        <ul className="nav-links">
-          <li>
-            <Link to="/">Inicio</Link>
-          </li>
+    <header className="header">
+      <nav className="navbar container">
+        <Link to="/" className="nav-brand">
+          <span className="text-gradient">Sistema de Citas</span>
+        </Link>
+
+        <div className="nav-content">
           {isAuthenticated && (
-            <>
-              <li>
-                <Link to="/appointments">Citas</Link>
-              </li>
-              <li>
-                <button className="logout-btn" onClick={handleLogout}>
-                  Cerrar Sesión
-                </button>
-              </li>
-            </>
+            <div className="user-info">
+              <span className="user-name">{user?.fullName}</span>
+              <span className="user-role">{user?.role}</span>
+            </div>
           )}
-          {!isAuthenticated && (
+
+          <ul className="nav-links">
             <li>
-              <Link to="/login" className="login-link">
-                Iniciar Sesión
-              </Link>
+              <Link to="/" className="nav-link">Inicio</Link>
             </li>
-          )}
-        </ul>
+            {isAuthenticated && (
+              <>
+                <li>
+                  <Link to="/appointments" className="nav-link">Citas</Link>
+                </li>
+                <li>
+                  <button 
+                    className="button button-outline logout-btn"
+                    onClick={handleLogout}
+                  >
+                    Cerrar Sesión
+                  </button>
+                </li>
+              </>
+            )}
+            {!isAuthenticated && (
+              <li>
+                <Link to="/login" className="button button-primary login-btn">
+                  Iniciar Sesión
+                </Link>
+              </li>
+            )}
+          </ul>
+        </div>
       </nav>
     </header>
   );
