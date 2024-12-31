@@ -11,9 +11,9 @@ export const saveLoginAttempt = async (username, success, ip = '', userAgent = '
       timestamp: createStructuredDate(new Date()),
       ip,
       userAgent
-    });
+    }).save();
 
-    return await loginAttempt.save();
+    return await loginAttempt;
   } catch (error) {
     throw new Error(`Error en saveLoginAttempt: ${error.message}`);
   }

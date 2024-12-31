@@ -32,11 +32,8 @@ export const loginService = async (username, password) => {
     }
 
     const currentTimestamp = Date.now();
-    console.log("currentTimestamp", currentTimestamp);
-    console.log("user.lockUntil", user.lockUntil);
     
     const lockTimestamp = getTimestamp(user.lockUntil);
-    console.log("lockTimestamp", lockTimestamp);
     
     // Check if account is locked
     if (lockTimestamp && currentTimestamp < lockTimestamp) {
@@ -70,7 +67,6 @@ export const loginService = async (username, password) => {
       { expiresIn: "1h" }
     );
 
-    console.log('Token generado:', token); // Para debugging
 
     return {
       success: true,

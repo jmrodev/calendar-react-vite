@@ -3,18 +3,6 @@ import config from "../config/env.cfg";
 import { createStructuredDate, formatStructuredDate } from "../utils/dateUtils";
 import { getAuthToken } from '../utils/authUtils';
 
-// Función helper para headers con auth
-const getAuthHeaders = () => {
-  const token = getAuthToken();
-  if (!token) {
-    throw new Error('No hay token de autenticación');
-  }
-  return {
-    'Content-Type': 'application/json',
-    'Authorization': `Bearer ${token}`
-  };
-};
-
 export const updateAppointment = async (id, appointment) => {
   try {
     const response = await fetch(`${config.baseUrl}/appointments/update/${id}`, {
@@ -100,43 +88,51 @@ export const confirmAppointment = async (appointmentId) => {
 
 export const createAppointment = async (appointment) => {
   try {
-    const structuredDate = createStructuredDate(appointment.date);
-    if (!structuredDate) {
-      throw new Error("Fecha inválida");
+    if (!appointment.date || !appointment.appointmentTime) {
+      throw new Error("Fecha y hora son requeridos");
     }
+
+    console.log('Datos a enviar al backend:', appointment);
 
     const response = await fetch(`${config.baseUrl}/appointments`, {
       method: "POST",
       headers: _getHeaders(),
-      body: JSON.stringify({
-        ...appointment,
-        date: structuredDate
-      }),
+      body: JSON.stringify(appointment),
     });
 
-    handleUnauthorizedError(response);
-
-    if (!response.ok) {
-      const errorData = await response.json();
-      throw new Error(errorData.error || "Error al crear la cita");
+    // Obtener el texto del error primero
+    const responseText = await response.text();
+    let errorData;
+    
+    try {
+      // Intentar parsearlo como JSON
+      errorData = JSON.parse(responseText);
+    } catch {
+      // Si no es JSON, usar el texto directamente
+      errorData = { message: responseText };
     }
 
-    return await response.json();
+    if (!response.ok) {
+      throw new Error(errorData.error || errorData.message || "Error al crear la cita");
+    }
+
+    // Si llegamos aquí, la respuesta fue exitosa
+    return JSON.parse(responseText);
   } catch (error) {
-    throw error;
+    console.error('Error detallado en createAppointment:', error);
+    // Asegurarnos de que siempre devolvemos un mensaje de error útil
+    throw new Error(error.message || "Error al crear la cita");
   }
 };
 
 export const getAllAppointments = async () => {
   try {
-    const headers = getAuthHeaders();
-    console.log('Headers de la petición:', headers); // Debug
+    const headers = _getHeaders();
 
     const response = await fetch(`${config.baseUrl}/appointments`, {
       headers
     });
 
-    console.log('Status de la respuesta:', response.status); // Debug
 
     if (!response.ok) {
       if (response.status === 401 || response.status === 403) {
@@ -156,7 +152,7 @@ export const getAppointmentsByDate = async (date) => {
   try {
     const response = await fetch(`${config.baseUrl}/appointments/date/${date}`, {
       method: 'GET',
-      headers: getAuthHeaders()
+      headers: _getHeaders()
     });
 
     handleUnauthorizedError(response);
@@ -173,18 +169,15 @@ export const getAppointmentsByDate = async (date) => {
   }
 };
 
-export const getAppointmentsByWeekDay = async (dayOfWeek) => {
+export const getAppointmentsByWeekDay = async (dayNumber) => {
   try {
     const token = getAuthToken();
     if (!token) {
       throw new Error('No hay token de autenticación');
     }
 
-    // Convertir número a nombre del día
-    const weekDays = ['sunday', 'monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday'];
-    const dayName = weekDays[dayOfWeek];
-
-    const response = await fetch(`${config.baseUrl}/appointments/weekday/${dayName}`, {
+    // Enviar directamente el número del día
+    const response = await fetch(`${config.baseUrl}/appointments/weekday/${dayNumber}`, {
       headers: {
         'Content-Type': 'application/json',
         'Authorization': `Bearer ${token}`
@@ -193,7 +186,7 @@ export const getAppointmentsByWeekDay = async (dayOfWeek) => {
 
     if (!response.ok) {
       if (response.status === 401 || response.status === 403) {
-        throw new Error('Error de autenticación by week day');
+        throw new Error('Error de autenticación');
       }
       throw new Error('Error al obtener las citas por día de la semana');
     }
@@ -210,7 +203,7 @@ export const getWeekAppointments = async (startDate, endDate) => {
     const response = await fetch(
       `${config.baseUrl}/appointments/week?startDate=${startDate.toISOString()}&endDate=${endDate.toISOString()}`,
       {
-        headers: getAuthHeaders()
+        headers: _getHeaders()
       }
     );
 

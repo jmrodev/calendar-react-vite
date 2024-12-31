@@ -6,7 +6,6 @@ const router = Router();
 
 // Log middleware para debugging
 router.use((req, res, next) => {
-  console.log('Appointment Route:', req.method, req.path);
   next();
 });
 

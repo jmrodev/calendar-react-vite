@@ -53,39 +53,86 @@ export const confirmAppointmentController = async (req, res) => {
 };
 
 export const createAppointmentController = async (req, res) => {
+  console.log("Datos recibidos en el controlador:", JSON.stringify(req.body, null, 2));
   try {
-    const {
-      date,
+    const { date, appointmentTime, appointment } = req.body;
+
+    // Log de los datos extraídos
+    console.log("Datos extraídos:", {
+      date: JSON.stringify(date),
       appointmentTime,
-      realAppointmentTime,
-      available,
-      appointment,
-      status
-    } = req.body;
+      appointment
+    });
+
+    // Validar que todos los campos requeridos estén presentes
+    if (!date || !appointmentTime || !appointment || !appointment.name || !appointment.reason) {
+      console.log("Validación fallida:", {
+        hasDate: !!date,
+        hasTime: !!appointmentTime,
+        hasAppointment: !!appointment,
+        hasName: appointment?.name,
+        hasReason: appointment?.reason
+      });
+      return res.status(400).json({
+        error: "Datos incompletos",
+        message: "Todos los campos son requeridos"
+      });
+    }
 
     const secretaryId = req.user.id;
     const secretaryName = req.user.username;
 
-    const structuredDate = createStructuredDate(date);
-    if (!structuredDate) {
-      throw new Error("Invalid date format");
+    // Ya no necesitamos crear una fecha estructurada porque ya viene así
+    const structuredDate = date;
+    console.log("Fecha estructurada:", structuredDate);
+
+    try {
+      // Verificar si la cita ya existe
+      console.log("Buscando cita existente para:", {
+        date: JSON.stringify(structuredDate),
+        appointmentTime
+      });
+
+      const existingAppointment = await findAppointment({ 
+        date: structuredDate, 
+        appointmentTime 
+      });
+
+      // Si findAppointment no lanza error, la cita no existe y podemos continuar
+      const appointmentData = {
+        date: structuredDate,
+        appointmentTime,
+        realAppointmentTime: appointmentTime,
+        available: false,
+        status: "pending",
+        appointment: {
+          confirmAppointment: false,
+          name: appointment.name,
+          reason: appointment.reason
+        }
+      };
+
+      console.log("Creando nueva cita con datos:", JSON.stringify(appointmentData, null, 2));
+
+      const newAppointment = await createAppointmentService(appointmentData, secretaryId, secretaryName);
+      console.log("Cita creada exitosamente:", newAppointment);
+
+      return res.status(201).json(newAppointment);
+    } catch (findError) {
+      console.error("Error al buscar/crear cita:", findError);
+      return res.status(400).json({ 
+        error: "Error de validación",
+        message: findError.message,
+        details: findError.stack
+      });
     }
-
-    await findAppointment({ date: structuredDate, appointmentTime });
-    
-    const newAppointment = await createAppointmentService({
-      date: structuredDate,
-      appointmentTime,
-      realAppointmentTime,
-      available,
-      status: status || "pending",
-      appointment,
-    }, secretaryId, secretaryName);
-
-    res.status(201).json(newAppointment);
   } catch (error) {
-    console.error("Error al crear cita:", error);
-    res.status(400).json({ error: error.message });
+    console.error("Error completo al crear cita:", error);
+    return res.status(500).json({ 
+      error: "Error del servidor",
+      message: error.message,
+      stack: error.stack
+    });
   }
 };
 
@@ -113,10 +160,6 @@ export const getAllAppointmentsController = async (req, res) => {
 
 export const getAppointmentByDateController = async (req, res) => {
   try {
-    console.log('User from token:', req.user);
-    console.log('Date param:', req.params.date);
-    console.log('Current date:', new Date().toISOString());
-
     const structuredDate = createStructuredDate(req.params.date);
     if (!structuredDate) {
       return res.status(400).json({ 
@@ -179,40 +222,32 @@ export const updateAppointmentController = async (req, res) => {
   }
 };
 
-export const getAppointmentsByWeekDayController = async (req, res) => {  
+export const getAppointmentsByWeekDayController = async (req, res) => {
   try {
-    // Log para debugging
-    console.log('User from token:', req.user);
-    console.log('Params:', req.params);
-
-    const { dayOfWeek } = req.params;    
+    const { dayOfWeek } = req.params;
     
-    const weekDays = {
-      'sunday': 0,
-      'monday': 1,
-      'tuesday': 2,
-      'wednesday': 3,
-      'thursday': 4,
-      'friday': 5,
-      'saturday': 6
-    };
-    
-    const dayNumber = weekDays[dayOfWeek.toLowerCase()];
-    
-    if (dayNumber === undefined) {
-      return res.status(400).json({ 
-        message: "Día de la semana inválido" 
+    // Validar que dayOfWeek sea un número entre 0 y 6
+    const dayNumber = parseInt(dayOfWeek);
+    if (isNaN(dayNumber) || dayNumber < 0 || dayNumber > 6) {
+      return res.status(400).json({
+        error: 'Bad Request',
+        message: 'El día de la semana debe ser un número entre 0 y 6'
       });
     }
 
+    console.log('Buscando citas para el día:', dayNumber);
+
     const appointments = await getAppointmentsByWeekDayService(dayNumber);
-    res.json(appointments);
+
+    console.log('Citas encontradas:', appointments.length);
+
+    return res.status(200).json(appointments);
   } catch (error) {
     console.error('Error en getAppointmentsByWeekDayController:', error);
-    if (error.message.includes('token')) {
-      return res.status(401).json({ message: error.message });
-    }
-    res.status(500).json({ message: error.message });
+    return res.status(500).json({
+      error: 'Internal Server Error',
+      message: error.message
+    });
   }
 };
 

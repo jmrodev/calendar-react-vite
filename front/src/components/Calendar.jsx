@@ -8,73 +8,55 @@ import showToast from '../utils/toastUtils';
 import "./styles/calendar.css";
 
 const Calendar = ({ onDateSelect, selectedDate }) => {
-  const [currentDate, setCurrentDate] = useState(() => {
-    const savedDate = localStorage.getItem('selectedDate');
-    return savedDate ? new Date(savedDate) : new Date();
-  });
+  const [currentDate, setCurrentDate] = useState(new Date());
   const dispatch = useDispatch();
-  const { 
-    monthCounts, 
-    weekDayCounts, 
-    loading, 
-    error 
-  } = useSelector(state => state.appointments);
-  const weekDays = [
-    { name: 'Domingo', short: 'Dom', value: 0 },
-    { name: 'Lunes', short: 'Lun', value: 1 },
-    { name: 'Martes', short: 'Mar', value: 2 },
-    { name: 'Miércoles', short: 'Mié', value: 3 },
-    { name: 'Jueves', short: 'Jue', value: 4 },
-    { name: 'Viernes', short: 'Vie', value: 5 },
-    { name: 'Sábado', short: 'Sáb', value: 6 }
-  ];
   const navigate = useNavigate();
+  const { monthCounts, weekDayCounts, loading, error } = useSelector(state => state.appointments);
 
   useEffect(() => {
-    const fetchData = async () => {
-      try {
-        console.log('Token actual:', localStorage.getItem('token'));
-        console.log('Auth headers:', getAuthHeaders());
-        
-        if (!isTokenValid()) {
-          throw new Error('Sesión expirada');
-        }
+    fetchData();
+  }, [currentDate]);
 
-        await Promise.all([
-          dispatch(fetchMonthAppointments({
-            year: currentDate.getFullYear(),
-            month: currentDate.getMonth()
-          })),
-          dispatch(fetchWeekDayAppointments())
-        ]);
-      } catch (error) {
-        console.error('Error completo:', error);
-        if (error.message.includes('autenticación') || error.message.includes('expirada')) {
-          dispatch(logout());
-          navigate('/login');
-          showToast('Su sesión ha expirado, por favor inicie sesión nuevamente', 'warning');
-        } else {
-          showToast('Error al cargar los datos', 'error');
-        }
+  const fetchData = async () => {
+    try {
+      if (!isTokenValid()) {
+        throw new Error('Sesión expirada');
       }
-    };
 
-    if (isTokenValid()) {
-      fetchData();
-    } else {
-      navigate('/login');
+      await Promise.all([
+        dispatch(fetchMonthAppointments({
+          year: currentDate.getFullYear(),
+          month: currentDate.getMonth()
+        })),
+        dispatch(fetchWeekDayAppointments())
+      ]);
+    } catch (error) {
+      console.error('Error completo:', error);
+      if (error.message.includes('autenticación') || error.message.includes('expirada')) {
+        dispatch(logout());
+        navigate('/login');
+        showToast('Su sesión ha expirado, por favor inicie sesión nuevamente', 'warning');
+      } else {
+        showToast('Error al cargar los datos', 'error');
+      }
     }
-  }, [currentDate, dispatch, navigate]);
-
-  const handleWeekDayClick = (dayValue) => {
-    const today = new Date();
-    const daysUntilNext = (dayValue + 7 - today.getDay()) % 7;
-    const nextDate = new Date(today);
-    nextDate.setDate(today.getDate() + daysUntilNext);
-    onDateSelect(nextDate, true);
   };
 
-  
+  const handleDateClick = (day) => {
+    const clickedDate = new Date(
+      currentDate.getFullYear(),
+      currentDate.getMonth(),
+      day
+    );
+    
+    const formattedDate = clickedDate.toISOString().split('T')[0];
+    console.log('Fecha seleccionada en Calendar:', formattedDate);
+    
+    if (onDateSelect) {
+      onDateSelect(formattedDate);
+    }
+  };
+
   const getFirstDayOfMonth = (year, month) => {
     return new Date(year, month, 1).getDay();
   };
@@ -123,7 +105,7 @@ const Calendar = ({ onDateSelect, selectedDate }) => {
         <div
           key={day}
           className={`day-container ${isToday ? "today" : ""} ${isWeekend ? "weekend" : ""} ${isSelected ? "selected" : ""}`}
-          onClick={() => onDateSelect(dateForDay, false)}
+          onClick={() => handleDateClick(day)}
           title={`${count} citas programadas`}
         >
           <div className="day-number">{day}</div>
@@ -233,7 +215,7 @@ const Calendar = ({ onDateSelect, selectedDate }) => {
 
   return (
     <div className="calendar">
-      <div className="monthly-calendar">
+      <div className="calendar-header">
         <h4>
           {currentDate.toLocaleString("default", { month: "long" })}{" "}
           {currentDate.getFullYear()}
@@ -241,14 +223,14 @@ const Calendar = ({ onDateSelect, selectedDate }) => {
         <div className="weekdays">
           {weekDays.map(day => renderWeekDay(day))}
         </div>
-        <div className="days">
-          {generateCalendar()}
-        </div>
-        <div className="navigation">
-          <button className="nav-btn" onClick={goToPreviousMonth}>◀</button>
-          <button className="nav-btn" onClick={goToCurrentMonth}>▼</button>
-          <button className="nav-btn" onClick={goToNextMonth}>▶</button>
-        </div>
+      </div>
+      <div className="calendar-grid">
+        {generateCalendar()}
+      </div>
+      <div className="navigation">
+        <button className="nav-btn" onClick={goToPreviousMonth}>◀</button>
+        <button className="nav-btn" onClick={goToCurrentMonth}>▼</button>
+        <button className="nav-btn" onClick={goToNextMonth}>▶</button>
       </div>
     </div>
   );

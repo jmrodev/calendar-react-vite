@@ -14,13 +14,24 @@ export const fetchWeekAppointments = createAsyncThunk(
 );
 
 export const createNewAppointment = createAsyncThunk(
-  'appointments/create',
-  async (appointmentData, { rejectWithValue }) => {
+  'appointments/createNewAppointment',
+  async (appointmentData) => {
     try {
-      const appointment = await appointmentService.createAppointment(appointmentData);
-      return appointment;
+      // Validación más detallada
+      if (!appointmentData.date) {
+        throw new Error('La fecha es requerida');
+      }
+      if (!appointmentData.appointmentTime) {
+        throw new Error('La hora es requerida');
+      }
+
+      console.log('Datos antes de enviar al servicio:', appointmentData);
+
+      const response = await appointmentService.createAppointment(appointmentData);
+      return response;
     } catch (error) {
-      return rejectWithValue(error.message);
+      console.error('Error en createNewAppointment:', error);
+      throw error;
     }
   }
 );
@@ -43,6 +54,23 @@ export const cancelAppointment = createAsyncThunk(
     try {
       await appointmentService.cancelAppointment(id);
       return id;
+    } catch (error) {
+      return rejectWithValue(error.message);
+    }
+  }
+);
+
+export const fetchWeekDayAppointments = createAsyncThunk(
+  'appointments/fetchWeekDay',
+  async (_, { rejectWithValue }) => {
+    try {
+      // Usar números en lugar de nombres de días
+      const appointments = await Promise.all(
+        [0, 1, 2, 3, 4, 5, 6].map(dayNumber => 
+          getAppointmentsByWeekDay(dayNumber)
+        )
+      );
+      return appointments;
     } catch (error) {
       return rejectWithValue(error.message);
     }

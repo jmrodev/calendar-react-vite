@@ -1,6 +1,6 @@
 import { format, parse } from "@formkit/tempo";
 
-export function standardizeDate(date) {
+export const standardizeDate = (date) => {
   if (!date) {
     console.error("Date is null or undefined");
     return null;
@@ -18,35 +18,21 @@ export function standardizeDate(date) {
 
     // Si es un string, intentar parsearlo
     const dateString = String(date).trim();
-    // Si es una fecha ISO
-    if (dateString.includes('T')) {
-      const isoDate = new Date(dateString);
-      if (!isNaN(isoDate.getTime())) {
-        return isoDate;
-      }
+    
+    // Si ya está en formato YYYY-MM-DD
+    if (/^\d{4}-\d{2}-\d{2}$/.test(dateString)) {
+      return new Date(dateString);
     }
 
-    // Si ya está en formato D/M/YYYY o DD/MM/YYYY
+    // Si está en formato D/M/YYYY o DD/MM/YYYY
     if (/^\d{1,2}\/\d{1,2}\/\d{4}$/.test(dateString)) {
       const [day, month, year] = dateString.split('/');
       return new Date(year, month - 1, parseInt(day));
     }
 
-    // Si está en formato YYYY-MM-DD
-    if (/^\d{4}-\d{2}-\d{2}$/.test(dateString)) {
-      return new Date(dateString);
-    }
-
-    const tempoParse = parse(dateString, [
-      "YYYY-MM-DD",
-      "YYYY-MM-DDTHH:mm:ss",
-      "YYYY-MM-DDTHH:mm:ssZ",
-      "DD/MM/YYYY",
-      "D/M/YYYY"
-    ]);
-
-    if (tempoParse) {
-      return new Date(tempoParse);
+    const parsedDate = new Date(dateString);
+    if (!isNaN(parsedDate.getTime())) {
+      return parsedDate;
     }
 
     console.error("Failed to parse date:", dateString);
@@ -55,7 +41,7 @@ export function standardizeDate(date) {
     console.error("Error in standardizeDate:", error);
     return null;
   }
-}
+};
 
 // Función auxiliar para formatear fechas para visualización
 export function formatDate(date, formatStr = "DD/MM/YYYY") {
@@ -88,36 +74,37 @@ export function formatDate(date, formatStr = "DD/MM/YYYY") {
   }
 }
 
-export const createStructuredDate = (dateString) => {
+export const createStructuredDate = (date) => {
   try {
-    // Si es una fecha ISO
-    const date = new Date(dateString);
-    if (!isNaN(date.getTime())) {
+    // Si ya es un objeto estructurado, devolverlo tal cual
+    if (date && typeof date === 'object' && 'year' in date) {
       return {
-        year: date.getFullYear(),
-        month: date.getMonth(),
-        day: date.getDate(),
-        hours: date.getHours(),
-        minutes: date.getMinutes(),
-        seconds: date.getSeconds()
+        year: date.year,
+        month: date.month,
+        day: date.day,
+        hours: date.hours || 0,
+        minutes: date.minutes || 0,
+        seconds: date.seconds || 0
       };
     }
 
-    // Si es un objeto de fecha estructurado
-    if (typeof dateString === 'object' && dateString !== null) {
-      return {
-        year: parseInt(dateString.year),
-        month: parseInt(dateString.month),
-        day: parseInt(dateString.day),
-        hours: parseInt(dateString.hours || 0),
-        minutes: parseInt(dateString.minutes || 0),
-        seconds: parseInt(dateString.seconds || 0)
-      };
+    // Si es un string o Date, parsearlo
+    const parsedDate = new Date(date);
+    if (isNaN(parsedDate.getTime())) {
+      console.error('Fecha inválida:', date);
+      return null;
     }
 
-    throw new Error('Formato de fecha inválido');
+    return {
+      year: parsedDate.getFullYear(),
+      month: parsedDate.getMonth(),
+      day: parsedDate.getDate(),
+      hours: parsedDate.getHours(),
+      minutes: parsedDate.getMinutes(),
+      seconds: parsedDate.getSeconds()
+    };
   } catch (error) {
-    console.error('Error en createStructuredDate:', error);
+    console.error('Error al crear fecha estructurada:', error);
     return null;
   }
 };

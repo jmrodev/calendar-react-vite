@@ -11,7 +11,7 @@ import {
   getAppointmentsByWeekDayRepository,
 } from "../Repository/appointmentRepository.js";
 import { newAppointmentId } from "../Utils/id/appointment.js";
-import { createStructuredDate, formatStructuredDate } from "../Utils/date/dateUtils.js";
+import { createStructuredDate, formatStructuredDate, standardizeDate } from "../Utils/date/dateUtils.js";
 
 export const completeAppointmentService = async (appointmentId) => {
   try {
@@ -123,9 +123,15 @@ export const updateAppointmentService = async (id, data, secretaryId) => {
 
 export const getAppointmentsByWeekDayService = async (dayOfWeek) => {
   try {
-    const appointments = await getAppointmentsByWeekDayRepository(dayOfWeek);
+    const currentDate = standardizeDate(new Date());
+    if (!currentDate) {
+      throw new Error('Fecha inválida');
+    }
+
+    const appointments = await getAppointmentsByWeekDayRepository(dayOfWeek, currentDate);
     return appointments;
   } catch (error) {
+    console.error('Error en getAppointmentsByWeekDayService:', error);
     throw new Error(`Error al obtener citas por día de la semana: ${error.message}`);
   }
 };

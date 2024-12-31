@@ -5,9 +5,7 @@ import { createStructuredDate, isDateLocked } from '../Utils/date/dateUtils.js';
 dotenv.config();
 
 export const authMiddleware = (req, res, next) => {
-  console.log('Headers:', req.headers);
-  console.log('Method:', req.method);
-
+  
   try {
     if (req.method === 'OPTIONS') {
       return next();
@@ -15,19 +13,16 @@ export const authMiddleware = (req, res, next) => {
 
     const authHeader = req.headers.authorization;
     if (!authHeader) {
-      console.log('No authorization header');
       return res.status(401).json({ message: 'No se proporcionó token de autenticación' });
     }
 
     const token = authHeader.split(' ')[1];
     if (!token) {
-      console.log('No token found in header');
       return res.status(401).json({ message: 'Formato de token inválido' });
     }
 
     try {
       const decoded = jwt.verify(token, process.env.JWT_SECRET);
-      console.log('Token decoded:', decoded);
 
       // Verificar bloqueo de usuario
       if (decoded.lockUntil) {

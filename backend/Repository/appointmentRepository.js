@@ -1,6 +1,6 @@
 import { AppointmentSchema } from "../Models/AppointmentSchema.js";
 import { createLog } from "./logRepository.js";
-import { createStructuredDate, formatStructuredDate, compareStructuredDates } from "../Utils/date/dateUtils.js";
+import { createStructuredDate, formatStructuredDate, compareStructuredDates, standardizeDate } from "../Utils/date/dateUtils.js";
 
 export const completeAppointmentRepository = async (appointmentId) => {
   try {
@@ -173,7 +173,7 @@ export const updateAppointmentRepository = async (id, appointment, secretaryId) 
   }
 };
 
-export const getAppointmentsByWeekDayRepository = async (dayOfWeek) => {  
+export const getAppointmentsByWeekDayRepository = async (dayOfWeek) => {
   try {
     const allAppointments = await AppointmentSchema.find();
     
@@ -181,10 +181,14 @@ export const getAppointmentsByWeekDayRepository = async (dayOfWeek) => {
       const appointmentDate = standardizeDate(appointment.date);
       if (!appointmentDate) return false;
       
-      let dayOfWeektransf = parseInt(dayOfWeek);      
-      return (appointmentDate.getDay() + 1) === dayOfWeektransf;
+      // Convertir el dayOfWeek a número si viene como string
+      const dayOfWeekNum = parseInt(dayOfWeek);
+      
+      // getDay() devuelve 0-6 (Domingo-Sábado)
+      return appointmentDate.getDay() === dayOfWeekNum;
     });
     
+    // Ordenar por fecha y hora
     appointments.sort((a, b) => {
       const dateA = standardizeDate(a.date);
       const dateB = standardizeDate(b.date);
@@ -198,6 +202,7 @@ export const getAppointmentsByWeekDayRepository = async (dayOfWeek) => {
 
     return appointments;
   } catch (error) {
+    console.error('Error en getAppointmentsByWeekDayRepository:', error);
     throw new Error(`Error en repositorio: ${error.message}`);
   }
 };

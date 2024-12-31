@@ -16,7 +16,9 @@ const AppointmentForm = ({ date, time, onClose }) => {
     patientEmail: '',
     patientPhone: '',
     reason: '',
-    notes: ''
+    notes: '',
+    date: date,
+    time: time
   });
 
   const handleChange = (e) => {
@@ -34,16 +36,33 @@ const AppointmentForm = ({ date, time, onClose }) => {
 
     try {
       const appointmentData = {
-        ...formData,
-        date,
-        time
+        date: {
+          year: new Date(date).getFullYear(),
+          month: new Date(date).getMonth(),
+          day: new Date(date).getDate(),
+          hours: parseInt(time.split(':')[0]),
+          minutes: parseInt(time.split(':')[1]),
+          seconds: 0
+        },
+        appointmentTime: time,
+        realAppointmentTime: time,
+        available: false,
+        status: "pending",
+        appointment: {
+          confirmAppointment: false,
+          name: formData.patientName,
+          reason: formData.reason
+        }
       };
+
+      console.log('Datos a enviar:', appointmentData);
 
       await dispatch(createNewAppointment(appointmentData)).unwrap();
       showToast('Cita agendada exitosamente', 'success');
       onClose();
     } catch (error) {
-      setError(error.message);
+      console.error('Error completo:', error);
+      setError(error.message || 'Error al crear la cita');
     } finally {
       setLoading(false);
     }
@@ -66,7 +85,7 @@ const AppointmentForm = ({ date, time, onClose }) => {
 
         <div className="appointment-info">
           <p>
-            <strong>Fecha:</strong> {formatStructuredDate(date)}
+            <strong>Fecha:</strong> {formatStructuredDate(new Date(date))}
           </p>
           <p>
             <strong>Hora:</strong> {time}

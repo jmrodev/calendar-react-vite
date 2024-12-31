@@ -21,9 +21,6 @@ export const loginController = async (req, res) => {
     if (!result.token) {
       throw new Error("Token no generado");
     }
-
-    console.log('Login exitoso:', { username, token: result.token }); // Para debugging
-
     res.status(200).json({
       success: true,
       message: "Login successful",

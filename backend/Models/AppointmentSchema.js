@@ -62,4 +62,8 @@ const AppointmentSchema = Schema("Appointment", {
   }
 });
 
+// No necesitamos el middleware pre-save ya que db-local no lo soporta
+// En su lugar, calcularemos el día de la semana en el repositorio
+
 export { AppointmentSchema };
+

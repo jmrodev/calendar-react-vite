@@ -7,8 +7,8 @@ export const createLog = async (logData) => {
       _id: newLogId(),
       ...logData,
       date: new Date()
-    });
-    return await log.save();
+    }).save();
+    return await log;
   } catch (error) {
     throw new Error(`Error creating log: ${error.message}`);
   }
