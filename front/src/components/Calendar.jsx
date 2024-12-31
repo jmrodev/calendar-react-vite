@@ -57,12 +57,12 @@ const Calendar = ({ onDateSelect, selectedDate }) => {
     }
   };
 
-  const getFirstDayOfMonth = (year, month) => {
-    return new Date(year, month, 1).getDay();
+  const getFirstDayOfMonth = () => {
+    return new Date(currentDate.getFullYear(), currentDate.getMonth(), 1).getDay();
   };
 
-  const getDaysInMonth = (year, month) => {
-    return new Date(year, month + 1, 0).getDate();
+  const getDaysInMonth = () => {
+    return new Date(currentDate.getFullYear(), currentDate.getMonth() + 1, 0).getDate();
   };
 
   const getOccupancyClass = (percentage) => {
@@ -72,10 +72,8 @@ const Calendar = ({ onDateSelect, selectedDate }) => {
   };
 
   const generateCalendar = () => {
-    const month = currentDate.getMonth();
-    const year = currentDate.getFullYear();
-    const daysInMonth = getDaysInMonth(year, month);
-    const firstDay = getFirstDayOfMonth(year, month);
+    const daysInMonth = getDaysInMonth();
+    const firstDay = getFirstDayOfMonth();
     const calendar = [];
 
     // Días vacíos al inicio del mes
@@ -85,21 +83,18 @@ const Calendar = ({ onDateSelect, selectedDate }) => {
 
     // Días del mes
     for (let day = 1; day <= daysInMonth; day++) {
-      const dateForDay = new Date(year, month, day);
+      const dateForDay = new Date(currentDate.getFullYear(), currentDate.getMonth(), day);
       const dateStr = dateForDay.toISOString().split('T')[0];
       const count = monthCounts[dateStr] || 0;
-      const maxAppointments = 8; // Máximo de citas por día
+      const maxAppointments = 8;
       const occupancyPercentage = (count / maxAppointments) * 100;
       const occupancyClass = getOccupancyClass(occupancyPercentage);
 
       const isToday = day === new Date().getDate() &&
-        month === new Date().getMonth() &&
-        year === new Date().getFullYear();
+        currentDate.getMonth() === new Date().getMonth() &&
+        currentDate.getFullYear() === new Date().getFullYear();
       const isWeekend = (firstDay + day - 1) % 7 === 0 || (firstDay + day - 1) % 7 === 6;
-      const isSelected = selectedDate &&
-        day === selectedDate.getDate() &&
-        month === selectedDate.getMonth() &&
-        year === selectedDate.getFullYear();
+      const isSelected = selectedDate === dateStr;
 
       calendar.push(
         <div
@@ -134,76 +129,6 @@ const Calendar = ({ onDateSelect, selectedDate }) => {
     setCurrentDate(new Date());
   };
 
-  // Modificar el renderizado de los días para incluir la barra de ocupación
-  const renderDay = (day, isWeekDay = false) => {
-    const date = new Date(currentDate.getFullYear(), currentDate.getMonth(), day);
-    const dateStr = date.toISOString().split('T')[0];
-    const count = monthCounts[dateStr] || 0;
-    const maxAppointments = 8; // Asumimos un máximo de 8 citas por día
-    const occupancyPercentage = (count / maxAppointments) * 100;
-
-    return (
-      <div className="day-container">
-        <div className="day-number">{day}</div>
-        <div className="occupancy-bar">
-          <div 
-            className="occupancy-fill"
-            style={{ width: `${Math.min(occupancyPercentage, 100)}%` }}
-          />
-        </div>
-      </div>
-    );
-  };
-
-  // Modificar el renderizado de los días de la semana para incluir la barra de ocupación
-  const renderWeekDay = (day) => {
-    if (loading) {
-      return (
-        <div 
-          key={day.value} 
-          className="day header-day loading"
-        >
-          <div className="weekday-content">
-            <span>{day.short}</span>
-          </div>
-        </div>
-      );
-    }
-
-    const count = weekDayCounts[day.value] || 0;
-    const maxAppointments = 20;
-    const occupancyPercentage = (count / maxAppointments) * 100;
-
-    let occupancyClass = 'low';
-    if (occupancyPercentage > 66) {
-      occupancyClass = 'high';
-    } else if (occupancyPercentage > 33) {
-      occupancyClass = 'medium';
-    }
-
-    return (
-      <div 
-        key={day.value} 
-        className={`day header-day ${
-          selectedDate && selectedDate.getDay() === day.value ? 'selected' : ''
-        }`}
-        onClick={() => handleWeekDayClick(day.value)}
-        title={`${day.name} - ${count} citas`}
-      >
-        <div className="weekday-content">
-          <span>{day.short}</span>
-          <div className="weekday-occupancy-bar">
-            <div 
-              className={`occupancy-fill ${occupancyClass}`}
-              style={{ width: `${Math.min(occupancyPercentage, 100)}%` }}
-            />
-          </div>
-        </div>
-      </div>
-    );
-  };
-
-  // Renderizado condicional basado en el estado
   if (error) {
     return (
       <div className="calendar-error">
@@ -221,7 +146,13 @@ const Calendar = ({ onDateSelect, selectedDate }) => {
           {currentDate.getFullYear()}
         </h4>
         <div className="weekdays">
-          {weekDays.map(day => renderWeekDay(day))}
+          <div>Dom</div>
+          <div>Lun</div>
+          <div>Mar</div>
+          <div>Mié</div>
+          <div>Jue</div>
+          <div>Vie</div>
+          <div>Sáb</div>
         </div>
       </div>
       <div className="calendar-grid">

@@ -1,14 +1,14 @@
 import React, { useState } from "react";
 import { useDispatch } from 'react-redux';
-import { fetchAppointmentsByDate } from '../redux/slices/appointmentsSlice';
+import  fetchAppointmentsByDate  from '../redux/slices/appointmentsSlice';
 import { Aside } from "./Aside";
 import { Main } from "./Main";
 import { AppContent } from "./AppContent";
 import { Header } from "./Header";
 import { Footer } from "./Footer";
 import "./styles/appointments.css";
-import { Calendar } from "./Calendar";
-import { DayView } from "./DayView";
+import  Calendar  from "./Calendar";
+import  DayView  from "./DayView";
 
 const Appointments = () => {
   const dispatch = useDispatch();
