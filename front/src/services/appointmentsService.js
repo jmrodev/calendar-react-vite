@@ -92,8 +92,6 @@ export const createAppointment = async (appointment) => {
       throw new Error("Fecha y hora son requeridos");
     }
 
-    console.log('Datos a enviar al backend:', appointment);
-
     const response = await fetch(`${config.baseUrl}/appointments`, {
       method: "POST",
       headers: _getHeaders(),

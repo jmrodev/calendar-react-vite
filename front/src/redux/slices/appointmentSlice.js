@@ -25,8 +25,6 @@ export const createNewAppointment = createAsyncThunk(
         throw new Error('La hora es requerida');
       }
 
-      console.log('Datos antes de enviar al servicio:', appointmentData);
-
       const response = await appointmentService.createAppointment(appointmentData);
       return response;
     } catch (error) {

@@ -55,8 +55,6 @@ const AppointmentForm = ({ date, time, onClose }) => {
         }
       };
 
-      console.log('Datos a enviar:', appointmentData);
-
       await dispatch(createNewAppointment(appointmentData)).unwrap();
       showToast('Cita agendada exitosamente', 'success');
       onClose();

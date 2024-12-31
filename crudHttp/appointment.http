@@ -25,7 +25,14 @@ Content-Type: application/json
 Authorization: {{tokenPrefix}} {{login.response.body.token}}
 
 {
-    "date":  "{{$datetime 'YYYY-MM-DD'}}",
+    "date": {
+        "year": {{$datetime 'YYYY'}},
+        "month": {{$datetime 'M'}},
+        "day": {{$datetime 'D'}},
+        "hours": {{$datetime 'H'}},
+        "minutes": {{$datetime 'm'}},
+        "seconds": {{$datetime 's'}}
+    },
     "appointmentTime": "{{$datetime 'HH:mm'}}",
     "realAppointmentTime": "{{$datetime 'HH:mm' 1 h}}",
     "available": true,
@@ -41,7 +48,14 @@ Authorization: {{tokenPrefix}} {{login.response.body.token}}
     },
     "changeLog": [
         {
-            "date": "{{$datetime 'YYYY-MM-DD HH:mm:ss'}}",
+            "date": {
+                "year": {{$datetime 'YYYY'}},
+                "month": {{$datetime 'M'}},
+                "day": {{$datetime 'D'}},
+                "hours": {{$datetime 'H'}},
+                "minutes": {{$datetime 'm'}},
+                "seconds": {{$datetime 's'}}
+            },
             "action": "created",
             "description": "Cita creada inicialmente",
             "secretaryId": 1,

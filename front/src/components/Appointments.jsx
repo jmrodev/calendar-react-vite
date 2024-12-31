@@ -15,7 +15,7 @@ const Appointments = () => {
   const [selectedDate, setSelectedDate] = useState(null);
 
   const handleDateSelect = (date) => {
-    console.log('Fecha seleccionada en Appointments:', date);
+   
     setSelectedDate(date);
     dispatch(fetchAppointmentsByDate(date));
   };

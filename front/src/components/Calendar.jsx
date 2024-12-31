@@ -50,7 +50,6 @@ const Calendar = ({ onDateSelect, selectedDate }) => {
     );
     
     const formattedDate = clickedDate.toISOString().split('T')[0];
-    console.log('Fecha seleccionada en Calendar:', formattedDate);
     
     if (onDateSelect) {
       onDateSelect(formattedDate);

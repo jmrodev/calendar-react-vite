@@ -40,17 +40,17 @@ export const createAppointmentRepository = async (appointmentData, secretaryId, 
       }]
     }).save();
 
-    await createLog({
-      userId: secretaryId,
-      action: "create",
-      entityType: "appointment",
-      entityId: appointment._id,
-      description: "Creación de nueva cita",
-      details: {
-        patientName: appointmentData.appointment.name,
-        appointmentDate: formatStructuredDate(appointment.date)
-      }
-    }).save();
+    // await createLog({
+    //   userId: secretaryId,
+    //   action: "create",
+    //   entityType: "appointment",
+    //   entityId: appointment._id,
+    //   description: "Creación de nueva cita",
+    //   details: {
+    //     patientName: appointmentData.appointment.name,
+    //     appointmentDate: formatStructuredDate(appointment.date)
+    //   }
+    // }).save();
 
     return appointment;
   } catch (error) {
