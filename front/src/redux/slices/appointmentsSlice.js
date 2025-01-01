@@ -1,6 +1,23 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
-import { getAppointmentsByDate, getAppointmentsByWeekDay } from '../../services/appointmentsService';
+import { getAppointmentsByDate, getAppointmentsByWeekDay, createAppointment } from '../../services/appointmentsService';
 import * as appointmentService from '../../services/appointmentsService';
+
+// Función auxiliar para serializar fechas
+const serializeDate = (appointment) => {
+  if (!appointment) return null;
+  
+  return {
+    ...appointment,
+    date: appointment.date ? {
+      year: appointment.date.year,
+      month: appointment.date.month,
+      day: appointment.date.day,
+      hours: appointment.date.hours || 0,
+      minutes: appointment.date.minutes || 0,
+      seconds: appointment.date.seconds || 0
+    } : null
+  };
+};
 
 export const fetchMonthAppointments = createAsyncThunk(
   'appointments/fetchMonthAppointments',
@@ -51,16 +68,33 @@ export const fetchAppointments = createAsyncThunk(
   }
 );
 
+export const createNewAppointment = createAsyncThunk(
+  'appointments/createNewAppointment',
+  async (appointmentData) => {
+    try {
+      const response = await appointmentService.createAppointment(appointmentData);
+      return serializeDate(response);
+    } catch (error) {
+      console.error('Error en createNewAppointment:', error);
+      throw error;
+    }
+  }
+);
+
 const appointmentsSlice = createSlice({
   name: 'appointments',
   initialState: {
+    appointments: [],
     monthCounts: {},
     weekDayCounts: {},
-    appointments: [],
     loading: false,
     error: null
   },
-  reducers: {},
+  reducers: {
+    clearError: (state) => {
+      state.error = null;
+    }
+  },
   extraReducers: (builder) => {
     builder
       .addCase(fetchMonthAppointments.pending, (state) => {
@@ -104,8 +138,34 @@ const appointmentsSlice = createSlice({
       .addCase(fetchAppointments.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload;
+      })
+      .addCase(createNewAppointment.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(createNewAppointment.fulfilled, (state, action) => {
+        state.loading = false;
+        const date = action.payload.date;
+        const dateStr = `${date.year}-${String(date.month + 1).padStart(2, '0')}-${String(date.day).padStart(2, '0')}`;
+        
+        // Actualizar contadores
+        if (state.monthCounts[dateStr] !== undefined) {
+          state.monthCounts[dateStr]++;
+        }
+        
+        // Agregar la nueva cita al array
+        if (Array.isArray(state.appointments)) {
+          state.appointments.push(action.payload);
+        } else {
+          state.appointments = [action.payload];
+        }
+      })
+      .addCase(createNewAppointment.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.error.message;
       });
   }
 });
 
+export const { clearError } = appointmentsSlice.actions;
 export default appointmentsSlice.reducer; 

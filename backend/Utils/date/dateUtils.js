@@ -1,46 +1,33 @@
 import { format, parse } from "@formkit/tempo";
 
 export const standardizeDate = (date) => {
-  if (!date) {
-    console.error("Date is null or undefined");
-    return null;
+  // Si es un objeto de fecha estructurado
+  if (date && typeof date === 'object' && 'year' in date) {
+    return new Date(
+      date.year,
+      date.month,
+      date.day,
+      date.hours || 0,
+      date.minutes || 0,
+      date.seconds || 0
+    );
   }
 
-  try {
-    // Si ya es un objeto Date
-    if (date instanceof Date) {
-      if (isNaN(date.getTime())) {
-        console.error("Invalid Date object");
-        return null;
-      }
-      return date;
-    }
+  // Si es una fecha normal
+  if (date instanceof Date) {
+    return date;
+  }
 
-    // Si es un string, intentar parsearlo
-    const dateString = String(date).trim();
-    
-    // Si ya está en formato YYYY-MM-DD
-    if (/^\d{4}-\d{2}-\d{2}$/.test(dateString)) {
-      return new Date(dateString);
-    }
-
-    // Si está en formato D/M/YYYY o DD/MM/YYYY
-    if (/^\d{1,2}\/\d{1,2}\/\d{4}$/.test(dateString)) {
-      const [day, month, year] = dateString.split('/');
-      return new Date(year, month - 1, parseInt(day));
-    }
-
-    const parsedDate = new Date(dateString);
+  // Si es un string
+  if (typeof date === 'string') {
+    const parsedDate = new Date(date);
     if (!isNaN(parsedDate.getTime())) {
       return parsedDate;
     }
-
-    console.error("Failed to parse date:", dateString);
-    return null;
-  } catch (error) {
-    console.error("Error in standardizeDate:", error);
-    return null;
   }
+
+  console.error('Failed to parse date:', date);
+  return null;
 };
 
 // Función auxiliar para formatear fechas para visualización

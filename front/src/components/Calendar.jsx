@@ -20,7 +20,10 @@ const Calendar = ({ onDateSelect, selectedDate }) => {
   const fetchData = async () => {
     try {
       if (!isTokenValid()) {
-        throw new Error('Sesión expirada');
+        dispatch(logout());
+        navigate('/login');
+        showToast('Su sesión ha expirado, por favor inicie sesión nuevamente', 'warning');
+        return;
       }
 
       await Promise.all([
@@ -32,7 +35,10 @@ const Calendar = ({ onDateSelect, selectedDate }) => {
       ]);
     } catch (error) {
       console.error('Error completo:', error);
-      if (error.message.includes('autenticación') || error.message.includes('expirada')) {
+      if (error.message.includes('401') || 
+          error.message.includes('403') || 
+          error.message.toLowerCase().includes('unauthorized') || 
+          error.message.toLowerCase().includes('token')) {
         dispatch(logout());
         navigate('/login');
         showToast('Su sesión ha expirado, por favor inicie sesión nuevamente', 'warning');
@@ -140,10 +146,7 @@ const Calendar = ({ onDateSelect, selectedDate }) => {
   return (
     <div className="calendar">
       <div className="calendar-header">
-        <h4>
-          {currentDate.toLocaleString("default", { month: "long" })}{" "}
-          {currentDate.getFullYear()}
-        </h4>
+        <h4>{currentDate.toLocaleString("default", { month: "long" })} {currentDate.getFullYear()}</h4>
         <div className="weekdays">
           <div>Dom</div>
           <div>Lun</div>

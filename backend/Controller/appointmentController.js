@@ -19,6 +19,7 @@ import {
 } from "../Utils/date/dateUtils.js";
 import { findAppointment } from "../Utils/appointment/findAppointment.js";
 import jwt from "jsonwebtoken";
+import { AppointmentRepository } from '../Repository/appointmentRepository.js';
 
 const verifyToken = (req) => {
   const authHeader = req.headers.authorization;
@@ -34,6 +35,8 @@ const verifyToken = (req) => {
     throw new Error("Token inválido o expirado");
   }
 };
+
+const appointmentRepository = new AppointmentRepository();
 
 export const completeAppointmentController = async (req, res) => {
   try {
@@ -59,74 +62,30 @@ export const confirmAppointmentController = async (req, res) => {
 };
 
 export const createAppointmentController = async (req, res) => {
+  console.log('🔵 Iniciando creación de cita');
   try {
-    const { date, appointmentTime, appointment } = req.body;
+    const appointmentData = req.body;
+    console.log('Datos recibidos:', { appointmentData });
 
-    if (
-      !date ||
-      !appointmentTime ||
-      !appointment ||
-      !appointment.name ||
-      !appointment.reason
-    ) {
+    // Validar campos requeridos
+    if (!appointmentData.date || !appointmentData.appointmentTime || 
+        !appointmentData.appointment || !appointmentData.secretary) {
       return res.status(400).json({
-        error: "Datos incompletos",
-        message: "Todos los campos son requeridos",
+        message: 'Faltan campos requeridos'
       });
     }
 
-    const secretaryId = req.user.id;
-    const secretaryName = req.user.username;
+    // Crear la cita
+    const newAppointment = await createAppointmentService(appointmentData);
 
-    const structuredDate = date;
+    // Enviar respuesta
+    res.status(201).json(newAppointment);
 
-    try {
-        const existingAppointment = await findAppointment({
-        date: structuredDate,
-        appointmentTime,
-      });
-
-      if (existingAppointment) {
-        return res.status(400).json({
-          error: "Cita duplicada",
-          message: "Ya existe una cita programada para esta fecha y hora"
-        });
-      }
-
-      const appointmentData = {
-        date: structuredDate,
-        appointmentTime,
-        realAppointmentTime: appointmentTime,
-        available: false,
-        status: "pending",
-        appointment: {
-          confirmAppointment: false,
-          name: appointment.name,
-          reason: appointment.reason,
-        },
-      };
-
-          const newAppointment = await createAppointmentService(
-        appointmentData,
-        secretaryId,
-        secretaryName
-      );
-
-      return res.status(201).json(newAppointment);
-    } catch (findError) {
-      console.error("Error al buscar/crear cita:", findError);
-      return res.status(400).json({
-        error: "Error de validación",
-        message: findError.message,
-        details: findError.stack,
-      });
-    }
   } catch (error) {
-    console.error("Error completo al crear cita:", error);
-    return res.status(500).json({
-      error: "Error del servidor",
-      message: error.message,
-      stack: error.stack,
+    console.error('❌ Error en createAppointmentController:', error);
+    res.status(500).json({
+      message: 'Error al crear la cita',
+      error: error.message
     });
   }
 };
@@ -246,11 +205,26 @@ export const getAppointmentsByWeekDayController = async (req, res) => {
 
 export const getAppointmentsByDate = async (req, res) => {
   try {
-    const decoded = verifyToken(req);
+    const { date } = req.params;
+    const [year, month, day] = date.split('-').map(Number);
+    
+    // Crear un objeto de fecha estructurado
+    const structuredDate = {
+      year,
+      month: month - 1, // Ajustar mes a base 0
+      day,
+      hours: 0,
+      minutes: 0,
+      seconds: 0
+    };
+
+    const appointments = await appointmentRepository.findByDate(structuredDate);
+    res.json(appointments);
   } catch (error) {
-    return res.status(401).json({
-      error: true,
-      message: error.message,
+    console.error('Error en getAppointmentsByDate:', error);
+    res.status(500).json({
+      message: 'Error al obtener las citas',
+      error: error.message
     });
   }
 };

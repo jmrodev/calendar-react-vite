@@ -4,6 +4,7 @@ import { formatStructuredDate } from '../utils/dateUtils';
 import AppointmentForm from './AppointmentForm';
 import ErrorMessage from '../messages/ErrorMessage';
 import './styles/dayView.css';
+import showToast from '../utils/toastUtils';
 
 const DayView = ({ selectedDate }) => {
   const [appointments, setAppointments] = useState([]);
@@ -18,20 +19,25 @@ const DayView = ({ selectedDate }) => {
     '15:00', '15:30', '16:00', '16:30', '17:00', '17:30'
   ];
 
-  useEffect(() => {
-    const fetchAppointments = async () => {
-      try {
-        setLoading(true);
-        const data = await getAppointmentsByDate(selectedDate);
-        setAppointments(data);
-        setError(null);
-      } catch (err) {
-        setError(err.message);
-      } finally {
-        setLoading(false);
+  const fetchAppointments = async () => {
+    try {
+      setLoading(true);
+      const data = await getAppointmentsByDate(selectedDate);
+      setAppointments(data);
+      setError(null);
+    } catch (err) {
+      if (err.message === 'Sesión expirada') {
+        // El error ya fue manejado por el servicio
+        return;
       }
-    };
+      setError(err.message);
+      showToast(err.message, 'error');
+    } finally {
+      setLoading(false);
+    }
+  };
 
+  useEffect(() => {
     if (selectedDate) {
       fetchAppointments();
     }
@@ -80,8 +86,8 @@ const DayView = ({ selectedDate }) => {
               <span className="time">{time}</span>
               {appointment && (
                 <div className="appointment-info">
-                  <span className="patient-name">{appointment.appointment.name}</span>
-                  <span className="treatment">{appointment.appointment.reason}</span>
+                  <span className="patient-name">{appointment.patientName}</span>
+                  <span className="treatment">{appointment.reason}</span>
                 </div>
               )}
             </div>
@@ -98,9 +104,9 @@ const DayView = ({ selectedDate }) => {
             setSelectedSlot(null);
           }}
           onSuccess={() => {
+            fetchAppointments();
             setShowForm(false);
             setSelectedSlot(null);
-            fetchAppointments();
           }}
         />
       )}

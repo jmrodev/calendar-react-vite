@@ -1,6 +1,7 @@
 import { AppointmentSchema } from "../Models/AppointmentSchema.js";
 import { createLog } from "./logRepository.js";
 import { createStructuredDate, formatStructuredDate, compareStructuredDates, standardizeDate } from "../Utils/date/dateUtils.js";
+import { generateAppointmentId } from '../Utils/id/appointment.js';
 
 export const completeAppointmentRepository = async (appointmentId) => {
   try {
@@ -206,3 +207,101 @@ export const getAppointmentsByWeekDayRepository = async (dayOfWeek) => {
     throw new Error(`Error en repositorio: ${error.message}`);
   }
 };
+
+export class AppointmentRepository {
+  constructor() {
+    this.appointments = AppointmentSchema;
+  }
+
+  async findByDateAndTime(date, time) {
+    try {
+      console.log('Buscando cita por fecha y hora:', { date, time });
+      const appointments = this.appointments.find({
+        'date.year': date.year,
+        'date.month': date.month,
+        'date.day': date.day,
+        appointmentTime: time
+      });
+
+      console.log('Citas encontradas:', appointments);
+      return appointments;
+    } catch (error) {
+      console.error('Error en findByDateAndTime:', error);
+      throw error;
+    }
+  }
+
+  async findByDate(date) {
+    try {
+      console.log('Buscando citas por fecha:', date);
+      const appointments = this.appointments.find({
+        'date.year': date.year,
+        'date.month': date.month,
+        'date.day': date.day
+      });
+
+      console.log('Citas encontradas:', appointments);
+      return appointments;
+    } catch (error) {
+      console.error('Error en findByDate:', error);
+      throw error;
+    }
+  }
+
+  async create(appointmentData) {
+    try {
+      console.log('Creando nueva cita con datos:', appointmentData);
+      
+      // Validar que todos los campos requeridos estén presentes
+      if (!appointmentData.date || 
+          !appointmentData.appointmentTime ||
+          !appointmentData.appointment ||
+          !appointmentData.secretary) {
+        throw new Error('Faltan campos requeridos');
+      }
+
+      const newId = await generateAppointmentId();
+      console.log('ID generado:', newId);
+
+      // Crear el objeto de cita siguiendo exactamente la estructura del schema
+      const appointment = {
+        _id: newId,
+        date: {
+          year: appointmentData.date.year,
+          month: appointmentData.date.month,
+          day: appointmentData.date.day,
+          hours: appointmentData.date.hours,
+          minutes: appointmentData.date.minutes,
+          seconds: appointmentData.date.seconds
+        },
+        appointmentTime: appointmentData.appointmentTime,
+        realAppointmentTime: appointmentData.appointmentTime,
+        available: false,
+        status: "pending",
+        appointment: {
+          confirmAppointment: false,
+          name: appointmentData.appointment.name,
+          reason: appointmentData.appointment.reason
+        },
+        secretary: {
+          id: appointmentData.secretary.id,
+          name: appointmentData.secretary.name
+        },
+        changeLog: []
+      };
+
+      console.log('Creando cita con estructura:', appointment);
+      const newAppointment = this.appointments.create(appointment);
+      console.log('Cita creada, guardando...');
+      
+      // Guardar la cita en la base de datos
+      const savedAppointment = await newAppointment.save();
+      console.log('Cita guardada exitosamente:', savedAppointment);
+      
+      return savedAppointment;
+    } catch (error) {
+      console.error('Error en create:', error);
+      throw error;
+    }
+  }
+}

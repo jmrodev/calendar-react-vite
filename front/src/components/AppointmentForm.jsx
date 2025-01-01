@@ -1,15 +1,19 @@
 import React, { useState } from 'react';
-import { useDispatch } from 'react-redux';
-import { createNewAppointment } from '../redux/slices/appointmentSlice';
+import { useDispatch, useSelector } from 'react-redux';
+import { createNewAppointment } from '../redux/slices/appointmentsSlice';
 import { formatStructuredDate } from '../utils/dateUtils';
 import ErrorMessage from '../messages/ErrorMessage';
 import showToast from '../utils/toastUtils';
 import './styles/appointmentForm.css';
+import { logout } from '../redux/slices/authSlice';
+import { useNavigate } from 'react-router-dom';
 
-const AppointmentForm = ({ date, time, onClose }) => {
+const AppointmentForm = ({ date, time, onClose, onSuccess }) => {
   const dispatch = useDispatch();
+  const user = useSelector(state => state.auth.user);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
+  const navigate = useNavigate();
 
   const [formData, setFormData] = useState({
     patientName: '',
@@ -35,6 +39,19 @@ const AppointmentForm = ({ date, time, onClose }) => {
     setError(null);
 
     try {
+      // Validar campos requeridos
+      if (!formData.patientName.trim() || 
+          !formData.patientEmail.trim() || 
+          !formData.patientPhone.trim() || 
+          !formData.reason.trim()) {
+        throw new Error('Todos los campos son requeridos');
+      }
+
+      // Validar que tenemos los datos del usuario
+      if (!user || !user.id) {
+        throw new Error('Error de autenticación: Por favor, inicie sesión nuevamente');
+      }
+
       const appointmentData = {
         date: {
           year: new Date(date).getFullYear(),
@@ -52,15 +69,30 @@ const AppointmentForm = ({ date, time, onClose }) => {
           confirmAppointment: false,
           name: formData.patientName,
           reason: formData.reason
-        }
+        },
+        secretary: {
+          id: user.id,
+          name: user.username || 'Usuario'
+        },
+        changeLog: []
       };
 
       await dispatch(createNewAppointment(appointmentData)).unwrap();
       showToast('Cita agendada exitosamente', 'success');
+      if (onSuccess) {
+        onSuccess();
+      }
       onClose();
     } catch (error) {
       console.error('Error completo:', error);
-      setError(error.message || 'Error al crear la cita');
+      const errorMessage = error.message || 'Error al crear la cita';
+      
+      if (typeof errorMessage === 'string' && errorMessage.toLowerCase().includes('autenticación')) {
+        dispatch(logout());
+        navigate('/login');
+      }
+      
+      setError(errorMessage);
     } finally {
       setLoading(false);
     }
@@ -92,7 +124,7 @@ const AppointmentForm = ({ date, time, onClose }) => {
 
         <form onSubmit={handleSubmit}>
           <div className="form-group">
-            <label htmlFor="patientName">Nombre del Paciente:</label>
+            <label htmlFor="patientName">Nombre del Paciente: *</label>
             <input
               type="text"
               id="patientName"
@@ -100,11 +132,12 @@ const AppointmentForm = ({ date, time, onClose }) => {
               value={formData.patientName}
               onChange={handleChange}
               required
+              className={!formData.patientName.trim() ? 'error' : ''}
             />
           </div>
 
           <div className="form-group">
-            <label htmlFor="patientEmail">Email:</label>
+            <label htmlFor="patientEmail">Email: *</label>
             <input
               type="email"
               id="patientEmail"
@@ -112,11 +145,12 @@ const AppointmentForm = ({ date, time, onClose }) => {
               value={formData.patientEmail}
               onChange={handleChange}
               required
+              className={!formData.patientEmail.trim() ? 'error' : ''}
             />
           </div>
 
           <div className="form-group">
-            <label htmlFor="patientPhone">Teléfono:</label>
+            <label htmlFor="patientPhone">Teléfono: *</label>
             <input
               type="tel"
               id="patientPhone"
@@ -124,11 +158,12 @@ const AppointmentForm = ({ date, time, onClose }) => {
               value={formData.patientPhone}
               onChange={handleChange}
               required
+              className={!formData.patientPhone.trim() ? 'error' : ''}
             />
           </div>
 
           <div className="form-group">
-            <label htmlFor="reason">Motivo de la Consulta:</label>
+            <label htmlFor="reason">Motivo de la Consulta: *</label>
             <input
               type="text"
               id="reason"
@@ -136,6 +171,7 @@ const AppointmentForm = ({ date, time, onClose }) => {
               value={formData.reason}
               onChange={handleChange}
               required
+              className={!formData.reason.trim() ? 'error' : ''}
             />
           </div>
 

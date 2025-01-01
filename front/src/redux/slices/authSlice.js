@@ -47,15 +47,16 @@ export const getCurrentUserAsync = createAsyncThunk(
   }
 );
 
+const initialState = {
+  user: null,
+  isAuthenticated: false,
+  loading: false,
+  error: null
+};
+
 const authSlice = createSlice({
   name: 'auth',
-  initialState: {
-    user: null,
-    token: null,
-    isAuthenticated: false,
-    loading: false,
-    error: null
-  },
+  initialState,
   reducers: {
     clearError: (state) => {
       state.error = null;
@@ -65,6 +66,10 @@ const authSlice = createSlice({
       state.token = null;
       state.isAuthenticated = false;
       removeAuthToken();
+    },
+    setUser: (state, action) => {
+      state.user = action.payload;
+      state.isAuthenticated = !!action.payload;
     }
   },
   extraReducers: (builder) => {
@@ -74,10 +79,10 @@ const authSlice = createSlice({
         state.error = null;
       })
       .addCase(loginAsync.fulfilled, (state, action) => {
-        state.loading = false;
-        state.isAuthenticated = true;
         state.user = action.payload.user;
-        state.token = action.payload.token;
+        state.isAuthenticated = true;
+        state.loading = false;
+        state.error = null;
       })
       .addCase(loginAsync.rejected, (state, action) => {
         state.loading = false;

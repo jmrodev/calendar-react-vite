@@ -2,6 +2,21 @@ import { _getHeaders, handleUnauthorizedError } from "./utils";
 import config from "../config/env.cfg";
 import { createStructuredDate, formatStructuredDate } from "../utils/dateUtils";
 import { getAuthToken } from '../utils/authUtils';
+import { store } from '../redux/store';
+import { logout } from '../redux/slices/authSlice';
+import showToast from '../utils/toastUtils';
+
+const handleAuthError = (error) => {
+  if (error.message.includes('401') || error.message.includes('403') || 
+      error.message.toLowerCase().includes('unauthorized') || 
+      error.message.toLowerCase().includes('token')) {
+    store.dispatch(logout());
+    showToast('Su sesión ha expirado, por favor inicie sesión nuevamente', 'warning');
+    window.location.href = '/login';
+    throw new Error('Sesión expirada');
+  }
+  throw error;
+};
 
 export const updateAppointment = async (id, appointment) => {
   try {
@@ -86,40 +101,38 @@ export const confirmAppointment = async (appointmentId) => {
   }
 };
 
-export const createAppointment = async (appointment) => {
+export const createAppointment = async (appointmentData) => {
   try {
-    if (!appointment.date || !appointment.appointmentTime) {
-      throw new Error("Fecha y hora son requeridos");
-    }
+    console.log('Datos enviados al servidor:', appointmentData);
 
     const response = await fetch(`${config.baseUrl}/appointments`, {
       method: "POST",
       headers: _getHeaders(),
-      body: JSON.stringify(appointment),
+      body: JSON.stringify(appointmentData),
     });
 
-    // Obtener el texto del error primero
-    const responseText = await response.text();
-    let errorData;
-    
-    try {
-      // Intentar parsearlo como JSON
-      errorData = JSON.parse(responseText);
-    } catch {
-      // Si no es JSON, usar el texto directamente
-      errorData = { message: responseText };
-    }
+    const data = await response.json();
+    console.log('Respuesta del servidor:', data);
 
     if (!response.ok) {
-      throw new Error(errorData.error || errorData.message || "Error al crear la cita");
+      throw new Error(data.message || data.error || "Error al crear la cita");
     }
 
-    // Si llegamos aquí, la respuesta fue exitosa
-    return JSON.parse(responseText);
+    // Asegurarse de que la fecha tenga el formato correcto
+    return {
+      ...data,
+      date: data.date ? {
+        year: data.date.year,
+        month: data.date.month,
+        day: data.date.day,
+        hours: data.date.hours || 0,
+        minutes: data.date.minutes || 0,
+        seconds: data.date.seconds || 0
+      } : null
+    };
   } catch (error) {
     console.error('Error detallado en createAppointment:', error);
-    // Asegurarnos de que siempre devolvemos un mensaje de error útil
-    throw new Error(error.message || "Error al crear la cita");
+    throw error;
   }
 };
 
@@ -153,17 +166,17 @@ export const getAppointmentsByDate = async (date) => {
       headers: _getHeaders()
     });
 
-    handleUnauthorizedError(response);
-
     if (!response.ok) {
-      throw new Error('Error al obtener las citas');
+      if (response.status === 401 || response.status === 403) {
+        throw new Error('401');
+      }
+      const errorData = await response.text();
+      throw new Error(errorData || 'Error al obtener las citas');
     }
 
-    const data = await response.json();
-    return data;
+    return await response.json();
   } catch (error) {
-    console.error('Error en getAppointmentsByDate:', error);
-    throw error;
+    handleAuthError(error);
   }
 };
 

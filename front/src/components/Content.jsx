@@ -6,12 +6,12 @@ import './styles/content.css';
 export const Content = () => {
   const [selectedDate, setSelectedDate] = useState(() => {
     const savedDate = localStorage.getItem('selectedDate');
-    return savedDate ? new Date(savedDate) : null;
+    return savedDate || null;
   });
 
-  const handleDateSelect = (date, isWeekDay = false) => {
+  const handleDateSelect = (date) => {
     setSelectedDate(date);
-    localStorage.setItem('selectedDate', date.toISOString());
+    localStorage.setItem('selectedDate', date);
   };
 
   return (

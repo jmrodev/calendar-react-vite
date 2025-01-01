@@ -10,6 +10,12 @@ export async function findAppointment({ date, appointmentTime }) {
     throw new Error("Fecha y hora de la cita son obligatorios");
   }
 
+  // Validar que date sea un objeto con la estructura correcta
+  if (!date.year || !date.month || !date.day) {
+    console.log('❌ Error: Estructura de fecha inválida', date);
+    throw new Error("La fecha debe tener una estructura válida (year, month, day)");
+  }
+
   try {
     console.log('🔍 Buscando citas existentes...');
     const allAppointments = await AppointmentSchema.find();
