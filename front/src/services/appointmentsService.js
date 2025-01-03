@@ -111,6 +111,23 @@ const deleteAppointment = async (id) => {
   }
 };
 
+const getByDate = async (date) => {
+  try {
+    const response = await fetch(`${config.baseUrl}/appointments/date/${JSON.stringify(date)}`, {
+      headers: _getHeaders()
+    });
+    handleUnauthorizedError(response);
+    const data = await response.json();
+    console.log('Appointments data received:', data);
+    
+    // Asegurarnos de devolver siempre un array
+    return Array.isArray(data) ? data : [];
+  } catch (error) {
+    handleAuthError(error);
+    return []; // Devolver array vacío en caso de error
+  }
+};
+
 // Exportar el objeto de servicio con todas las funciones
 export const appointmentsService = {
   getByDate: getAppointmentsByDate,
@@ -130,5 +147,6 @@ export {
   getAll,
   createAppointment,
   updateAppointment,
-  deleteAppointment
+  deleteAppointment,
+  getByDate
 };

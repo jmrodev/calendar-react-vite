@@ -26,10 +26,22 @@ const DayView = ({ selectedDate }) => {
     
     try {
       setLoading(true);
-      console.log('Fetching appointments for:', selectedDate);
-      const data = await appointmentsService.getByDate(selectedDate);
-      console.log('Appointments data:', data);
-      setAppointments(data);
+      const date = new Date(selectedDate);
+      const structuredDate = {
+        year: date.getFullYear(),
+        month: date.getMonth(),
+        day: date.getDate(),
+        hours: 0,
+        minutes: 0,
+        seconds: 0
+      };
+      
+      console.log('Fetching appointments for structured date:', structuredDate);
+      const data = await appointmentsService.getByDate(structuredDate);
+      console.log('Appointments received:', data);
+      
+      const appointmentsArray = Array.isArray(data) ? data : [];
+      setAppointments(appointmentsArray);
       setError(null);
     } catch (err) {
       console.error('Error fetching appointments:', err);
@@ -93,7 +105,9 @@ const DayView = ({ selectedDate }) => {
 
       <div className="time-slots-container">
         {timeSlots.map(time => {
-          const appointment = appointments.find(apt => apt.appointmentTime === time);
+          const appointment = Array.isArray(appointments) ? 
+            appointments.find(apt => apt.appointmentTime === time) : 
+            null;
           const available = isSlotAvailable(time);
           const appointmentInfo = getAppointmentInfo(appointment);
 

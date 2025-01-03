@@ -89,16 +89,29 @@ export const getAllAppointmentsRepository = async () => {
 
 export const getAppointmentByDateRepository = async (date) => {
   try {    
-    const searchDate = createStructuredDate(date);
-    if (!searchDate) {
-      throw new Error("Invalid date");
+    let searchDate;
+    if (typeof date === 'string') {
+      try {
+        searchDate = JSON.parse(date);
+      } catch {
+        throw new Error("Invalid date format");
+      }
+    } else {
+      searchDate = date;
     }
 
-    const appointments = await AppointmentSchema.find();
-    return appointments.filter(appointment => 
-      compareStructuredDates(appointment.date, searchDate)
-    );
+    console.log('Searching appointments for date:', searchDate);
+    
+    const appointments = await AppointmentSchema.find({
+      'date.year': searchDate.year,
+      'date.month': searchDate.month,
+      'date.day': searchDate.day
+    });
+
+    console.log('Found appointments:', appointments);
+    return Array.isArray(appointments) ? appointments : [];
   } catch (error) {
+    console.error('Error in getAppointmentByDateRepository:', error);
     throw new Error(`Error in getAppointmentByDateRepository: ${error.message}`);
   }
 };

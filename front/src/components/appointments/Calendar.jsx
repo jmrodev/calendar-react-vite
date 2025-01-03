@@ -48,18 +48,10 @@ const Calendar = ({ onDateSelect, selectedDate }) => {
     }
   };
 
-  const handleDateClick = (day) => {
-    const clickedDate = new Date(
-      currentDate.getFullYear(),
-      currentDate.getMonth(),
-      day
-    );
-    
-    const formattedDate = clickedDate.toISOString().split('T')[0];
-    
-    if (onDateSelect) {
-      onDateSelect(formattedDate);
-    }
+  const handleDateSelect = (date) => {
+    const selectedDate = new Date(date);
+    console.log('Fecha seleccionada en Calendar:', selectedDate);
+    onDateSelect(selectedDate);
   };
 
   const getFirstDayOfMonth = () => {
@@ -105,7 +97,7 @@ const Calendar = ({ onDateSelect, selectedDate }) => {
         <div
           key={day}
           className={`day-container ${isToday ? "today" : ""} ${isWeekend ? "weekend" : ""} ${isSelected ? "selected" : ""}`}
-          onClick={() => handleDateClick(day)}
+          onClick={() => handleDateSelect(dateForDay)}
           title={`${count} citas programadas`}
         >
           <div className="day-number">{day}</div>

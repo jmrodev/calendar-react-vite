@@ -206,19 +206,10 @@ export const getAppointmentsByWeekDayController = async (req, res) => {
 export const getAppointmentsByDate = async (req, res) => {
   try {
     const { date } = req.params;
-    const [year, month, day] = date.split('-').map(Number);
+    console.log('Received date in controller:', date);
     
-    // Crear un objeto de fecha estructurado
-    const structuredDate = {
-      year,
-      month: month - 1, // Ajustar mes a base 0
-      day,
-      hours: 0,
-      minutes: 0,
-      seconds: 0
-    };
-
-    const appointments = await appointmentRepository.findByDate(structuredDate);
+    const appointments = await getAppointmentByDateRepository(date);
+    console.log('Sending appointments:', appointments);
     res.json(appointments);
   } catch (error) {
     console.error('Error en getAppointmentsByDate:', error);
