@@ -1,0 +1,20 @@
+.new-appointment-btn {
+    background-color: #646cff;
+    color: white;
+    border: none;
+    padding: 0.8rem 1.5rem;
+    border-radius: 4px;
+    cursor: pointer;
+    font-weight: 500;
+    margin-bottom: 1rem;
+    transition: all 0.3s ease;
+  }
+  
+  .new-appointment-btn:hover {
+    background-color: #5753e0;
+  }
+  
+  .main-content {
+    flex: 1;
+    padding: var(--spacing-lg) 0;
+  }

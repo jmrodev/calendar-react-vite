@@ -1,0 +1,12 @@
+.theme-toggle {
+  background: none;
+  border: none;
+  padding: var(--spacing-sm);
+  cursor: pointer;
+  font-size: var(--font-size-xl);
+  transition: transform var(--transition-speed) var(--transition-bounce);
+}
+
+.theme-toggle:hover {
+  transform: scale(1.1);
+} 

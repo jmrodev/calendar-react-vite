@@ -1,12 +1,12 @@
 import { createBrowserRouter } from 'react-router-dom';
-import ProtectedLayout from '../components/ProtectedLayout';
-import Dashboard from '../components/Dashboard';
-import {Login} from '../components/Login';
-// Importa los componentes que faltan
-import Appointments from '../components/Appointments';
-import Doctors from '../components/Doctors';
-import Patients from '../components/Patients';
-import Settings from '../components/Settings';
+import ProtectedLayout from '../layouts/ProtectedLayout';
+import Dashboard from '../pages/Dashboard';
+import { Login } from '../pages/Login';
+import Appointments from '../pages/Appointments';
+import Doctors from '../pages/Doctors';
+import Patients from '../pages/Patients';
+import Settings from '../pages/Settings';
+import UnauthorizedPage from '../pages/UnauthorizedPage';
 
 export const router = createBrowserRouter([
   {
@@ -36,6 +36,10 @@ export const router = createBrowserRouter([
         path: '/settings',
         element: <Settings />,
       },
+      {
+        path: '/unauthorized',
+        element: <UnauthorizedPage />,
+      }
     ],
   },
 ]); 
