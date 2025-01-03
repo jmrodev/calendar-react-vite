@@ -1,24 +1,53 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 import { appointmentsService } from '../../services/appointmentsService';
+import config from '../../config/env.cfg';
+import { getAuthToken } from '../../utils/authUtils';
 
 // Thunks
 export const fetchMonthAppointments = createAsyncThunk(
   'appointments/fetchMonthAppointments',
   async ({ year, month }) => {
-    const daysInMonth = new Date(year, month + 1, 0).getDate();
-    const counts = {};
-    
-    for (let day = 1; day <= daysInMonth; day++) {
-      const date = `${year}-${(month + 1).toString().padStart(2, '0')}-${day.toString().padStart(2, '0')}`;
-      try {
-        const appointments = await appointmentsService.getByDate(date);
-        counts[date] = appointments.length;
-      } catch (error) {
-        console.error(`Error fetching appointments for ${date}:`, error);
-        counts[date] = 0;
+    try {
+      console.log('Fetching appointments for:', { year, month });
+      
+      const url = `${config.baseUrl}/appointments/month/${year}/${month + 1}`;
+      console.log('Request URL:', url);
+      
+      const response = await fetch(url, {
+        headers: {
+          'Authorization': `Bearer ${getAuthToken()}`,
+          'Content-Type': 'application/json'
+        }
+      });
+      
+      if (!response.ok) {
+        const text = await response.text();
+        console.error('Error response:', text);
+        try {
+          const errorData = JSON.parse(text);
+          throw new Error(errorData.message || 'Error al obtener las citas del mes');
+        } catch {
+          throw new Error(`Error ${response.status}: ${response.statusText}`);
+        }
       }
+      
+      const data = await response.json();
+      console.log('Appointments received:', data);
+      
+      const appointmentsByDate = {};
+      data.forEach(appointment => {
+        const dateStr = `${appointment.date.year}-${String(appointment.date.month + 1).padStart(2, '0')}-${String(appointment.date.day).padStart(2, '0')}`;
+        if (!appointmentsByDate[dateStr]) {
+          appointmentsByDate[dateStr] = 0;
+        }
+        appointmentsByDate[dateStr]++;
+      });
+      
+      return appointmentsByDate;
+    } catch (error) {
+      console.error('Error fetching month appointments:', error);
+      throw error;
     }
-    return counts;
   }
 );
 
@@ -70,79 +99,27 @@ export const deleteAppointment = createAsyncThunk(
 const appointmentsSlice = createSlice({
   name: 'appointments',
   initialState: {
-    appointments: [],
     monthCounts: {},
     weekDayCounts: {},
     loading: false,
-    error: null,
-    selectedDate: null
+    error: null
   },
-  reducers: {
-    clearError: (state) => {
-      state.error = null;
-    },
-    setSelectedDate: (state, action) => {
-      state.selectedDate = action.payload;
-    }
-  },
+  reducers: {},
   extraReducers: (builder) => {
     builder
-      // Fetch Month Appointments
       .addCase(fetchMonthAppointments.pending, (state) => {
         state.loading = true;
         state.error = null;
       })
       .addCase(fetchMonthAppointments.fulfilled, (state, action) => {
-        state.monthCounts = { ...state.monthCounts, ...action.payload };
         state.loading = false;
+        state.monthCounts = action.payload;
       })
       .addCase(fetchMonthAppointments.rejected, (state, action) => {
         state.loading = false;
         state.error = action.error.message;
-      })
-
-      // Fetch Week Appointments
-      .addCase(fetchWeekAppointments.pending, (state) => {
-        state.loading = true;
-        state.error = null;
-      })
-      .addCase(fetchWeekAppointments.fulfilled, (state, action) => {
-        state.appointments = action.payload;
-        state.loading = false;
-      })
-      .addCase(fetchWeekAppointments.rejected, (state, action) => {
-        state.loading = false;
-        state.error = action.error.message;
-      })
-
-      // CRUD Operations
-      .addCase(createAppointment.pending, (state) => {
-        state.loading = true;
-        state.error = null;
-      })
-      .addCase(createAppointment.fulfilled, (state, action) => {
-        state.loading = false;
-        const date = action.payload.date;
-        const dateStr = `${date.year}-${String(date.month + 1).padStart(2, '0')}-${String(date.day).padStart(2, '0')}`;
-        
-        if (state.monthCounts[dateStr] !== undefined) {
-          state.monthCounts[dateStr]++;
-        }
-        
-        if (Array.isArray(state.appointments)) {
-          state.appointments.push(action.payload);
-        } else {
-          state.appointments = [action.payload];
-        }
-      })
-      .addCase(createAppointment.rejected, (state, action) => {
-        state.loading = false;
-        state.error = action.error.message;
-      })
-
-      // ... resto de los reducers para update y delete
+      });
   }
 });
 
-export const { clearError, setSelectedDate } = appointmentsSlice.actions;
 export default appointmentsSlice.reducer; 

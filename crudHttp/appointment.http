@@ -180,7 +180,7 @@ GET http://{{host}}/api/appointments/confirmed
 Authorization: {{tokenPrefix}} {{login.response.body.token}}
 
 ### Obtener citas por día de la semana
-GET http://{{host}}/api/appointments/weekday/monday
+GET http://{{host}}/api/appointments/weekday/1
 Authorization: {{tokenPrefix}} {{login.response.body.token}}
 
 ### Obtener logs de una cita
@@ -200,9 +200,9 @@ DELETE http://{{host}}/api/appointments/{{appointmentId}}
 Authorization: {{tokenPrefix}} {{login.response.body.token}}
 
 ### Crear una nueva cita
-POST http://localhost:3001/appointments
+POST http://localhost:3001/api/appointments
 Content-Type: application/json
-Authorization: Bearer {{token}}
+Authorization: Bearer {{login.response.body.token}}
 
 {
   "date": {
@@ -225,17 +225,17 @@ Authorization: Bearer {{token}}
 }
 
 ### Obtener citas por fecha
-GET http://localhost:3001/appointments/date/{"year":2024,"month":0,"day":15,"hours":0,"minutes":0,"seconds":0}
-Authorization: Bearer {{token}}
+GET http://localhost:3001/api/appointments/date/{"year":2024,"month":0,"day":15,"hours":0,"minutes":0,"seconds":0}
+Authorization: Bearer {{login.response.body.token}}
 
 ### Obtener citas por día de la semana
-GET http://localhost:3001/appointments/weekday/monday
-Authorization: Bearer {{token}}
+GET http://localhost:3001/api/appointments/weekday/1
+Authorization: Bearer {{login.response.body.token}}
 
 ### Actualizar una cita
-PUT http://localhost:3001/appointments/update/1
+PUT http://localhost:3001/api/appointments/update/1
 Content-Type: application/json
-Authorization: Bearer {{token}}
+Authorization: Bearer {{login.response.body.token}}
 
 {
   "date": {
@@ -251,13 +251,17 @@ Authorization: Bearer {{token}}
 }
 
 ### Eliminar una cita
-DELETE http://localhost:3001/appointments/1
-Authorization: Bearer {{token}}
+DELETE http://localhost:3001/api/appointments/1
+Authorization: Bearer {{login.response.body.token}}
 
 ### Confirmar una cita
-PUT http://localhost:3001/appointments/confirm/1
-Authorization: Bearer {{token}}
+PUT http://localhost:3001/api/appointments/confirm/2
+Authorization: Bearer {{login.response.body.token}}
 
 ### Completar una cita
-PUT http://localhost:3001/appointments/complete/1
-Authorization: Bearer {{token}}
+PUT http://localhost:3001/api/appointments/complete/1
+Authorization: Bearer {{login.response.body.token}}
+
+### Obtener citas por mes
+GET http://localhost:3001/api/appointments/month/2025/1
+Authorization: Bearer {{login.response.body.token}}

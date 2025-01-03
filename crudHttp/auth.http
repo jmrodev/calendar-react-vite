@@ -16,24 +16,24 @@ Content-Type: application/json
 
 ### Obtener todas las citas
 GET http://{{host}}/api/appointments
-Authorization: {{tokenPrefix}} {{token}}
+Authorization: {{tokenPrefix}} {{login.response.body.token}}
 
 ### Verificar token
 GET http://{{host}}/api/auth/verify
-Authorization: {{tokenPrefix}} {{token}}
+Authorization: {{tokenPrefix}} {{login.response.body.token}}
 
 ### Refrescar token
 POST http://{{host}}/api/auth/refresh
-Authorization: {{tokenPrefix}} {{token}}
+Authorization: {{tokenPrefix}} {{login.response.body.token}}
 
 ### Cerrar sesión
 POST http://{{host}}/api/auth/logout
-Authorization: {{tokenPrefix}} {{token}}
+Authorization: {{tokenPrefix}} {{login.response.body.token}}
 
 ### Cambiar contraseña
 PUT http://{{host}}/api/auth/change-password
 Content-Type: application/json
-Authorization: {{tokenPrefix}} {{token}}
+Authorization: {{tokenPrefix}} {{login.response.body.token}}
 
 {
     "oldPassword": "Asdfghj??a3kl",

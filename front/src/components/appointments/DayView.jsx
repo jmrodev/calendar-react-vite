@@ -22,26 +22,18 @@ const DayView = ({ selectedDate }) => {
   ];
 
   const fetchAppointments = useCallback(async () => {
-    if (!selectedDate) return;
+    if (!selectedDate || !selectedDate.year || selectedDate.month === undefined || !selectedDate.day) {
+      console.log('No valid date selected:', selectedDate);
+      return;
+    }
     
     try {
       setLoading(true);
-      const date = new Date(selectedDate);
-      const structuredDate = {
-        year: date.getFullYear(),
-        month: date.getMonth(),
-        day: date.getDate(),
-        hours: 0,
-        minutes: 0,
-        seconds: 0
-      };
-      
-      console.log('Fetching appointments for structured date:', structuredDate);
-      const data = await appointmentsService.getByDate(structuredDate);
+      console.log('Fetching appointments for structured date:', selectedDate);
+      const data = await appointmentsService.getByDate(selectedDate);
       console.log('Appointments received:', data);
       
-      const appointmentsArray = Array.isArray(data) ? data : [];
-      setAppointments(appointmentsArray);
+      setAppointments(Array.isArray(data) ? data : []);
       setError(null);
     } catch (err) {
       console.error('Error fetching appointments:', err);
@@ -58,7 +50,19 @@ const DayView = ({ selectedDate }) => {
   }, [selectedDate, navigate]);
 
   useEffect(() => {
-    fetchAppointments();
+    let isMounted = true;
+
+    const loadAppointments = async () => {
+      if (isMounted) {
+        await fetchAppointments();
+      }
+    };
+
+    loadAppointments();
+
+    return () => {
+      isMounted = false;
+    };
   }, [fetchAppointments]);
 
   const isSlotAvailable = (time) => {
@@ -66,11 +70,10 @@ const DayView = ({ selectedDate }) => {
   };
 
   const handleTimeSlotClick = (time) => {
-    const dateObj = new Date(selectedDate);
-    const formattedDate = dateObj.toISOString().split('T')[0];
+    if (!selectedDate) return;
     
     setSelectedSlot({ 
-      date: formattedDate,
+      date: selectedDate,
       time: time 
     });
     setShowForm(true);

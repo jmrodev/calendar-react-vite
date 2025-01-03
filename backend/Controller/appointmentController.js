@@ -19,7 +19,8 @@ import {
 } from "../Utils/date/dateUtils.js";
 import { findAppointment } from "../Utils/appointment/findAppointment.js";
 import jwt from "jsonwebtoken";
-import { AppointmentRepository } from '../Repository/appointmentRepository.js';
+import { AppointmentRepository, getAppointmentsByMonthRepository } from '../Repository/appointmentRepository.js';
+import AppointmentSchema from '../Models/AppointmentSchema.js';
 
 const verifyToken = (req) => {
   const authHeader = req.headers.authorization;
@@ -205,16 +206,58 @@ export const getAppointmentsByWeekDayController = async (req, res) => {
 
 export const getAppointmentsByDate = async (req, res) => {
   try {
-    const { date } = req.params;
-    console.log('Received date in controller:', date);
+    const dateStr = req.params.date;
+    console.log('Received date string:', dateStr);
     
-    const appointments = await getAppointmentByDateRepository(date);
-    console.log('Sending appointments:', appointments);
+    // Parsear la fecha
+    const [year, month, day] = dateStr.split('-').map(Number);
+    const structuredDate = {
+      year,
+      month: month - 1, // Convertir a base 0
+      day,
+      hours: 0,
+      minutes: 0,
+      seconds: 0
+    };
+    
+    console.log('Structured date:', structuredDate);
+    
+    const appointments = await getAppointmentByDateRepository(structuredDate);
+    console.log('Found appointments:', appointments);
     res.json(appointments);
   } catch (error) {
     console.error('Error en getAppointmentsByDate:', error);
     res.status(500).json({
       message: 'Error al obtener las citas',
+      error: error.message
+    });
+  }
+};
+
+export const getAppointmentsByMonth = async (req, res) => {
+  try {
+    const { year, month } = req.params;
+    
+    // Convertir a números
+    const numYear = parseInt(year);
+    const numMonth = parseInt(month) - 1; // Convertir a base 0
+    
+    if (isNaN(numYear) || isNaN(numMonth)) {
+      return res.status(400).json({
+        message: 'Año o mes inválido'
+      });
+    }
+    
+    console.log('Controller: Buscando citas para:', { year: numYear, month: numMonth });
+    
+    const appointments = await getAppointmentsByMonthRepository(numYear, numMonth);
+    
+    console.log('Controller: Citas encontradas:', appointments.length);
+    res.json(appointments);
+  } catch (error) {
+    console.error('Error en getAppointmentsByMonth:', error);
+    res.status(500).json({
+      message: 'Error al obtener las citas del mes',
       error: error.message
     });
   }

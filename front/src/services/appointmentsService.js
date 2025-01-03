@@ -22,7 +22,11 @@ const handleAuthError = (error) => {
 // Funciones del servicio
 const getAppointmentsByDate = async (date) => {
   try {
-    const response = await fetch(`${config.baseUrl}/appointments/date/${date}`, {
+    // Convertir la fecha a string en formato ISO
+    const dateString = `${date.year}-${String(date.month + 1).padStart(2, '0')}-${String(date.day).padStart(2, '0')}`;
+    console.log('Sending date to backend:', dateString);
+    
+    const response = await fetch(`${config.baseUrl}/appointments/date/${dateString}`, {
       headers: _getHeaders()
     });
     handleUnauthorizedError(response);
@@ -113,7 +117,17 @@ const deleteAppointment = async (id) => {
 
 const getByDate = async (date) => {
   try {
-    const response = await fetch(`${config.baseUrl}/appointments/date/${JSON.stringify(date)}`, {
+    // Validar que la fecha tenga los campos necesarios
+    if (!date || !date.year || date.month === undefined || !date.day) {
+      console.error('Invalid date object:', date);
+      return [];
+    }
+
+    // Convertir la fecha a string en formato ISO
+    const dateString = `${date.year}-${String(date.month + 1).padStart(2, '0')}-${String(date.day).padStart(2, '0')}`;
+    console.log('Sending date to backend:', dateString);
+    
+    const response = await fetch(`${config.baseUrl}/appointments/date/${dateString}`, {
       headers: _getHeaders()
     });
     handleUnauthorizedError(response);
@@ -123,6 +137,7 @@ const getByDate = async (date) => {
     // Asegurarnos de devolver siempre un array
     return Array.isArray(data) ? data : [];
   } catch (error) {
+    console.error('Error in getByDate:', error);
     handleAuthError(error);
     return []; // Devolver array vacío en caso de error
   }
@@ -130,7 +145,7 @@ const getByDate = async (date) => {
 
 // Exportar el objeto de servicio con todas las funciones
 export const appointmentsService = {
-  getByDate: getAppointmentsByDate,
+  getByDate,
   getWeekAppointments,
   getByWeekDay,
   getAll,

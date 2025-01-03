@@ -50,8 +50,22 @@ const Calendar = ({ onDateSelect, selectedDate }) => {
 
   const handleDateSelect = (date) => {
     const selectedDate = new Date(date);
-    console.log('Fecha seleccionada en Calendar:', selectedDate);
-    onDateSelect(selectedDate);
+    if (isNaN(selectedDate.getTime())) {
+      console.error('Invalid date:', date);
+      return;
+    }
+
+    const structuredDate = {
+      year: selectedDate.getFullYear(),
+      month: selectedDate.getMonth(),
+      day: selectedDate.getDate(),
+      hours: 0,
+      minutes: 0,
+      seconds: 0
+    };
+
+    console.log('Fecha seleccionada en Calendar:', structuredDate);
+    onDateSelect(structuredDate);
   };
 
   const getFirstDayOfMonth = () => {
@@ -80,8 +94,16 @@ const Calendar = ({ onDateSelect, selectedDate }) => {
 
     // Días del mes
     for (let day = 1; day <= daysInMonth; day++) {
-      const dateForDay = new Date(currentDate.getFullYear(), currentDate.getMonth(), day);
-      const dateStr = dateForDay.toISOString().split('T')[0];
+      const dateForDay = {
+        year: currentDate.getFullYear(),
+        month: currentDate.getMonth(),
+        day: day,
+        hours: 0,
+        minutes: 0,
+        seconds: 0
+      };
+
+      const dateStr = `${dateForDay.year}-${String(dateForDay.month + 1).padStart(2, '0')}-${String(dateForDay.day).padStart(2, '0')}`;
       const count = monthCounts[dateStr] || 0;
       const maxAppointments = 8;
       const occupancyPercentage = (count / maxAppointments) * 100;
@@ -91,7 +113,10 @@ const Calendar = ({ onDateSelect, selectedDate }) => {
         currentDate.getMonth() === new Date().getMonth() &&
         currentDate.getFullYear() === new Date().getFullYear();
       const isWeekend = (firstDay + day - 1) % 7 === 0 || (firstDay + day - 1) % 7 === 6;
-      const isSelected = selectedDate === dateStr;
+      const isSelected = selectedDate && 
+        selectedDate.year === dateForDay.year && 
+        selectedDate.month === dateForDay.month && 
+        selectedDate.day === dateForDay.day;
 
       calendar.push(
         <div

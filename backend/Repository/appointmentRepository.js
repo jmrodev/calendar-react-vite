@@ -89,23 +89,12 @@ export const getAllAppointmentsRepository = async () => {
 
 export const getAppointmentByDateRepository = async (date) => {
   try {    
-    let searchDate;
-    if (typeof date === 'string') {
-      try {
-        searchDate = JSON.parse(date);
-      } catch {
-        throw new Error("Invalid date format");
-      }
-    } else {
-      searchDate = date;
-    }
-
-    console.log('Searching appointments for date:', searchDate);
+    console.log('Searching appointments for date:', date);
     
     const appointments = await AppointmentSchema.find({
-      'date.year': searchDate.year,
-      'date.month': searchDate.month,
-      'date.day': searchDate.day
+      'date.year': date.year,
+      'date.month': date.month,
+      'date.day': date.day
     });
 
     console.log('Found appointments:', appointments);
@@ -218,6 +207,26 @@ export const getAppointmentsByWeekDayRepository = async (dayOfWeek) => {
   } catch (error) {
     console.error('Error en getAppointmentsByWeekDayRepository:', error);
     throw new Error(`Error en repositorio: ${error.message}`);
+  }
+};
+
+export const getAppointmentsByMonthRepository = async (year, month) => {
+  try {
+    console.log('Repository: Buscando citas para:', { year, month });
+    
+    const appointments = await AppointmentSchema.find({
+      'date.year': year,
+      'date.month': month
+    });
+    
+    console.log('Repository: Citas encontradas:', appointments.length);
+    
+    // Asegurarse de devolver un array vacío si no hay citas
+    return Array.isArray(appointments) ? appointments : [];
+    
+  } catch (error) {
+    console.error('Error en getAppointmentsByMonthRepository:', error);
+    throw new Error(`Error al obtener las citas del mes: ${error.message}`);
   }
 };
 
