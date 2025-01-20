@@ -23,132 +23,25 @@ Authorization: {{tokenPrefix}} {{login.response.body.token}}
 # Por fecha
 GET http://{{host}}/api/appointments?date=2025-01-06
 Authorization: {{tokenPrefix}} {{login.response.body.token}}
-
+###
 # Por estado
 GET http://{{host}}/api/appointments?status=pending
 Authorization: {{tokenPrefix}} {{login.response.body.token}}
 
+###
 # Por mes y año
 GET http://{{host}}/api/appointments?month=12&year=2024
 Authorization: {{tokenPrefix}} {{login.response.body.token}}
-
+###
 # Por día de la semana
 GET http://{{host}}/api/appointments?weekDay=1
 Authorization: {{tokenPrefix}} {{login.response.body.token}}
-
+###
 # Por secretaria
-GET http://{{host}}/api/appointments?secretaryId=1
+GET http://{{host}}/api/appointments?secretaryId=3
 Authorization: {{tokenPrefix}} {{login.response.body.token}}
-
+###
 # Múltiples filtros
 GET http://{{host}}/api/appointments?status=pending&secretaryId=1&month=12&year=2024
 Authorization: {{tokenPrefix}} {{login.response.body.token}}
 
-### Obtener cita específica
-GET http://{{host}}/api/appointments/{{appointmentId}}
-Authorization: {{tokenPrefix}} {{login.response.body.token}}
-
-### Crear una cita
-POST http://{{host}}/api/appointments
-Content-Type: application/json
-Authorization: {{tokenPrefix}} {{login.response.body.token}}
-
-{
-    "date": {
-        "year": {{$datetime 'YYYY'}},
-        "month": {{$datetime 'M'}},
-        "day": {{$datetime 'D'}}
-    },
-    "appointmentTime": "{{$datetime 'HH:mm'}}",
-    "appointment": {
-        "name": "John Doe",
-        "reason": "Consulta General"
-    }
-}
-
-### Actualizar una cita
-PUT http://{{host}}/api/appointments/{{appointmentId}}?status=confirmed
-Authorization: {{tokenPrefix}} {{login.response.body.token}}
-
-{
-    "appointmentTime": "{{$datetime 'HH:mm'}}"
-}
-
-### Confirmar una cita
-PUT http://{{host}}/api/appointments/{{appointmentId}}/confirm
-Authorization: {{tokenPrefix}} {{login.response.body.token}}
-
-### Completar una cita
-PUT http://{{host}}/api/appointments/{{appointmentId}}/complete
-Authorization: {{tokenPrefix}} {{login.response.body.token}}
-
-### Eliminar una cita
-DELETE http://{{host}}/api/appointments/{{appointmentId}}
-Authorization: {{tokenPrefix}} {{login.response.body.token}}
-
-### Crear una nueva cita
-POST http://localhost:3001/api/appointments
-Content-Type: application/json
-Authorization: Bearer {{login.response.body.token}}
-
-{
-  "date": {
-    "year": 2024,
-    "month": 0,
-    "day": 15,
-    "hours": 9,
-    "minutes": 0,
-    "seconds": 0
-  },
-  "appointmentTime": "09:00",
-  "realAppointmentTime": "09:00",
-  "available": false,
-  "status": "pending",
-  "appointment": {
-    "name": "Juan Pérez",
-    "reason": "Consulta general",
-    "confirmAppointment": false
-  }
-}
-
-### Obtener citas por fecha
-GET http://localhost:3001/api/appointments/date/{"year":2024,"month":0,"day":15,"hours":0,"minutes":0,"seconds":0}
-Authorization: Bearer {{login.response.body.token}}
-
-### Obtener citas por día de la semana
-GET http://localhost:3001/api/appointments/weekday/1
-Authorization: Bearer {{login.response.body.token}}
-
-### Actualizar una cita
-PUT http://localhost:3001/api/appointments/update/1
-Content-Type: application/json
-Authorization: Bearer {{login.response.body.token}}
-
-{
-  "date": {
-    "year": 2024,
-    "month": 0,
-    "day": 15,
-    "hours": 10,
-    "minutes": 0,
-    "seconds": 0
-  },
-  "appointmentTime": "10:00",
-  "status": "rescheduled"
-}
-
-### Eliminar una cita
-DELETE http://localhost:3001/api/appointments/3
-Authorization: Bearer {{login.response.body.token}}
-
-### Confirmar una cita
-PUT http://localhost:3001/api/appointments/confirm/2
-Authorization: Bearer {{login.response.body.token}}
-
-### Completar una cita
-PUT http://localhost:3001/api/appointments/complete/1
-Authorization: Bearer {{login.response.body.token}}
-
-### Obtener citas por mes
-GET http://localhost:3001/api/appointments/month/2024/12
-Authorization: Bearer {{login.response.body.token}}

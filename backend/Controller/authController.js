@@ -8,7 +8,7 @@ import jwt from "jsonwebtoken";
 export const loginController = async (req, res) => {
   try {
     const { username, password } = req.body;
-    
+    const { rememberMe } = req.query;
     
     if (!username || !password) {
       return res.status(400).json({
@@ -17,23 +17,20 @@ export const loginController = async (req, res) => {
       });
     }
 
-    const result = await loginService(username, password);
+    const result = await loginService(username, password, rememberMe);
     
-    if (!result.token) {
-      throw new Error("Token no generado");
-    }
     res.status(200).json({
       success: true,
       message: "Login successful",
       token: result.token,
-      user: result.user
+      user: result.user,
+      expiresIn: rememberMe ? '7d' : '1h'
     });
   } catch (error) {
     console.error("Login error:", error);
     res.status(400).json({
       success: false,
-      message: error.message,
-      details: process.env.NODE_ENV === 'development' ? error.stack : undefined
+      message: error.message
     });
   }
 };

@@ -13,9 +13,9 @@ export const saveLoginAttempt = async (username, success, ip = '', userAgent = '
       userAgent
     }).save();
 
-    return await loginAttempt;
+    return loginAttempt;
   } catch (error) {
-    throw new Error(`Error en saveLoginAttempt: ${error.message}`);
+    throw new Error(`Error al guardar intento de login: ${error.message}`);
   }
 };
 
@@ -24,13 +24,13 @@ export const getLoginAttempts = async (username, minutes = 30) => {
     const currentDate = new Date();
     const cutoffDate = createStructuredDate(new Date(currentDate.getTime() - minutes * 60000));
 
-    const attempts = await LoginAttemptSchema.find({
-      username,
-      timestamp: { $gt: cutoffDate }
+    const attempts = await LoginAttemptSchema.find(attempt => {
+      return attempt.username === username && 
+             compareStructuredDates(attempt.timestamp, cutoffDate) > 0;
     });
 
     return attempts;
   } catch (error) {
-    throw new Error(`Error en getLoginAttempts: ${error.message}`);
+    throw new Error(`Error al obtener intentos de login: ${error.message}`);
   }
 };

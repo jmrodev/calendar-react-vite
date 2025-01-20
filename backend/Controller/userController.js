@@ -27,25 +27,29 @@ export const deleteUserController = async (req, res) => {
 
 export const getAllUsersController = async (req, res) => {
   try {
-    const { role, status, search } = req.query;
+    const { role, status, search, limit = 10, page = 1 } = req.query;
     
-    let filters = {};
-    
-    if (role) filters.role = role;
-    if (status) filters.status = status;
-    if (search) {
-      filters.$or = [
-        { username: { $regex: search, $options: 'i' } },
-        { 'personalInfo.firstName': { $regex: search, $options: 'i' } },
-        { 'personalInfo.lastName': { $regex: search, $options: 'i' } }
-      ];
-    }
+    const filters = {
+      role,
+      status,
+      search,
+      pagination: {
+        limit: parseInt(limit),
+        page: parseInt(page)
+      }
+    };
 
-    const users = await getAllUsers(filters);
+    const result = await getAllUsers(filters);
 
     res.json({
       success: true,
-      data: users,
+      data: result.users,
+      pagination: {
+        total: result.total,
+        page: filters.pagination.page,
+        limit: filters.pagination.limit,
+        pages: Math.ceil(result.total / filters.pagination.limit)
+      },
       filters: { role, status, search }
     });
   } catch (error) {
