@@ -27,10 +27,33 @@ export const deleteUserController = async (req, res) => {
 
 export const getAllUsersController = async (req, res) => {
   try {
-    const users = await getAllUsers();
-    res.json(users);
+    const { role, status, search } = req.query;
+    
+    let filters = {};
+    
+    if (role) filters.role = role;
+    if (status) filters.status = status;
+    if (search) {
+      filters.$or = [
+        { username: { $regex: search, $options: 'i' } },
+        { 'personalInfo.firstName': { $regex: search, $options: 'i' } },
+        { 'personalInfo.lastName': { $regex: search, $options: 'i' } }
+      ];
+    }
+
+    const users = await getAllUsers(filters);
+
+    res.json({
+      success: true,
+      data: users,
+      filters: { role, status, search }
+    });
   } catch (error) {
-    res.status(500).json({ error: error.message });
+    res.status(500).json({
+      success: false,
+      error: "Internal Server Error",
+      message: error.message
+    });
   }
 };
 

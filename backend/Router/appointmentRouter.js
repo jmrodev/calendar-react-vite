@@ -3,32 +3,55 @@ import {
   createAppointmentController,
   deleteAppointmentController,
   getAllAppointmentsController,
-  getAppointmentByDateController,
   getAppointmentByIdController,
-  getConfirmedAppointmentsController,
   updateAppointmentController,
   confirmAppointmentController,
   completeAppointmentController,
-  getAppointmentsByWeekDayController,
-  getAppointmentsByMonth
 } from "../Controller/appointmentController.js";
-import { authToken } from "../middleware/token/authToken.js";
+import { authorize } from "../middleware/roles/authorize.js";
 
 const router = Router();
 
-router.use(authToken);
+router.get(
+  "/",
+  authorize("appointments", "read"),
+  getAllAppointmentsController
+);
 
-router.get("/month/:year/:month", getAppointmentsByMonth);
-router.get("/date/:date", getAppointmentByDateController);
-router.get("/weekday/:dayOfWeek", getAppointmentsByWeekDayController);
-router.get("/confirmed", getConfirmedAppointmentsController);
-router.get("/id/:id", getAppointmentByIdController);
-router.get("/", getAllAppointmentsController);
+router.get(
+  "/:id",
+  authorize("appointments", "read"),
+  getAppointmentByIdController
+);
 
-router.post("/", createAppointmentController);
-router.put("/update/:id", updateAppointmentController);
-router.put("/confirm/:appointmentId", confirmAppointmentController);
-router.put("/complete/:appointmentId", completeAppointmentController);
-router.delete("/:id", deleteAppointmentController);
+router.post(
+  "/",
+  authorize("appointments", "create"),
+  createAppointmentController
+);
+
+router.put(
+  "/:id",
+  authorize("appointments", "update"),
+  updateAppointmentController
+);
+
+router.delete(
+  "/:id",
+  authorize("appointments", "delete"),
+  deleteAppointmentController
+);
+
+router.put(
+  "/:id/confirm",
+  authorize("appointments", "update"),
+  confirmAppointmentController
+);
+
+router.put(
+  "/:id/complete",
+  authorize("appointments", "update"),
+  completeAppointmentController
+);
 
 export default router;

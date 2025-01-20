@@ -88,20 +88,15 @@ export const getAllAppointmentsRepository = async () => {
 };
 
 export const getAppointmentByDateRepository = async (date) => {
-  try {    
-    console.log('Searching appointments for date:', date);
-    
-    const appointments = await AppointmentSchema.find(appointment => {
-      return appointment.date.year === date.year &&
-             appointment.date.month === date.month &&
-             appointment.date.day === date.day;
-    });
-
-    console.log('Found appointments:', appointments);
-    return Array.isArray(appointments) ? appointments : [];
+  try {
+    const appointments = await AppointmentSchema.find(apt => 
+      apt.date.year === date.year &&
+      apt.date.month === date.month &&
+      apt.date.day === date.day
+    );
+    return appointments;
   } catch (error) {
-    console.error('Error in getAppointmentByDateRepository:', error);
-    throw new Error(`Error in getAppointmentByDateRepository: ${error.message}`);
+    throw new Error(`Error al obtener citas por fecha: ${error.message}`);
   }
 };
 
@@ -227,6 +222,15 @@ export const getAppointmentsByMonthRepository = async (year, month) => {
   } catch (error) {
     console.error('Error en getAppointmentsByMonthRepository:', error);
     throw new Error(`Error al obtener las citas del mes: ${error.message}`);
+  }
+};
+
+export const getAppointmentsByStatusRepository = async (status) => {
+  try {
+    const appointments = await AppointmentSchema.find(apt => apt.status === status);
+    return appointments;
+  } catch (error) {
+    throw new Error(`Error al obtener citas por estado: ${error.message}`);
   }
 };
 

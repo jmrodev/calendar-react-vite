@@ -9,6 +9,8 @@ import {
   getConfirmedAppointmentsRepository,
   updateAppointmentRepository,
   getAppointmentsByWeekDayRepository,
+  getAppointmentsByMonthRepository,
+  getAppointmentsByStatusRepository,
 } from "../Repository/appointmentRepository.js";
 import { generateAppointmentId } from "../Utils/id/appointment.js";
 import {
@@ -17,6 +19,7 @@ import {
   standardizeDate,
 } from "../Utils/date/dateUtils.js";
 import { AppointmentRepository } from "../Repository/appointmentRepository.js";
+import { AppointmentSchema } from "../Models/AppointmentSchema.js";
 
 // Instanciar el repositorio
 const appointmentRepository = new AppointmentRepository();
@@ -223,5 +226,34 @@ export const getAppointmentsByWeekDayService = async (dayOfWeek) => {
     throw new Error(
       `Error al obtener citas por día de la semana: ${error.message}`
     );
+  }
+};
+
+export const getFilteredAppointmentsService = async (filters) => {
+  try {
+    const { date, status, month, year, weekDay } = filters;
+    let appointments;
+
+    if (date) {
+      const structuredDate = createStructuredDate(date);
+      appointments = await getAppointmentByDateRepository(structuredDate);
+    } else if (month && year) {
+      appointments = await getAppointmentsByMonthRepository(parseInt(year), parseInt(month));
+    } else if (weekDay) {
+      appointments = await getAppointmentsByWeekDayRepository(parseInt(weekDay));
+    } else if (status) {
+      appointments = await getAppointmentsByStatusRepository(status);
+    } else {
+      appointments = await getAllAppointmentsRepository();
+    }
+
+    return {
+      success: true,
+      data: appointments,
+      filters: { date, status, month, year, weekDay }
+    };
+  } catch (error) {
+    console.error('Error en getFilteredAppointmentsService:', error);
+    throw new Error(`Error al filtrar citas: ${error.message}`);
   }
 };

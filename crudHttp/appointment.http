@@ -14,14 +14,42 @@ Content-Type: application/json
 
 ###
 @authToken = {login.response.body.token}
-@appointmentId = 5
 
 ### Obtener todas las citas
 GET http://{{host}}/api/appointments
 Authorization: {{tokenPrefix}} {{login.response.body.token}}
 
+### Obtener citas con filtros
+# Por fecha
+GET http://{{host}}/api/appointments?date=2025-01-06
+Authorization: {{tokenPrefix}} {{login.response.body.token}}
+
+# Por estado
+GET http://{{host}}/api/appointments?status=pending
+Authorization: {{tokenPrefix}} {{login.response.body.token}}
+
+# Por mes y año
+GET http://{{host}}/api/appointments?month=12&year=2024
+Authorization: {{tokenPrefix}} {{login.response.body.token}}
+
+# Por día de la semana
+GET http://{{host}}/api/appointments?weekDay=1
+Authorization: {{tokenPrefix}} {{login.response.body.token}}
+
+# Por secretaria
+GET http://{{host}}/api/appointments?secretaryId=1
+Authorization: {{tokenPrefix}} {{login.response.body.token}}
+
+# Múltiples filtros
+GET http://{{host}}/api/appointments?status=pending&secretaryId=1&month=12&year=2024
+Authorization: {{tokenPrefix}} {{login.response.body.token}}
+
+### Obtener cita específica
+GET http://{{host}}/api/appointments/{{appointmentId}}
+Authorization: {{tokenPrefix}} {{login.response.body.token}}
+
 ### Crear una cita
-POST http://{{host}}/api/appointments/
+POST http://{{host}}/api/appointments
 Content-Type: application/json
 Authorization: {{tokenPrefix}} {{login.response.body.token}}
 
@@ -29,167 +57,32 @@ Authorization: {{tokenPrefix}} {{login.response.body.token}}
     "date": {
         "year": {{$datetime 'YYYY'}},
         "month": {{$datetime 'M'}},
-        "day": {{$datetime 'D'}},
-        "hours": {{$datetime 'H'}},
-        "minutes": {{$datetime 'm'}},
-        "seconds": {{$datetime 's'}}
+        "day": {{$datetime 'D'}}
     },
     "appointmentTime": "{{$datetime 'HH:mm'}}",
-    "realAppointmentTime": "{{$datetime 'HH:mm' 1 h}}",
-    "available": true,
-    "status": "pending",
     "appointment": {
-        "confirmAppointment": false,
         "name": "John Doe",
         "reason": "Consulta General"
-    },
-    "secretary": {
-        "id": 1,
-        "name": "María González"
-    },
-    "changeLog": [
-        {
-            "date": {
-                "year": {{$datetime 'YYYY'}},
-                "month": {{$datetime 'M'}},
-                "day": {{$datetime 'D'}},
-                "hours": {{$datetime 'H'}},
-                "minutes": {{$datetime 'm'}},
-                "seconds": {{$datetime 's'}}
-            },
-            "action": "created",
-            "description": "Cita creada inicialmente",
-            "secretaryId": 1,
-            "newStatus": "pending"
-        }
-    ]
+    }
 }
 
 ### Actualizar una cita
-PUT http://{{host}}/api/appointments/update/{{appointmentId}}
-Content-Type: application/json
+PUT http://{{host}}/api/appointments/{{appointmentId}}?status=confirmed
 Authorization: {{tokenPrefix}} {{login.response.body.token}}
 
 {
-    "date": {
-        "year": {{$datetime 'YYYY'}},
-        "month": {{$datetime 'M' -1}},
-        "day": {{$datetime 'D'}},
-        "hours": {{$datetime 'H'}},
-        "minutes": {{$datetime 'm'}},
-        "seconds": {{$datetime 's'}}
-    },
-    "appointmentTime": "{{$datetime 'HH:mm'}}",
-    "realAppointmentTime": "{{$datetime 'HH:mm'}}",
-    "available": false,
-    "status": "pending",
-    "appointment": {
-        "confirmAppointment": false,
-        "name": "John Doe",
-        "reason": "Consulta General"
-    }
+    "appointmentTime": "{{$datetime 'HH:mm'}}"
 }
 
 ### Confirmar una cita
-PUT http://{{host}}/api/appointments/confirm/{{appointmentId}}
-Content-Type: application/json
+PUT http://{{host}}/api/appointments/{{appointmentId}}/confirm
 Authorization: {{tokenPrefix}} {{login.response.body.token}}
 
-{
-    "confirmAppointment": true,
-    "changeLog": {
-        "date": "{{$datetime 'YYYY-MM-DD HH:mm:ss'}}",
-        "action": "confirmed",
-        "description": "Cita confirmada por la secretaria",
-        "secretaryId": 1,
-        "previousStatus": "pending",
-        "newStatus": "confirmed"
-    }
-}
-
-### Marcar como completada una cita
-PUT http://{{host}}/api/appointments/complete/{{appointmentId}}
-Content-Type: application/json
+### Completar una cita
+PUT http://{{host}}/api/appointments/{{appointmentId}}/complete
 Authorization: {{tokenPrefix}} {{login.response.body.token}}
 
-{
-    "status": "completed",
-    "changeLog": {
-        "date": "{{$datetime 'YYYY-MM-DD HH:mm:ss'}}",
-        "action": "completed",
-        "description": "Cita marcada como completada",
-        "secretaryId": 1,
-        "previousStatus": "confirmed",
-        "newStatus": "completed"
-    }
-}
-
-### Reasignar cita
-PUT http://{{host}}/api/appointments/{{appointmentId}}/reschedule
-Content-Type: application/json
-Authorization: {{tokenPrefix}} {{login.response.body.token}}
-
-{
-    "newDate": "{{$datetime 'YYYY-MM-DD' 1 d}}",
-    "newTime": "{{$datetime 'HH:mm' 2 h}}",
-    "reason": "Solicitud del paciente",
-    "changeLog": {
-        "date": "{{$datetime 'YYYY-MM-DD HH:mm:ss'}}",
-        "action": "rescheduled",
-        "description": "Cita reprogramada a solicitud del paciente",
-        "secretaryId": 1,
-        "previousStatus": "pending",
-        "newStatus": "rescheduled"
-    }
-}
-
-### Cancelar cita
-PUT http://{{host}}/api/appointments/{{appointmentId}}/cancel
-Content-Type: application/json
-Authorization: {{tokenPrefix}} {{login.response.body.token}}
-
-{
-    "reason": "Cancelación por el paciente",
-    "notifyPatient": true,
-    "changeLog": {
-        "date": "{{$datetime 'YYYY-MM-DD HH:mm:ss'}}",
-        "action": "cancelled",
-        "description": "Cita cancelada por el paciente",
-        "secretaryId": 1,
-        "previousStatus": "pending",
-        "newStatus": "cancelled"
-    }
-}
-
-### Obtener citas por fecha
-GET http://{{host}}/api/appointments/date/{{datetime}}
-Authorization: {{tokenPrefix}} {{login.response.body.token}}
-
-### Obtener cita por ID
-GET http://{{host}}/api/appointments/{{appointmentId}}
-Authorization: {{tokenPrefix}} {{login.response.body.token}}
-
-### Obtener citas confirmadas
-GET http://{{host}}/api/appointments/confirmed
-Authorization: {{tokenPrefix}} {{login.response.body.token}}
-
-### Obtener citas por día de la semana
-GET http://{{host}}/api/appointments/weekday/1
-Authorization: {{tokenPrefix}} {{login.response.body.token}}
-
-### Obtener logs de una cita
-GET http://{{host}}/api/appointments/{{appointmentId}}/logs
-Authorization: {{tokenPrefix}} {{login.response.body.token}}
-
-### Obtener citas por secretaria
-GET http://{{host}}/api/appointments/secretary/{{userId}}
-Authorization: {{tokenPrefix}} {{login.response.body.token}}
-
-### Obtener citas por estado
-GET http://{{host}}/api/appointments/status/pending
-Authorization: {{tokenPrefix}} {{login.response.body.token}}
-
-### Eliminar una cita por ID
+### Eliminar una cita
 DELETE http://{{host}}/api/appointments/{{appointmentId}}
 Authorization: {{tokenPrefix}} {{login.response.body.token}}
 
@@ -245,7 +138,7 @@ Authorization: Bearer {{login.response.body.token}}
 }
 
 ### Eliminar una cita
-DELETE http://localhost:3001/api/appointments/1
+DELETE http://localhost:3001/api/appointments/3
 Authorization: Bearer {{login.response.body.token}}
 
 ### Confirmar una cita
@@ -257,5 +150,5 @@ PUT http://localhost:3001/api/appointments/complete/1
 Authorization: Bearer {{login.response.body.token}}
 
 ### Obtener citas por mes
-GET http://localhost:3001/api/appointments/month/2025/1
+GET http://localhost:3001/api/appointments/month/2024/12
 Authorization: Bearer {{login.response.body.token}}

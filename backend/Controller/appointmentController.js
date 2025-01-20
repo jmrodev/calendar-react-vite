@@ -9,6 +9,7 @@ import {
   confirmAppointmentService,
   completeAppointmentService,
   getAppointmentsByWeekDayService,
+  getFilteredAppointmentsService,
 } from "../Service/appointmentService.js";
 import {
   standardizeDate,
@@ -106,10 +107,23 @@ export const deleteAppointmentController = async (req, res) => {
 
 export const getAllAppointmentsController = async (req, res) => {
   try {
-    const appointments = await getAllAppointmentsService();
-    res.json(appointments);
+    const filters = {
+      date: req.query.date,
+      status: req.query.status,
+      month: req.query.month,
+      year: req.query.year,
+      weekDay: req.query.weekDay
+    };
+
+    const result = await getFilteredAppointmentsService(filters);
+    res.json(result);
   } catch (error) {
-    res.status(500).json({ error: error.message });
+    console.error('Error en getAllAppointmentsController:', error);
+    res.status(500).json({
+      success: false,
+      error: "Internal Server Error",
+      message: error.message
+    });
   }
 };
 
@@ -164,32 +178,27 @@ export const getConfirmedAppointmentsController = async (req, res) => {
 export const updateAppointmentController = async (req, res) => {
   try {
     const { id } = req.params;
-    const appointmentData = req.body;
+    const { status, action } = req.query;
     const secretaryId = req.user.id;
 
-    // Validaciones mejoradas
-    if (!id) {
-      return res.status(400).json({
-        success: false,
-        message: 'ID de cita es requerido'
-      });
+    if (action) {
+      switch (action) {
+        case 'confirm':
+          return await confirmAppointmentController(req, res);
+        case 'complete':
+          return await completeAppointmentController(req, res);
+        default:
+          return res.status(400).json({
+            success: false,
+            message: 'Acción no válida'
+          });
+      }
     }
 
-    if (!appointmentData || Object.keys(appointmentData).length === 0) {
-      return res.status(400).json({
-        success: false,
-        message: 'No se proporcionaron datos para actualizar'
-      });
-    }
-
-    // Validar que la cita exista antes de actualizar
-    const existingAppointment = await AppointmentSchema.findOne({ _id: Number(id) });
-    if (!existingAppointment) {
-      return res.status(404).json({
-        success: false,
-        message: 'Cita no encontrada'
-      });
-    }
+    const appointmentData = {
+      ...req.body,
+      status: status || req.body.status
+    };
 
     const updatedAppointment = await updateAppointmentService(
       id,

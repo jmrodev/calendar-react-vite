@@ -3,9 +3,10 @@ import { PERMISSIONS } from "../../config/role.config.js";
 export const authorize = (resource, action) => {
   return (req, res, next) => {
     try {
-      if (!req.user || !req.user.role) {
+      if (!req.user?.role) {
         return res.status(401).json({
-          error: "No autorizado - Usuario o rol no encontrado",
+          error: "Unauthorized",
+          message: "Usuario o rol no encontrado"
         });
       }
 
@@ -14,36 +15,39 @@ export const authorize = (resource, action) => {
 
       if (!rolePermissions) {
         return res.status(403).json({
-          error: "Rol no válido",
+          error: "Forbidden",
+          message: "Rol no válido"
         });
       }
 
       const hasPermission = rolePermissions[resource]?.[action];
 
       if (!hasPermission) {
+        const requiredRole = Object.keys(PERMISSIONS).find(role => 
+          PERMISSIONS[role][resource]?.[action]
+        );
+        
         return res.status(403).json({
-          error: `No tienes permiso para ${action} en ${resource}`,
-          requiredRole: Object.keys(PERMISSIONS).find(role => 
-            PERMISSIONS[role][resource]?.[action]
-          )
+          error: "Forbidden",
+          message: `No tienes permiso para ${action} en ${resource}`,
+          requiredRole
         });
       }
 
-      // Agregar información de auditoría
+      // Extender información de auditoría
       req.audit = {
-        userId: req.user.id,
-        username: req.user.username,
+        ...req.audit,
         role: userRole,
-        action: action,
-        resource: resource,
-        timestamp: new Date()
+        action,
+        resource
       };
 
-      return next();
+      next();
     } catch (error) {
       console.error("Error en autorización:", error);
       return res.status(500).json({
-        error: "Error interno del servidor durante la autorización",
+        error: "Internal Server Error",
+        message: "Error en la autorización"
       });
     }
   };
