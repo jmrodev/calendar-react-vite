@@ -12,7 +12,7 @@ import {
   getAppointmentsByWeekDayController,
   getAppointmentsByMonth
 } from "../Controller/appointmentController.js";
-import { authToken } from "../Middleware/token/authToken.js";
+import { authToken } from "../middleware/token/authToken.js";
 
 const router = Router();
 

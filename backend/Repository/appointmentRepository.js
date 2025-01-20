@@ -91,10 +91,10 @@ export const getAppointmentByDateRepository = async (date) => {
   try {    
     console.log('Searching appointments for date:', date);
     
-    const appointments = await AppointmentSchema.find({
-      'date.year': date.year,
-      'date.month': date.month,
-      'date.day': date.day
+    const appointments = await AppointmentSchema.find(appointment => {
+      return appointment.date.year === date.year &&
+             appointment.date.month === date.month &&
+             appointment.date.day === date.day;
     });
 
     console.log('Found appointments:', appointments);
@@ -324,6 +324,46 @@ export class AppointmentRepository {
     } catch (error) {
       console.error('Error en create:', error);
       throw error;
+    }
+  }
+
+  async updateAppointment(id, appointmentData, secretaryId) {
+    try {
+      const existingAppointment = await this.appointments.findOne({ _id: Number(id) });
+      if (!existingAppointment) {
+        throw new Error("Cita no encontrada");
+      }
+
+      // Asegurarse de mantener la estructura correcta de los datos
+      const updatedData = {
+        ...existingAppointment,
+        date: appointmentData.date || existingAppointment.date,
+        appointmentTime: appointmentData.appointmentTime || existingAppointment.appointmentTime,
+        realAppointmentTime: appointmentData.realAppointmentTime || existingAppointment.realAppointmentTime,
+        available: appointmentData.available !== undefined ? appointmentData.available : existingAppointment.available,
+        status: appointmentData.status || existingAppointment.status,
+        appointment: {
+          ...existingAppointment.appointment,
+          ...appointmentData.appointment
+        },
+        secretary: existingAppointment.secretary,
+        changeLog: appointmentData.changeLog || existingAppointment.changeLog
+      };
+
+      // Actualizar la cita
+      const updatedAppointment = await this.appointments.update(
+        { _id: Number(id) },
+        updatedData
+      );
+
+      if (!updatedAppointment) {
+        throw new Error("Error al actualizar la cita");
+      }
+
+      return updatedAppointment;
+    } catch (error) {
+      console.error('Error en updateAppointment:', error);
+      throw new Error(`Error al actualizar la cita: ${error.message}`);
     }
   }
 }

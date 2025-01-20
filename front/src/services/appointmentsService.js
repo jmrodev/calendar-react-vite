@@ -90,15 +90,24 @@ const createAppointment = async (appointmentData) => {
 
 const updateAppointment = async (id, updates) => {
   try {
-    const response = await fetch(`${config.baseUrl}/appointments/${id}`, {
+    const response = await fetch(`${config.baseUrl}/appointments/update/${id}`, {
       method: 'PUT',
       headers: _getHeaders(),
       body: JSON.stringify(updates)
     });
+    
+    if (!response.ok) {
+      const errorData = await response.json();
+      throw new Error(errorData.message || 'Error al actualizar la cita');
+    }
+
     handleUnauthorizedError(response);
-    return await response.json();
+    const data = await response.json();
+    return data.data; // Retornar los datos actualizados
   } catch (error) {
+    console.error('Error updating appointment:', error);
     handleAuthError(error);
+    throw error;
   }
 };
 

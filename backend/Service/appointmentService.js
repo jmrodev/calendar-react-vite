@@ -138,11 +138,71 @@ export const getConfirmedAppointmentsService = async () => {
   }
 };
 
-export const updateAppointmentService = async (id, data, secretaryId) => {
+export const updateAppointmentService = async (id, appointmentData, secretaryId) => {
   try {
-    return await updateAppointmentRepository(id, data, secretaryId);
+    // Validaciones mejoradas
+    if (!id || !appointmentData) {
+      throw new Error("ID de cita y datos de actualización son requeridos");
+    }
+
+    // Verificar que el ID sea un número válido
+    const appointmentId = Number(id);
+    if (isNaN(appointmentId)) {
+      throw new Error("ID de cita inválido");
+    }
+
+    const appointmentRepository = new AppointmentRepository();
+    
+    // Validar que la cita exista
+    const existingAppointment = await appointmentRepository.appointments.findOne({ _id: appointmentId });
+    if (!existingAppointment) {
+      throw new Error("Cita no encontrada");
+    }
+
+    // Crear el log de cambios con la fecha estructurada
+    const now = new Date();
+    const changeLogEntry = {
+      date: {
+        year: now.getFullYear(),
+        month: now.getMonth(),
+        day: now.getDate(),
+        hours: now.getHours(),
+        minutes: now.getMinutes(),
+        seconds: now.getSeconds()
+      },
+      action: "updated",
+      description: "Cita actualizada",
+      secretaryId: secretaryId,
+      previousStatus: existingAppointment.status,
+      newStatus: appointmentData.status || existingAppointment.status
+    };
+
+    // Preparar datos actualizados manteniendo la estructura correcta
+    const updatedData = {
+      ...existingAppointment,
+      date: appointmentData.date || existingAppointment.date,
+      appointmentTime: appointmentData.appointmentTime || existingAppointment.appointmentTime,
+      realAppointmentTime: appointmentData.realAppointmentTime || existingAppointment.realAppointmentTime,
+      available: appointmentData.available !== undefined ? appointmentData.available : existingAppointment.available,
+      status: appointmentData.status || existingAppointment.status,
+      appointment: {
+        ...existingAppointment.appointment,
+        ...appointmentData.appointment
+      },
+      secretary: existingAppointment.secretary,
+      changeLog: [...(existingAppointment.changeLog || []), changeLogEntry]
+    };
+
+    const updatedAppointment = await appointmentRepository.updateAppointment(
+      appointmentId,
+      updatedData,
+      secretaryId
+    );
+
+    return updatedAppointment;
   } catch (error) {
-    throw new Error(`Error in update appointment service: ${error.message}`);
+    console.error('Error en updateAppointmentService:', error);
+    throw new Error(`Error al actualizar la cita: ${error.message}`);
   }
 };
 

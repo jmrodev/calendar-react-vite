@@ -1,15 +1,14 @@
-import express from 'express';
-import cors from 'cors';
-import appointmentRouter from './Router/appointmentRouter.js';
+import express from "express";
+import configExpress from "./config/express.js";
+import appointmentRouter from "./Router/appointmentRouter.js";
+import authRouter from "./Router/authRouter.js";
+import { authMiddleware } from "./middleware/auth.js";
 
 const app = express();
 
-app.use(cors());
-app.use(express.json());
+configExpress(app);
 
-// Asegúrate de que la ruta base sea /api/appointments
-app.use('/api/appointments', appointmentRouter);
+app.use("/api/auth", authRouter);
+app.use("/api/appointments", authMiddleware, appointmentRouter);
 
-// ... resto de la configuración del servidor ...
-
-export default app; 
+export default app;

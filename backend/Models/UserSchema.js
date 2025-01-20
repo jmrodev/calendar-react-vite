@@ -1,7 +1,15 @@
 import dbLocal from "db-local";
 import { createStructuredDate } from '../Utils/date/dateUtils.js';
+import fs from 'fs';
+import path from 'path';
+import { fileURLToPath } from 'url';
+import { dirname } from 'path';
 
-const { Schema } = new dbLocal({ path: "../databases" });
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
+const dbPath = path.join(__dirname, '../../databases');
+
+const { Schema } = new dbLocal({ path: dbPath });
 
 const UserSchema = Schema("User", {
   _id: { type: Number, required: true },

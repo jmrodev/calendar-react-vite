@@ -1,5 +1,5 @@
 import dbLocal from "db-local";
-const { Schema } = new dbLocal({ path: "../databases" });
+const { Schema } = new dbLocal({ path: "../../databases" });
 
 const LoginAttemptSchema = Schema("LoginAttempt", {
   _id: { type: Number, required: true },

@@ -20,7 +20,7 @@ import {
 import { findAppointment } from "../Utils/appointment/findAppointment.js";
 import jwt from "jsonwebtoken";
 import { AppointmentRepository, getAppointmentsByMonthRepository } from '../Repository/appointmentRepository.js';
-import AppointmentSchema from '../Models/AppointmentSchema.js';
+import { AppointmentSchema } from '../Models/AppointmentSchema.js';
 
 const verifyToken = (req) => {
   const authHeader = req.headers.authorization;
@@ -164,19 +164,51 @@ export const getConfirmedAppointmentsController = async (req, res) => {
 export const updateAppointmentController = async (req, res) => {
   try {
     const { id } = req.params;
+    const appointmentData = req.body;
     const secretaryId = req.user.id;
+
+    // Validaciones mejoradas
+    if (!id) {
+      return res.status(400).json({
+        success: false,
+        message: 'ID de cita es requerido'
+      });
+    }
+
+    if (!appointmentData || Object.keys(appointmentData).length === 0) {
+      return res.status(400).json({
+        success: false,
+        message: 'No se proporcionaron datos para actualizar'
+      });
+    }
+
+    // Validar que la cita exista antes de actualizar
+    const existingAppointment = await AppointmentSchema.findOne({ _id: Number(id) });
+    if (!existingAppointment) {
+      return res.status(404).json({
+        success: false,
+        message: 'Cita no encontrada'
+      });
+    }
 
     const updatedAppointment = await updateAppointmentService(
       id,
-      req.body,
+      appointmentData,
       secretaryId
     );
-    res.json({
+
+    res.status(200).json({
       success: true,
-      updatedAppointment,
+      message: 'Cita actualizada exitosamente',
+      data: updatedAppointment
     });
   } catch (error) {
-    res.status(500).json({ error: error.message });
+    console.error('Error en updateAppointmentController:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Error al actualizar la cita',
+      error: error.message
+    });
   }
 };
 
@@ -250,7 +282,11 @@ export const getAppointmentsByMonth = async (req, res) => {
     
     console.log('Controller: Buscando citas para:', { year: numYear, month: numMonth });
     
-    const appointments = await getAppointmentsByMonthRepository(numYear, numMonth);
+    // Buscar citas que coincidan con el año y mes
+    const appointments = await AppointmentSchema.find(appointment => {
+      return appointment.date.year === numYear && 
+             appointment.date.month === numMonth;
+    });
     
     console.log('Controller: Citas encontradas:', appointments.length);
     res.json(appointments);

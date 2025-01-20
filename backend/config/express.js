@@ -14,14 +14,22 @@ export default (app) => {
     credentials: true
   }));
 
+  // Body parsers
   app.use(express.json());
   app.use(express.urlencoded({ extended: true }));
 
-  // Error handling middleware
+  // Middleware para logging de requests
+  app.use((req, res, next) => {
+    console.log(`${req.method} ${req.url}`);
+    next();
+  });
+
+  // Middleware de error global
   app.use((err, req, res, next) => {
-    console.error(err.stack);
+    console.error('Error:', err.stack);
     res.status(500).json({
       message: 'Error interno del servidor',
+      error: process.env.NODE_ENV === 'development' ? err.message : undefined
     });
   });
 

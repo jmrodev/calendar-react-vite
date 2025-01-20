@@ -14,7 +14,8 @@ Content-Type: application/json
 
 ###
 @authToken = {login.response.body.token}
-@appointmentId = 1
+@appointmentId = 5
+
 ### Obtener todas las citas
 GET http://{{host}}/api/appointments
 Authorization: {{tokenPrefix}} {{login.response.body.token}}
@@ -70,30 +71,23 @@ Content-Type: application/json
 Authorization: {{tokenPrefix}} {{login.response.body.token}}
 
 {
-    "date": "{{$datetime 'YYYY-MM-DD'}}",
+    "date": {
+        "year": {{$datetime 'YYYY'}},
+        "month": {{$datetime 'M' -1}},
+        "day": {{$datetime 'D'}},
+        "hours": {{$datetime 'H'}},
+        "minutes": {{$datetime 'm'}},
+        "seconds": {{$datetime 's'}}
+    },
     "appointmentTime": "{{$datetime 'HH:mm'}}",
-    "realAppointmentTime": "{{$datetime 'HH:mm' 1 h}}",
-    "available": true,
-    "status": "updated",
+    "realAppointmentTime": "{{$datetime 'HH:mm'}}",
+    "available": false,
+    "status": "pending",
     "appointment": {
-        "confirmAppointment": true,
-        "name": "John Doe Updated",
-        "reason": "Seguimiento de Consulta"
-    },
-    "secretary": {
-        "id": 1,
-        "name": "María González"
-    },
-    "changeLog": [
-        {
-            "date": "{{$datetime 'YYYY-MM-DD HH:mm:ss'}}",
-            "action": "updated",
-            "description": "Actualización de datos de la cita",
-            "secretaryId": 1,
-            "previousStatus": "pending",
-            "newStatus": "updated"
-        }
-    ]
+        "confirmAppointment": false,
+        "name": "John Doe",
+        "reason": "Consulta General"
+    }
 }
 
 ### Confirmar una cita
