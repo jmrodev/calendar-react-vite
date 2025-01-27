@@ -3,28 +3,23 @@ import {
   loginController,
   logoutController,
   registerController,
-  refreshTokenController,
+  refreshTokenController
 } from "../Controller/authController.js";
 import { authMiddleware } from "../middleware/auth.js";
 import { authorize } from "../middleware/roles/authorize.js";
 
 const router = Router();
 
+// Rutas públicas (no requieren autenticación)
 router.post("/login", loginController);
-router.post("/register", registerController);
+router.post("/refresh-token", refreshTokenController);
 
-router.post(
-  "/logout",
-  authMiddleware,
-  authorize("auth", "logout"),
-  logoutController
-);
-
-router.post(
-  "/refresh-token",
-  authMiddleware,
-  authorize("auth", "refresh"),
-  refreshTokenController
+// Rutas protegidas
+router.post("/logout", authMiddleware, logoutController);
+router.post("/register", 
+  authMiddleware, 
+  authorize("users", "create"), 
+  registerController
 );
 
 export default router;

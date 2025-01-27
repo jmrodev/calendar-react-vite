@@ -1,57 +1,72 @@
 import { Router } from "express";
+import { authMiddleware } from "../middleware/auth.js";
+import { authorize } from "../middleware/roles/authorize.js";
 import {
-  createAppointmentController,
-  deleteAppointmentController,
   getAllAppointmentsController,
   getAppointmentByIdController,
+  createAppointmentController,
   updateAppointmentController,
+  deleteAppointmentController,
   confirmAppointmentController,
   completeAppointmentController,
+  getAppointmentsByDate,
+  getAppointmentsByMonth
 } from "../Controller/appointmentController.js";
-import { authorize } from "../middleware/roles/authorize.js";
 
 const router = Router();
 
-router.get(
-  "/",
+router.get("/", 
+  authMiddleware,
   authorize("appointments", "read"),
   getAllAppointmentsController
 );
 
-router.get(
-  "/:id",
+router.get("/:id", 
+  authMiddleware,
   authorize("appointments", "read"),
   getAppointmentByIdController
 );
 
-router.post(
-  "/",
+router.post("/", 
+  authMiddleware,
   authorize("appointments", "create"),
   createAppointmentController
 );
 
-router.put(
-  "/:id",
+router.put("/:id", 
+  authMiddleware,
   authorize("appointments", "update"),
   updateAppointmentController
 );
 
-router.delete(
-  "/:id",
+router.delete("/:id", 
+  authMiddleware,
   authorize("appointments", "delete"),
   deleteAppointmentController
 );
 
-router.put(
-  "/:id/confirm",
+router.patch("/:id/confirm", 
+  authMiddleware,
   authorize("appointments", "update"),
   confirmAppointmentController
 );
 
-router.put(
-  "/:id/complete",
+router.patch("/:id/complete", 
+  authMiddleware,
   authorize("appointments", "update"),
   completeAppointmentController
+);
+
+router.get("/date/:date", 
+  authMiddleware,
+  authorize("appointments", "read"),
+  getAppointmentsByDate
+);
+
+router.get("/month/:year/:month", 
+  authMiddleware,
+  authorize("appointments", "read"),
+  getAppointmentsByMonth
 );
 
 export default router;

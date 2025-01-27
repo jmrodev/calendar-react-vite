@@ -57,4 +57,19 @@ export const authMiddleware = (req, res, next) => {
       message: 'Token inválido o expirado' 
     });
   }
+};
+
+// Función auxiliar para verificar token (para uso interno si es necesario)
+export const verifyToken = (req) => {
+  const authHeader = req.headers.authorization;
+  if (!authHeader) {
+    throw new Error("No se proporcionó token de autenticación");
+  }
+
+  const token = authHeader.split(" ")[1];
+  try {
+    return jwt.verify(token, secretKey);
+  } catch (error) {
+    throw new Error("Token inválido o expirado");
+  }
 }; 

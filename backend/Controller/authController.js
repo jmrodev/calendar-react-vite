@@ -38,9 +38,16 @@ export const loginController = async (req, res) => {
 export const logoutController = async (req, res) => {
   try {
     await logoutService(req.session);
-    res.json({ message: "Logout successful" });
+    res.status(200).json({ 
+      success: true,
+      message: "Logout successful" 
+    });
   } catch (error) {
-    res.status(500).json({ error: error.message });
+    console.error("Logout error:", error);
+    res.status(500).json({ 
+      success: false,
+      message: error.message 
+    });
   }
 };
 
@@ -50,13 +57,17 @@ export const registerController = async (req, res) => {
     if (!username || !password || !role) {
       return res.status(400).json({
         success: false,
-        message: "Error en registerController: Todos los campos son requeridos",
+        message: "Todos los campos son requeridos",
       });
     }
 
     const result = await registerService(username, password, role);
-    res.status(201).json(result);
+    res.status(201).json({
+      success: true,
+      ...result
+    });
   } catch (error) {
+    console.error("Register error:", error);
     res.status(400).json({
       success: false,
       message: error.message,
@@ -65,20 +76,27 @@ export const registerController = async (req, res) => {
 };
 
 export const refreshTokenController = async (req, res) => {
-  const authHeader = req.headers["authorization"];
-  if (!authHeader) {
-    return res.status(401).json({ message: "No authorization header" });
-  }
-
-  const token = authHeader.split(" ")[1];
-  if (!token) {
-    return res.status(401).json({ message: "No token provided" });
-  }
-
   try {
+    const authHeader = req.headers["authorization"];
+    if (!authHeader) {
+      return res.status(401).json({ 
+        success: false,
+        message: "No authorization header" 
+      });
+    }
+
+    const token = authHeader.split(" ")[1];
+    if (!token) {
+      return res.status(401).json({ 
+        success: false,
+        message: "No token provided" 
+      });
+    }
+
     const decoded = jwt.verify(token, process.env.JWT_SECRET, {
       ignoreExpiration: true,
     });
+    
     const newToken = jwt.sign(
       { 
         id: decoded.id, 
@@ -88,6 +106,7 @@ export const refreshTokenController = async (req, res) => {
       process.env.JWT_SECRET,
       { expiresIn: "1h" }
     );
+    
     res.json({ 
       success: true,
       token: newToken,

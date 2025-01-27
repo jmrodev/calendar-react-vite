@@ -6,15 +6,33 @@ import {
   getUserByIdController,
 } from "../Controller/userController.js";
 import { authorize } from "../middleware/roles/authorize.js";
+import { authMiddleware } from "../middleware/auth.js";
 
 const router = Router();
 
-router.get("/", authorize("users", "read"), getAllUsersController);
+// Primero autenticamos, luego autorizamos
+router.get("/", 
+  authMiddleware,
+  authorize("users", "read"), 
+  getAllUsersController
+);
 
-router.get("/:id", authorize("users", "read"), getUserByIdController);
+router.get("/:id", 
+  authMiddleware,
+  authorize("users", "read"), 
+  getUserByIdController
+);
 
-router.post("/", authorize("users", "create"), createUserController);
+router.post("/", 
+  authMiddleware,
+  authorize("users", "create"), 
+  createUserController
+);
 
-router.delete("/:id", authorize("users", "delete"), deleteUserController);
+router.delete("/:id", 
+  authMiddleware,
+  authorize("users", "delete"), 
+  deleteUserController
+);
 
 export default router;

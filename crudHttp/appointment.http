@@ -21,7 +21,7 @@ Authorization: {{tokenPrefix}} {{login.response.body.token}}
 
 ### Obtener citas con filtros
 # Por fecha
-GET http://{{host}}/api/appointments?date=2025-01-06
+GET http://{{host}}/api/appointments?date=06
 Authorization: {{tokenPrefix}} {{login.response.body.token}}
 ###
 # Por estado
