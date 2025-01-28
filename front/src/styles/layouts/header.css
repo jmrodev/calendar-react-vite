@@ -1,0 +1,131 @@
+.header {
+  background-color: var(--background-primary);
+  border-bottom: 1px solid var(--border-color);
+  position: sticky;
+  top: 0;
+  z-index: var(--z-index-sticky);
+  box-shadow: var(--shadow-sm);
+}
+
+.navbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  height: 64px;
+  padding: 0 var(--spacing-md);
+}
+
+.nav-brand {
+  text-decoration: none;
+  font-size: var(--font-size-xl);
+  font-weight: var(--font-weight-bold);
+  color: var(--text-primary);
+}
+
+.nav-content {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-lg);
+}
+
+.user-info {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  margin-right: var(--spacing-md);
+  padding-right: var(--spacing-md);
+  border-right: 1px solid var(--border-color);
+}
+
+.user-name {
+  color: var(--text-primary);
+  font-weight: var(--font-weight-medium);
+  font-size: var(--font-size-sm);
+}
+
+.user-role {
+  color: var(--text-secondary);
+  font-size: var(--font-size-xs);
+  text-transform: capitalize;
+}
+
+.nav-links {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-md);
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.nav-link {
+  color: var(--text-secondary);
+  text-decoration: none;
+  font-weight: var(--font-weight-medium);
+  padding: var(--spacing-xs) var(--spacing-sm);
+  border-radius: var(--border-radius-sm);
+  transition: all var(--transition-speed);
+}
+
+.nav-link:hover {
+  color: var(--primary-color);
+  background-color: rgba(67, 97, 238, 0.05);
+}
+
+.login-btn {
+  padding: var(--spacing-xs) var(--spacing-lg);
+}
+
+.logout-btn {
+  color: var(--danger-color);
+  border-color: var(--danger-color);
+}
+
+.logout-btn:hover {
+  background-color: var(--danger-color);
+  color: var(--text-light);
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .navbar {
+    padding: 0 var(--spacing-sm);
+  }
+
+  .nav-brand {
+    font-size: var(--font-size-lg);
+  }
+
+  .user-info {
+    display: none;
+  }
+
+  .nav-links {
+    gap: var(--spacing-sm);
+  }
+
+  .nav-link {
+    padding: var(--spacing-xs);
+  }
+
+  .login-btn, 
+  .logout-btn {
+    padding: var(--spacing-xs) var(--spacing-md);
+  }
+}
+
+/* Animaciones */
+@keyframes slideDown {
+  from {
+    transform: translateY(-100%);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+.header {
+  animation: slideDown 0.3s ease-out;
+} 

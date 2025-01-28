@@ -1,0 +1,20 @@
+.navbar {
+  height: 64px;
+  background-color: var(--background-primary);
+}
+
+.navbar-brand {
+  font-size: var(--font-size-xl);
+  font-weight: bold;
+}
+
+.navbar-menu {
+  gap: var(--spacing-lg);
+}
+
+@media (max-width: 768px) {
+  .navbar-menu {
+    flex-direction: column;
+    gap: var(--spacing-sm);
+  }
+} 

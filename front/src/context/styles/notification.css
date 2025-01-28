@@ -1,0 +1,65 @@
+@import '../../styles/variables.css';
+
+.notification {
+  position: fixed;
+  top: var(--spacing-md);
+  right: var(--spacing-md);
+  padding: var(--spacing-md);
+  border-radius: var(--border-radius-md);
+  background-color: var(--background-primary);
+  box-shadow: var(--shadow-md);
+  z-index: var(--z-index-tooltip);
+  min-width: 300px;
+  max-width: 400px;
+  animation: slideIn var(--transition-speed);
+}
+
+.notification.success {
+  background-color: var(--success-color);
+  color: var(--text-light);
+}
+
+.notification.error {
+  background-color: var(--danger-color);
+  color: var(--text-light);
+}
+
+.notification.warning {
+  background-color: var(--warning-color);
+  color: var(--text-primary);
+}
+
+.notification-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: var(--spacing-sm);
+}
+
+.notification-title {
+  font-weight: var(--font-weight-bold);
+  font-size: var(--font-size-md);
+}
+
+.notification-close {
+  background: none;
+  border: none;
+  color: currentColor;
+  cursor: pointer;
+  padding: var(--spacing-xs);
+}
+
+.notification-message {
+  font-size: var(--font-size-sm);
+}
+
+@keyframes slideIn {
+  from {
+    transform: translateX(100%);
+    opacity: 0;
+  }
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
+} 

@@ -1,0 +1,36 @@
+.theme-toggle {
+  background: none;
+  border: none;
+  padding: var(--spacing-sm);
+  cursor: pointer;
+  font-size: var(--font-size-xl);
+  transition: transform var(--transition-speed) var(--transition-bounce);
+  color: var(--text-primary);
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  border-radius: var(--border-radius-pill);
+}
+
+.theme-toggle:hover {
+  transform: scale(1.1);
+  background-color: var(--background-hover);
+}
+
+.theme-toggle:focus {
+  outline: 2px solid var(--primary-color);
+  outline-offset: 2px;
+}
+
+/* Animación suave al cambiar el icono */
+.theme-toggle span {
+  position: absolute;
+  transition: all var(--transition-speed) var(--transition-spring);
+}
+
+.theme-toggle:active {
+  transform: scale(0.95);
+} 
