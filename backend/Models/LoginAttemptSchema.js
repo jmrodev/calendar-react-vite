@@ -1,24 +1,13 @@
-import dbLocal from "db-local";
-const { Schema } = new dbLocal({ path: "../../databases" });
+import { Schema } from "../config/database.js";
+import { createStructuredDate } from "../Utils/date/dateUtils.js";
 
-const LoginAttemptSchema = Schema("LoginAttempt", {
+const LoginAttemptSchema = Schema("LoginAttempts", {
   _id: { type: Number, required: true },
   username: { type: String, required: true },
   success: { type: Boolean, required: true },
-  timestamp: { 
-    type: Object,
-    required: true,
-    schema: {
-      year: { type: Number, required: true },
-      month: { type: Number, required: true },
-      day: { type: Number, required: true },
-      hours: { type: Number, required: true },
-      minutes: { type: Number, required: true },
-      seconds: { type: Number, required: true }
-    }
-  },
-  ip: { type: String },
-  userAgent: { type: String }
+  timestamp: { type: Object, default: () => createStructuredDate(new Date()) },
+  ip: { type: String, default: '' },
+  userAgent: { type: String, default: '' }
 });
 
-export { LoginAttemptSchema }; 
+export default LoginAttemptSchema;

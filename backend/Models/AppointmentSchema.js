@@ -1,7 +1,7 @@
-import dbLocal from "db-local";
-const { Schema } = new dbLocal({ path: "../../databases" });
+import { Schema } from "../config/database.js";
+import { DateSchema } from "./DateSchema.js";
 
-const AppointmentSchema = Schema("Appointment", {
+const AppointmentSchema = Schema("Appointments", {
   _id: { type: Number, required: true },
   date: {
     year: { type: Number, required: true },
@@ -14,7 +14,11 @@ const AppointmentSchema = Schema("Appointment", {
   appointmentTime: { type: String, required: true },
   realAppointmentTime: { type: String, required: true },
   available: { type: Boolean, default: false },
-  status: { type: String, default: "pending" },
+  status: { 
+    type: String, 
+    default: "pending",
+    enum: ["pending", "confirmed", "completed", "cancelled"]
+  },
   appointment: {
     confirmAppointment: { type: Boolean, default: false },
     name: { type: String, required: true },
@@ -24,8 +28,10 @@ const AppointmentSchema = Schema("Appointment", {
     id: { type: Number, required: true },
     name: { type: String, required: true }
   },
-  changeLog: { type: Array, default: [] }
+  changeLog: { type: Array, default: [] },
+  createdAt: { type: Object, default: null },
+  updatedAt: { type: Object, default: null }
 });
 
-export { AppointmentSchema };
+export default AppointmentSchema;
 

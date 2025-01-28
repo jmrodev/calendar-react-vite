@@ -1,73 +1,67 @@
 import {
-  createAppointmentService,
-  deleteAppointmentService,
-  getFilteredAppointmentsService,
-  getAppointmentByIdService,
-  updateAppointmentService,
-  confirmAppointmentService,
-  completeAppointmentService,
+  appointmentService
 } from "../Service/appointmentService.js";
-import { createStructuredDate } from "../Utils/date/dateUtils.js";
-import { appointmentRepository } from "../Repository/appointmentRepository.js";
 
 export const getAllAppointmentsController = async (req, res) => {
   try {
-    const { date, status, month, year, weekDay, secretaryId } = req.query;
-
     const filters = {
-      date,
-      status,
-      month: month ? parseInt(month) : undefined,
-      year: year ? parseInt(year) : undefined,
-      weekDay: weekDay ? parseInt(weekDay) : undefined,
-      secretaryId: secretaryId ? parseInt(secretaryId) : undefined,
+      status: req.query.status,
+      date: req.query.date,
+      userId: req.query.userId,
+      search: req.query.search,
+      pagination: {
+        page: parseInt(req.query.page) || 1,
+        limit: parseInt(req.query.limit) || 10
+      }
     };
 
-    const result = await getFilteredAppointmentsService(filters);
-
+    const result = await appointmentService.getFilteredAppointments(filters);
     res.json({
       success: true,
-      data: result.data,
-      filters: result.filters,
-      total: result.data.length,
+      ...result
     });
   } catch (error) {
-    res.status(500).json({
+    console.error("Error en getAllAppointments:", error);
+    res.status(400).json({
       success: false,
-      message: error.message,
+      message: error.message
     });
   }
 };
 
 export const getAppointmentByIdController = async (req, res) => {
   try {
-    const { id } = req.params;
-    const appointment = await getAppointmentByIdService(id);
+    const appointment = await appointmentService.getAppointmentById(req.params.id);
     res.json({
       success: true,
-      data: appointment,
+      appointment
     });
   } catch (error) {
-    res.status(500).json({
+    console.error("Error en getAppointmentById:", error);
+    res.status(400).json({
       success: false,
-      message: error.message,
+      message: error.message
     });
   }
 };
 
 export const createAppointmentController = async (req, res) => {
   try {
-    const appointmentData = req.body;
-    const newAppointment = await createAppointmentService(appointmentData);
+    const appointmentData = {
+      ...req.body,
+      createdBy: req.user.id // Desde el middleware de auth
+    };
+    
+    const appointment = await appointmentService.createAppointment(appointmentData);
     res.status(201).json({
       success: true,
-      data: newAppointment,
-      message: "Cita creada exitosamente",
+      appointment
     });
   } catch (error) {
-    res.status(500).json({
+    console.error("Error en createAppointment:", error);
+    res.status(400).json({
       success: false,
-      message: error.message,
+      message: error.message
     });
   }
 };
@@ -75,150 +69,116 @@ export const createAppointmentController = async (req, res) => {
 export const updateAppointmentController = async (req, res) => {
   try {
     const { id } = req.params;
-    const { status } = req.query;
-    const secretaryId = req.user.id;
-
-    const appointmentData = {
+    const updateData = {
       ...req.body,
-      status: status || req.body.status,
-      secretary: {
-        id: secretaryId,
-        name: req.user.username,
-      },
+      updatedBy: req.user.id // Desde el middleware de auth
     };
-
-    const updatedAppointment = await updateAppointmentService(
-      id,
-      appointmentData
-    );
-
+    
+    const appointment = await appointmentService.updateAppointment(id, updateData);
     res.json({
       success: true,
-      data: updatedAppointment,
-      message: "Cita actualizada exitosamente",
+      appointment
     });
   } catch (error) {
-    res.status(500).json({
+    console.error("Error en updateAppointment:", error);
+    res.status(400).json({
       success: false,
-      message: error.message,
+      message: error.message
     });
   }
 };
 
 export const deleteAppointmentController = async (req, res) => {
   try {
-    const { id } = req.params;
-    const deletedAppointment = await deleteAppointmentService(id);
+    await appointmentService.deleteAppointment(req.params.id);
     res.json({
       success: true,
-      data: deletedAppointment,
-      message: "Cita eliminada exitosamente",
+      message: "Cita eliminada exitosamente"
     });
   } catch (error) {
-    res.status(500).json({
+    console.error("Error en deleteAppointment:", error);
+    res.status(400).json({
       success: false,
-      message: error.message,
+      message: error.message
     });
   }
 };
 
 export const confirmAppointmentController = async (req, res) => {
   try {
-    const { id } = req.params;
-    const confirmedAppointment = await confirmAppointmentService(id);
+    const appointment = await appointmentService.confirmAppointment(req.params.id);
     res.json({
       success: true,
-      data: confirmedAppointment,
-      message: "Cita confirmada exitosamente",
+      appointment
     });
   } catch (error) {
+    console.error("Error en confirmAppointment:", error);
     res.status(400).json({
       success: false,
-      message: error.message,
+      message: error.message
     });
   }
 };
 
 export const completeAppointmentController = async (req, res) => {
   try {
-    const { id } = req.params;
-    const completedAppointment = await completeAppointmentService(id);
+    const appointment = await appointmentService.completeAppointment(req.params.id);
     res.json({
       success: true,
-      data: completedAppointment,
-      message: "Cita completada exitosamente",
+      appointment
     });
   } catch (error) {
+    console.error("Error en completeAppointment:", error);
     res.status(400).json({
       success: false,
-      message: error.message,
+      message: error.message
     });
   }
 };
 
-export const getAppointmentsByDate = async (req, res) => {
+export const getAppointmentsByDateController = async (req, res) => {
   try {
-    const dateStr = req.params.date;
-    console.log("Received date string:", dateStr);
-
-    // Parsear la fecha
-    const [year, month, day] = dateStr.split("-").map(Number);
-    const structuredDate = {
-      year,
-      month: month - 1, // Convertir a base 0
-      day,
-      hours: 0,
-      minutes: 0,
-      seconds: 0,
-    };
-
-    console.log("Structured date:", structuredDate);
-
-    const appointments = await getAppointmentByDateRepository(structuredDate);
-    console.log("Found appointments:", appointments);
-    res.json(appointments);
+    const { date } = req.params;
+    const appointments = await appointmentService.getAppointmentsByDate(date);
+    res.json({
+      success: true,
+      appointments
+    });
   } catch (error) {
     console.error("Error en getAppointmentsByDate:", error);
-    res.status(500).json({
-      message: "Error al obtener las citas",
-      error: error.message,
+    res.status(400).json({
+      success: false,
+      message: error.message
     });
   }
 };
 
-export const getAppointmentsByMonth = async (req, res) => {
+export const getAppointmentsByMonthController = async (req, res) => {
   try {
     const { year, month } = req.params;
-
-    // Convertir a números
+    
+    // Validar y convertir parámetros
     const numYear = parseInt(year);
-    const numMonth = parseInt(month) - 1; // Convertir a base 0
+    const numMonth = parseInt(month);
 
-    if (isNaN(numYear) || isNaN(numMonth)) {
+    if (isNaN(numYear) || isNaN(numMonth) || 
+        numMonth < 1 || numMonth > 12) {
       return res.status(400).json({
-        message: "Año o mes inválido",
+        success: false,
+        message: "Año o mes inválido"
       });
     }
 
-    console.log("Controller: Buscando citas para:", {
-      year: numYear,
-      month: numMonth,
+    const appointments = await appointmentService.getAppointmentsByMonth(numYear, numMonth);
+    res.json({
+      success: true,
+      appointments
     });
-
-    // Buscar citas que coincidan con el año y mes
-    const appointments = await AppointmentSchema.find((appointment) => {
-      return (
-        appointment.date.year === numYear && appointment.date.month === numMonth
-      );
-    });
-
-    console.log("Controller: Citas encontradas:", appointments.length);
-    res.json(appointments);
   } catch (error) {
     console.error("Error en getAppointmentsByMonth:", error);
-    res.status(500).json({
-      message: "Error al obtener las citas del mes",
-      error: error.message,
+    res.status(400).json({
+      success: false,
+      message: error.message
     });
   }
 };

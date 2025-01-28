@@ -4,34 +4,57 @@ import {
   deleteUserController,
   getAllUsersController,
   getUserByIdController,
+  updateUserController
 } from "../Controller/userController.js";
 import { authorize } from "../middleware/roles/authorize.js";
 import { authMiddleware } from "../middleware/auth.js";
+import rateLimit from 'express-rate-limit';
 
 const router = Router();
 
-// Primero autenticamos, luego autorizamos
-router.get("/", 
+// Rate limiting para rutas de usuarios
+const userLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000, // 15 minutos
+  max: 100 // límite de 100 peticiones
+});
+
+router.get(
+  "/",
   authMiddleware,
-  authorize("users", "read"), 
+  authorize("users", "read"),
+  userLimiter,
   getAllUsersController
 );
 
-router.get("/:id", 
+router.get(
+  "/:id",
   authMiddleware,
-  authorize("users", "read"), 
+  authorize("users", "read"),
+  userLimiter,
   getUserByIdController
 );
 
-router.post("/", 
+router.post(
+  "/",
   authMiddleware,
-  authorize("users", "create"), 
+  authorize("users", "create"),
+  userLimiter,
   createUserController
 );
 
-router.delete("/:id", 
+router.put(
+  "/:id",
   authMiddleware,
-  authorize("users", "delete"), 
+  authorize("users", "update"),
+  userLimiter,
+  updateUserController
+);
+
+router.delete(
+  "/:id",
+  authMiddleware,
+  authorize("users", "delete"),
+  userLimiter,
   deleteUserController
 );
 

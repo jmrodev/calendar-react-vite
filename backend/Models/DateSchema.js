@@ -1,7 +1,6 @@
-import dbLocal from "db-local";
-const { Schema } = new dbLocal({ path: "../../databases" });
+import { Schema } from "../config/database.js";
 
-const DateSchema = Schema("Date", {
+const DateSchema = Schema("Dates", {
   year: { type: Number, required: true },
   month: { type: Number, required: true }, // 0-11
   day: { type: Number, required: true }, // 1-31
@@ -10,4 +9,4 @@ const DateSchema = Schema("Date", {
   seconds: { type: Number, required: true }, // 0-59
 });
 
-export { DateSchema }; 
+export default DateSchema; 

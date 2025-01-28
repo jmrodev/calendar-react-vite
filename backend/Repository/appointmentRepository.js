@@ -1,83 +1,39 @@
-import { AppointmentSchema } from "../Models/AppointmentSchema.js";
-import { createStructuredDate, standardizeDate } from "../Utils/date/dateUtils.js";
+import AppointmentSchema from "../Models/AppointmentSchema.js";
+import { createStructuredDate } from "../Utils/date/dateUtils.js";
 
 export class AppointmentRepository {
   constructor() {
     this.appointments = AppointmentSchema;
   }
 
-  async findByFilters(filters = {}) {
-    try {
-      const { date, status, month, year, weekDay, secretaryId } = filters;
-
-      if (date) {
-        const [y, m, d] = date.split('-').map(Number);
-        return await this.appointments.find(apt => 
-          apt.date.year === y &&
-          apt.date.month === m - 1 && // Ajustar mes a base 0
-          apt.date.day === d
-        );
-      }
-
-      if (status) {
-        return await this.appointments.find(apt => apt.status === status);
-      }
-
-      if (month && year) {
-        return await this.appointments.find(apt => 
-          apt.date.year === parseInt(year) &&
-          apt.date.month === parseInt(month) - 1
-        );
-      }
-
-      if (weekDay !== undefined) {
-        const allAppointments = await this.appointments.find();
-        return allAppointments.filter(apt => {
-          const date = standardizeDate(apt.date);
-          return date && date.getDay() === parseInt(weekDay);
-        }).sort((a, b) => {
-          const dateA = standardizeDate(a.date);
-          const dateB = standardizeDate(b.date);
-          return dateA - dateB || a.appointmentTime.localeCompare(b.appointmentTime);
-        });
-      }
-
-      if (secretaryId) {
-        return await this.appointments.find(apt => 
-          apt.secretary.id === parseInt(secretaryId)
-        );
-      }
-
-      return await this.appointments.find();
-    } catch (error) {
-      console.error('Error en findByFilters:', error);
-      throw new Error(`Error al filtrar citas: ${error.message}`);
-    }
-  }
-
-  async findById(id) {
-    try {
-      const appointment = await this.appointments.findOne({ _id: Number(id) });
-      if (!appointment) throw new Error("Cita no encontrada");
-      return appointment;
-    } catch (error) {
-      throw new Error(`Error al obtener cita: ${error.message}`);
-    }
-  }
-
   async create(appointmentData) {
     try {
-      return await this.appointments.create(appointmentData).save();
+      const appointment = await this.appointments.create({
+        ...appointmentData,
+        status: 'pending',
+        createdAt: createStructuredDate(new Date())
+      }).save();
+      
+      return appointment;
     } catch (error) {
       throw new Error(`Error al crear cita: ${error.message}`);
     }
   }
 
-  async update(id, data) {
+  async update(id, updateData) {
     try {
-      const appointment = await this.findById(id);
-      Object.assign(appointment, data);
-      return await appointment.save();
+      const appointment = await this.appointments.findOne({ _id: Number(id) });
+      if (!appointment) {
+        throw new Error("Cita no encontrada");
+      }
+
+      Object.assign(appointment, {
+        ...updateData,
+        updatedAt: createStructuredDate(new Date())
+      });
+      await appointment.save();
+      
+      return appointment;
     } catch (error) {
       throw new Error(`Error al actualizar cita: ${error.message}`);
     }
@@ -85,7 +41,10 @@ export class AppointmentRepository {
 
   async delete(id) {
     try {
-      const appointment = await this.findById(id);
+      const appointment = await this.appointments.findOne({ _id: Number(id) });
+      if (!appointment) {
+        throw new Error("Cita no encontrada");
+      }
       await appointment.remove();
       return appointment;
     } catch (error) {
@@ -93,11 +52,80 @@ export class AppointmentRepository {
     }
   }
 
+  async findByFilters(filters = {}) {
+    try {
+      const { status, date, userId, search, pagination } = filters;
+      let query = {};
+      
+      if (status) query.status = status;
+      if (date) query.date = date;
+      if (userId) query.userId = Number(userId);
+      if (search) {
+        query.$or = [
+          { 'patientName': { $regex: search, $options: 'i' } },
+          { 'notes': { $regex: search, $options: 'i' } }
+        ];
+      }
+
+      const skip = pagination ? (pagination.page - 1) * pagination.limit : 0;
+      const limit = pagination?.limit || 10;
+      
+      const total = await this.appointments.find(query).length;
+      const appointments = await this.appointments.find(query)
+        .skip(skip)
+        .limit(limit);
+
+      return {
+        appointments,
+        total,
+        page: pagination?.page || 1,
+        limit
+      };
+    } catch (error) {
+      throw new Error(`Error al buscar citas: ${error.message}`);
+    }
+  }
+
+  async findById(id) {
+    try {
+      const appointment = await this.appointments.findOne({ _id: Number(id) });
+      if (!appointment) {
+        throw new Error("Cita no encontrada");
+      }
+      return appointment;
+    } catch (error) {
+      throw new Error(`Error al obtener cita: ${error.message}`);
+    }
+  }
+
+  async findByDate(date) {
+    try {
+      return await this.appointments.find({ date });
+    } catch (error) {
+      throw new Error(`Error al buscar citas por fecha: ${error.message}`);
+    }
+  }
+
+  async findByMonth(year, month) {
+    try {
+      const startDate = new Date(year, month - 1, 1);
+      const endDate = new Date(year, month, 0);
+      
+      return await this.appointments.find(appointment => {
+        const appointmentDate = new Date(appointment.date);
+        return appointmentDate >= startDate && appointmentDate <= endDate;
+      });
+    } catch (error) {
+      throw new Error(`Error al buscar citas por mes: ${error.message}`);
+    }
+  }
+
   async confirmAppointment(id) {
     try {
-      const appointment = await this.findById(id);
-      appointment.appointment.confirmAppointment = true;
-      return await appointment.save();
+      return await this.update(id, { 
+        status: 'confirmed',
+        confirmedAt: createStructuredDate(new Date())
+      });
     } catch (error) {
       throw new Error(`Error al confirmar cita: ${error.message}`);
     }
@@ -105,14 +133,14 @@ export class AppointmentRepository {
 
   async completeAppointment(id) {
     try {
-      const appointment = await this.findById(id);
-      appointment.status = "completed";
-      return await appointment.save();
+      return await this.update(id, { 
+        status: 'completed',
+        completedAt: createStructuredDate(new Date())
+      });
     } catch (error) {
       throw new Error(`Error al completar cita: ${error.message}`);
     }
   }
 }
 
-// Exportar una instancia única del repositorio
 export const appointmentRepository = new AppointmentRepository();

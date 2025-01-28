@@ -1,75 +1,36 @@
-import dbLocal from "db-local";
-import { createStructuredDate } from '../Utils/date/dateUtils.js';
-import fs from 'fs';
-import path from 'path';
-import { fileURLToPath } from 'url';
-import { dirname } from 'path';
+import { Schema } from "../config/database.js";
+import { createStructuredDate } from "../Utils/date/dateUtils.js";
 
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = dirname(__filename);
-const dbPath = path.join(__dirname, '../../databases');
-
-const { Schema } = new dbLocal({ path: dbPath });
-
-const UserSchema = Schema("User", {
+const UserSchema = Schema("Users", {
   _id: { type: Number, required: true },
-  username: {
-    type: String,
-    required: true,
-    unique: true
-  },
-  password: { 
+  username: { type: String, required: true },
+  password: { type: String, required: true },
+  role: { 
     type: String, 
-    required: true 
-  },
-  role: {
-    type: String,
     required: true,
-    enum: ["admin", "doctor", "secretary", "guest"]
-  },
-  personalInfo: {
-    type: Object,
-    required: true,
-    schema: {
-      firstName: { type: String, required: true },
-      lastName: { type: String, required: true },
-      email: { type: String, required: true },
-      phone: { type: String, required: true }
-    }
-  },
-  loginAttempts: { 
-    type: Number, 
-    default: 0 
-  },
-  lockUntil: { 
-    type: Object,
-    required: false,
-    default: () => createStructuredDate(new Date()),
-    schema: {
-      year: { type: Number, required: true },
-      month: { type: Number, required: true },
-      day: { type: Number, required: true },
-      hours: { type: Number, required: true },
-      minutes: { type: Number, required: true },
-      seconds: { type: Number, required: true }
-    }
-  },
-  lastLogin: { 
-    type: Object,
-    required: false,
-    default: () => createStructuredDate(new Date()),
-    schema: {
-      year: { type: Number, required: true },
-      month: { type: Number, required: true },
-      day: { type: Number, required: true },
-      hours: { type: Number, required: true },
-      minutes: { type: Number, required: true },
-      seconds: { type: Number, required: true }
-    }
+    enum: ["admin", "secretary", "user"]
   },
   status: { 
     type: String, 
-    default: 'active' 
+    default: 'active',
+    enum: ["active", "inactive", "locked"]
+  },
+  loginAttempts: { type: Number, default: 0 },
+  lockUntil: { type: Object, default: null },
+  lastLogin: { type: Object, default: null },
+  personalInfo: {
+    firstName: { type: String, required: true },
+    lastName: { type: String, required: true },
+    email: { type: String, required: true },
+    phone: { type: String, required: true }
+  },
+  createdAt: { 
+    type: Object, 
+    default: () => createStructuredDate(new Date()) 
+  },
+  updatedAt: { 
+    type: Object, 
+    default: null 
   }
 });
 

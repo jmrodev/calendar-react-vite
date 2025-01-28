@@ -1,72 +1,69 @@
-import {
-  createUserRepository,
-  deleteUserRepository,
-  getAllUsersRepository,
-  getUserByIdRepository,
-} from "../../Repository/userRepository.js";
-import { findUserByUsername } from "../../Utils/user/findUserByName.js";
-import { hashPassword } from "../../Utils/auth/hashPassword.js";
-import { newUserId } from "../../Utils/id/user.js";
+import { userRepository } from "../Repository/userRepository.js";
+import { hashPassword } from "../Utils/auth/hashPassword.js";
+import { newUserId } from "../Utils/id/user.js";
 
-export const createUser = async (username, password, role, personalInfo) => {
-  try {
-    // Validaciones
-    if (!username || !password || !role || !personalInfo) {
-      throw new Error("All fields are required");
-    }
-
-    const existingUser = await findUserByUsername(username);
-    if (existingUser) {
-      throw new Error("User already exists");
-    }
-
-    if (role !== "admin") {
-      throw new Error("Invalid role to create users");
-    }
-
-    if (password.length < 8) {
-      throw new Error("Password too short");
-    }
-
-    // Crear objeto de usuario
-    const userData = {
-      _id: newUserId(),
-      username,
-      password,
-      role,
-      personalInfo,
-      status: 'active'
-    };
-
-    // Hashear contraseña y crear usuario
-    const hashedUser = await hashPassword(userData);
-    return await createUserRepository(hashedUser);
-  } catch (error) {
-    throw new Error(`Error in create user service: ${error.message}`);
+export class UserService {
+  constructor() {
+    this.repository = userRepository;
   }
-};
 
-export const deleteUser = async (id) => {
-  try {
-    await getUserByIdRepository(id);
-    return await deleteUserRepository(id);
-  } catch (error) {
-    throw new Error(`Error in delete user service: ${error.message}`);
-  }
-};
+  async createUser(username, password, role, personalInfo) {
+    try {
+      // Validaciones
+      if (!username || !password || !role || !personalInfo) {
+        throw new Error("Todos los campos son requeridos");
+      }
 
-export const getAllUsers = async () => {
-  try {
-    return await getAllUsersRepository();
-  } catch (error) {
-    throw new Error(`Error in get all users service: ${error.message}`);
-  }
-};
+      const existingUser = await this.repository.findByUsername(username);
+      if (existingUser) {
+        throw new Error("El usuario ya existe");
+      }
 
-export const getUserById = async (id) => {
-  try {
-    return await getUserByIdRepository(id);
-  } catch (error) {
-    throw new Error(`Error in get user by id service: ${error.message}`);
+      if (password.length < 8) {
+        throw new Error("La contraseña es demasiado corta");
+      }
+
+      // Crear objeto de usuario
+      const userData = {
+        _id: await newUserId(),
+        username,
+        password,
+        role,
+        personalInfo,
+        status: 'active'
+      };
+
+      // Hashear contraseña y crear usuario
+      const hashedUser = await hashPassword(userData);
+      return await this.repository.create(hashedUser);
+    } catch (error) {
+      throw new Error(`Error al crear usuario: ${error.message}`);
+    }
   }
-};
+
+  async deleteUser(id) {
+    try {
+      return await this.repository.delete(id);
+    } catch (error) {
+      throw new Error(`Error al eliminar usuario: ${error.message}`);
+    }
+  }
+
+  async getAllUsers(filters) {
+    try {
+      return await this.repository.getAll(filters);
+    } catch (error) {
+      throw new Error(`Error al obtener usuarios: ${error.message}`);
+    }
+  }
+
+  async getUserById(id) {
+    try {
+      return await this.repository.getById(id);
+    } catch (error) {
+      throw new Error(`Error al obtener usuario: ${error.message}`);
+    }
+  }
+}
+
+export const userService = new UserService();

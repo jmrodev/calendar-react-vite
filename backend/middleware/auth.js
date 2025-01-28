@@ -5,6 +5,13 @@ import { createStructuredDate, isDateLocked } from '../Utils/date/dateUtils.js';
 dotenv.config();
 const secretKey = process.env.JWT_SECRET;
 
+// Agregar blacklist de tokens
+const tokenBlacklist = new Set();
+
+export const invalidateToken = (token) => {
+  tokenBlacklist.add(token);
+};
+
 export const authMiddleware = (req, res, next) => {
   try {
     if (req.method === 'OPTIONS') return next();
@@ -22,6 +29,13 @@ export const authMiddleware = (req, res, next) => {
       return res.status(401).json({ 
         error: "Unauthorized",
         message: 'Formato de token inválido' 
+      });
+    }
+
+    if (tokenBlacklist.has(token)) {
+      return res.status(401).json({
+        error: "Unauthorized",
+        message: "Token invalidado"
       });
     }
 
