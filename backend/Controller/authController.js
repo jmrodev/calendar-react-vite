@@ -1,8 +1,4 @@
-import {
-  loginService,
-  logoutService,
-  registerService,
-} from "../Service/authService.js";
+import { authService } from "../Service/authService.js";
 import jwt from "jsonwebtoken";
 
 export const loginController = async (req, res) => {
@@ -17,7 +13,10 @@ export const loginController = async (req, res) => {
       });
     }
 
-    const result = await loginService(username, password, rememberMe);
+    const result = await authService.login(username, password, rememberMe, {
+      ip: req.ip,
+      userAgent: req.headers['user-agent']
+    });
     
     res.status(200).json({
       success: true,
@@ -37,7 +36,7 @@ export const loginController = async (req, res) => {
 
 export const logoutController = async (req, res) => {
   try {
-    await logoutService(req.session);
+    await authService.logout(req.session);
     res.status(200).json({ 
       success: true,
       message: "Logout successful" 
@@ -61,7 +60,7 @@ export const registerController = async (req, res) => {
       });
     }
 
-    const result = await registerService(username, password, role);
+    const result = await authService.register(username, password, role);
     res.status(201).json({
       success: true,
       ...result

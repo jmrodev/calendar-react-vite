@@ -6,6 +6,7 @@
   "type": "module",
   "scripts": {
     "start": "node --watch server.js",
+    "startnormal": "node server.js",
     "dev": "node --watch server.js",
     "test": "jest --experimental-require-module"
   },
@@ -24,7 +25,8 @@
     "express-rate-limit": "^7.4.1",
     "helmet": "^8.0.0",
     "jsonwebtoken": "^9.0.2",
-    "morgan": "^1.10.0"
+    "morgan": "^1.10.0",
+    "uuid": "^11.0.5"
   },
   "devDependencies": {
     "@babel/core": "^7.26.0",

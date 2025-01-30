@@ -1,6 +1,6 @@
-import { LoginAttemptSchema } from "../Models/LoginAttemptSchema.js";
-import { createStructuredDate } from "../Utils/date/dateUtils.js";
-import { newLoginAttemptId } from "../Utils/id/loginAttempt.js";
+import { v4 as uuidv4 } from 'uuid';
+import LoginAttemptSchema from "../Models/LoginAttemptSchema.js";
+import DateSchema from "../Models/DateSchema.js";
 
 export class AuthRepository {
   constructor() {
@@ -9,34 +9,38 @@ export class AuthRepository {
 
   async saveLoginAttempt(username, success, ip = '', userAgent = '') {
     try {
+      const now = new Date();
+      const timestampId = uuidv4(); // Generar UUID
+      console.log('Generated timestamp _id:', typeof(timestampId));
+
+      const timestamp = await DateSchema.create({
+        _id: timestampId,
+        year: now.getFullYear(),
+        month: now.getMonth(),
+        day: now.getDate(),
+        hours: now.getHours(),
+        minutes: now.getMinutes(),
+        seconds: now.getSeconds()
+      });
+      console.log("Timestamp:", timestamp);
+
+      const loginAttemptId = uuidv4(); // Generar UUID
+      console.log('Generated loginAttempt _id:', typeof(loginAttemptId));
+
       const loginAttempt = await this.loginAttempts.create({
-        _id: await newLoginAttemptId(),
+        _id: loginAttemptId,
         username,
         success,
-        timestamp: createStructuredDate(new Date()),
+        timestamp: timestamp._id, // Referencia al ID del timestamp
         ip,
         userAgent
-      }).save();
+      });
+      console.log("Login attempt:", loginAttempt);
 
       return loginAttempt;
     } catch (error) {
+      console.error('Error details:', error);
       throw new Error(`Error al guardar intento de login: ${error.message}`);
-    }
-  }
-
-  async getLoginAttempts(username, minutes = 30) {
-    try {
-      const currentDate = new Date();
-      const cutoffDate = createStructuredDate(new Date(currentDate.getTime() - minutes * 60000));
-
-      const attempts = await this.loginAttempts.find(attempt => {
-        return attempt.username === username && 
-               compareStructuredDates(attempt.timestamp, cutoffDate) > 0;
-      });
-
-      return attempts;
-    } catch (error) {
-      throw new Error(`Error al obtener intentos de login: ${error.message}`);
     }
   }
 }

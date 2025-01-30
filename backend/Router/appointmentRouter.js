@@ -10,8 +10,8 @@ import {
   deleteAppointmentController,
   confirmAppointmentController,
   completeAppointmentController,
-  getAppointmentsByDate,
-  getAppointmentsByMonth
+  getAppointmentsByDateController,
+  getAppointmentsByMonthController
 } from "../Controller/appointmentController.js";
 
 const router = Router();
@@ -22,70 +22,22 @@ const appointmentLimiter = rateLimit({
   max: 100 // límite de 100 peticiones
 });
 
-// Rutas protegidas con autenticación y autorización
-router.get("/", 
-  authMiddleware,
-  authorize("appointments", "read"),
-  appointmentLimiter,
-  getAllAppointmentsController
-);
+// Middleware común para todas las rutas
+router.use(authMiddleware, appointmentLimiter);
 
-router.get("/:id", 
-  authMiddleware,
-  authorize("appointments", "read"),
-  appointmentLimiter,
-  getAppointmentByIdController
-);
+// Rutas CRUD básicas
+router.get("/", authorize("appointments", "read"), getAllAppointmentsController);
+router.get("/:id", authorize("appointments", "read"), getAppointmentByIdController);
+router.post("/", authorize("appointments", "create"), createAppointmentController);
+router.put("/:id", authorize("appointments", "update"), updateAppointmentController);
+router.delete("/:id", authorize("appointments", "delete"), deleteAppointmentController);
 
-router.post("/", 
-  authMiddleware,
-  authorize("appointments", "create"),
-  appointmentLimiter,
-  createAppointmentController
-);
-
-router.put("/:id", 
-  authMiddleware,
-  authorize("appointments", "update"),
-  appointmentLimiter,
-  updateAppointmentController
-);
-
-router.delete("/:id", 
-  authMiddleware,
-  authorize("appointments", "delete"),
-  appointmentLimiter,
-  deleteAppointmentController
-);
-
-// Rutas especiales
-router.patch("/:id/confirm", 
-  authMiddleware,
-  authorize("appointments", "update"),
-  appointmentLimiter,
-  confirmAppointmentController
-);
-
-router.patch("/:id/complete", 
-  authMiddleware,
-  authorize("appointments", "update"),
-  appointmentLimiter,
-  completeAppointmentController
-);
+// Rutas de estado de citas
+router.patch("/:id/confirm", authorize("appointments", "update"), confirmAppointmentController);
+router.patch("/:id/complete", authorize("appointments", "update"), completeAppointmentController);
 
 // Rutas de consulta por fecha
-router.get("/date/:date", 
-  authMiddleware,
-  authorize("appointments", "read"),
-  appointmentLimiter,
-  getAppointmentsByDate
-);
-
-router.get("/month/:year/:month", 
-  authMiddleware,
-  authorize("appointments", "read"),
-  appointmentLimiter,
-  getAppointmentsByMonth
-);
+router.get("/date/:date", authorize("appointments", "read"), getAppointmentsByDateController);
+router.get("/month/:year/:month", authorize("appointments", "read"), getAppointmentsByMonthController);
 
 export default router;

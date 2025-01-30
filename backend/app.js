@@ -2,6 +2,7 @@ import express from "express";
 import { config } from "dotenv";
 import configExpress from "./config/express.js";
 import router from "./Router/router.js";
+import { createServer } from 'net';
 
 // Cargar variables de entorno
 config();
@@ -48,15 +49,36 @@ app.use((err, req, res, next) => {
   });
 });
 
-// Configuración del puerto
-const PORT = process.env.PORT || 3000;
+function findAvailablePort(startPort) {
+  return new Promise((resolve, reject) => {
+    const server = createServer();
+    
+    server.listen(startPort, () => {
+      const { port } = server.address();
+      server.close(() => resolve(port));
+    });
 
-// Iniciar servidor (excepto en pruebas)
-if (process.env.NODE_ENV !== 'test') {
-  app.listen(PORT, () => {
-    console.log(`🚀 Servidor corriendo en puerto ${PORT}`);
-    console.log(`📝 Ambiente: ${process.env.NODE_ENV || 'development'}`);
+    server.on('error', (err) => {
+      if (err.code === 'EADDRINUSE') {
+        findAvailablePort(startPort + 1).then(resolve, reject);
+      } else {
+        reject(err);
+      }
+    });
   });
 }
+
+const port = process.env.PORT || await findAvailablePort(3000);
+
+const server = app.listen(port, () => {
+  console.log(`Server running on port ${port}`);
+}).on('error', (err) => {
+  if (err.code === 'EADDRINUSE') {
+    console.log(`Port ${port} is busy, trying ${port + 1}`);
+    server.listen(port + 1);
+  } else {
+    console.error('Server error:', err);
+  }
+});
 
 export default app;

@@ -1,5 +1,6 @@
 import AppointmentSchema from "../Models/AppointmentSchema.js";
 import { createStructuredDate } from "../Utils/date/dateUtils.js";
+import { v4 as uuidv4 } from 'uuid';
 
 export class AppointmentRepository {
   constructor() {
@@ -9,6 +10,7 @@ export class AppointmentRepository {
   async create(appointmentData) {
     try {
       const appointment = await this.appointments.create({
+        _id: uuidv4(),
         ...appointmentData,
         status: 'pending',
         createdAt: createStructuredDate(new Date())
@@ -22,7 +24,7 @@ export class AppointmentRepository {
 
   async update(id, updateData) {
     try {
-      const appointment = await this.appointments.findOne({ _id: Number(id) });
+      const appointment = await this.appointments.findOne({ _id: id });
       if (!appointment) {
         throw new Error("Cita no encontrada");
       }
@@ -41,7 +43,7 @@ export class AppointmentRepository {
 
   async delete(id) {
     try {
-      const appointment = await this.appointments.findOne({ _id: Number(id) });
+      const appointment = await this.appointments.findOne({ _id: id });
       if (!appointment) {
         throw new Error("Cita no encontrada");
       }
@@ -88,7 +90,7 @@ export class AppointmentRepository {
 
   async findById(id) {
     try {
-      const appointment = await this.appointments.findOne({ _id: Number(id) });
+      const appointment = await this.appointments.findOne({ _id: id });
       if (!appointment) {
         throw new Error("Cita no encontrada");
       }

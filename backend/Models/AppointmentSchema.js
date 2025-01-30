@@ -1,16 +1,9 @@
 import { Schema } from "../config/database.js";
-import { DateSchema } from "./DateSchema.js";
+import DateSchema from "./DateSchema.js";
 
-const AppointmentSchema = Schema("Appointments", {
-  _id: { type: Number, required: true },
-  date: {
-    year: { type: Number, required: true },
-    month: { type: Number, required: true },
-    day: { type: Number, required: true },
-    hours: { type: Number, default: 0 },
-    minutes: { type: Number, default: 0 },
-    seconds: { type: Number, default: 0 }
-  },
+const AppointmentSchema = Schema("Appointment", {
+  _id: { type: String, required: true },
+  date: DateSchema,
   appointmentTime: { type: String, required: true },
   realAppointmentTime: { type: String, required: true },
   available: { type: Boolean, default: false },
@@ -19,18 +12,15 @@ const AppointmentSchema = Schema("Appointments", {
     default: "pending",
     enum: ["pending", "confirmed", "completed", "cancelled"]
   },
-  appointment: {
+  details: {
     confirmAppointment: { type: Boolean, default: false },
-    name: { type: String, required: true },
+    patientName: { type: String, required: true },
     reason: { type: String, required: true }
   },
-  secretary: {
-    id: { type: Number, required: true },
-    name: { type: String, required: true }
-  },
-  changeLog: { type: Array, default: [] },
-  createdAt: { type: Object, default: null },
-  updatedAt: { type: Object, default: null }
+  managedBy: { type: Number, ref: 'Users' },
+  changeLog: [{ type: Number, ref: 'Logs' }],
+  createdAt: DateSchema,
+  updatedAt: DateSchema
 });
 
 export default AppointmentSchema;

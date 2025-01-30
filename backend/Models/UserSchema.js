@@ -1,37 +1,40 @@
 import { Schema } from "../config/database.js";
-import { createStructuredDate } from "../Utils/date/dateUtils.js";
+import DateSchema from "./DateSchema.js";
 
-const UserSchema = Schema("Users", {
-  _id: { type: Number, required: true },
+const UserSchema = Schema("User", {
+  _id: { type: String, required: true },
   username: { type: String, required: true },
   password: { type: String, required: true },
   role: { 
     type: String, 
     required: true,
-    enum: ["admin", "secretary", "user"]
+    enum: ["admin", "secretary", "patient"]
   },
   status: { 
     type: String, 
     default: 'active',
     enum: ["active", "inactive", "locked"]
   },
-  loginAttempts: { type: Number, default: 0 },
-  lockUntil: { type: Object, default: null },
-  lastLogin: { type: Object, default: null },
   personalInfo: {
     firstName: { type: String, required: true },
     lastName: { type: String, required: true },
     email: { type: String, required: true },
     phone: { type: String, required: true }
   },
-  createdAt: { 
-    type: Object, 
-    default: () => createStructuredDate(new Date()) 
+  // Campos específicos para secretarias
+  secretaryInfo: {
+    schedule: {
+      startTime: { type: String },
+      endTime: { type: String },
+      workDays: [{ type: String }]
+    },
+    appointmentsManaged: [{ type: Number, ref: 'Appointments' }]
   },
-  updatedAt: { 
-    type: Object, 
-    default: null 
-  }
+  loginAttempts: { type: Number, default: 0 },
+  lockUntil: DateSchema,
+  lastLogin: DateSchema,
+  createdAt: DateSchema,
+  updatedAt: DateSchema
 });
 
 export default UserSchema;

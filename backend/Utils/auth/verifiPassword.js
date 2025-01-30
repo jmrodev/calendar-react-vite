@@ -6,8 +6,9 @@ export async function verifyPassword(plainPassword, hashedPassword) {
   }
 
   try {
+    // Asegurarnos de que siempre estemos trabajando con contraseñas hasheadas
     if (!hashedPassword.startsWith("$2b$")) {
-      return plainPassword === hashedPassword;
+      throw new Error("La contraseña almacenada no está hasheada correctamente");
     }
 
     const isMatch = await bcrypt.compare(plainPassword, hashedPassword);

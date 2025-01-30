@@ -1,5 +1,5 @@
-import { Schema } from "db-local";
 import UserSchema from "../Models/UserSchema.js";
+import { v4 as uuidv4 } from 'uuid';
 
 export class UserRepository {
   constructor() {
@@ -8,8 +8,11 @@ export class UserRepository {
 
   async create(userData) {
     try {
-      const user = await this.users.create(userData).save();
-      return this._sanitizeUser(user);
+      const user = await this.users.create({
+        _id: uuidv4(),
+        ...userData,
+      }).save();
+      return this._sanitizeUser(user, true);
     } catch (error) {
       throw new Error(`Error al crear usuario: ${error.message}`);
     }
@@ -17,7 +20,7 @@ export class UserRepository {
 
   async update(id, updateData) {
     try {
-      const user = await this.users.findOne({ _id: Number(id) });
+      const user = await this.users.findOne({ _id: id });
       if (!user) {
         throw new Error("Usuario no encontrado");
       }
@@ -25,7 +28,7 @@ export class UserRepository {
       Object.assign(user, updateData);
       await user.save();
       
-      return this._sanitizeUser(user);
+      return this._sanitizeUser(user, true);
     } catch (error) {
       throw new Error(`Error al actualizar usuario: ${error.message}`);
     }
@@ -33,7 +36,7 @@ export class UserRepository {
 
   async delete(id) {
     try {
-      const user = await this.users.findOne({ _id: Number(id) });
+      const user = await this.users.findOne({ _id: id });
       if (!user) {
         throw new Error("Usuario no encontrado");
       }
@@ -49,7 +52,6 @@ export class UserRepository {
       const { role, status, search, pagination } = filters;
       let query = {};
       
-      // Aplicar filtros
       if (role) query.role = role;
       if (status) query.status = status;
       if (search) {
@@ -60,20 +62,17 @@ export class UserRepository {
         ];
       }
 
-      // Calcular paginación
       const skip = pagination ? (pagination.page - 1) * pagination.limit : 0;
       const limit = pagination?.limit || 10;
       
-      // Obtener total de documentos
       const total = await this.users.find(query).length;
       
-      // Obtener usuarios paginados
       const users = await this.users.find(query)
         .skip(skip)
         .limit(limit);
 
       return {
-        users: users.map(this._sanitizeUser),
+        users: users.map(user => this._sanitizeUser(user)),
         total,
         page: pagination?.page || 1,
         limit
@@ -85,7 +84,7 @@ export class UserRepository {
 
   async getById(id) {
     try {
-      const user = await this.users.findOne({ _id: Number(id) });
+      const user = await this.users.findOne({ _id: id });
       if (!user) {
         throw new Error("Usuario no encontrado");
       }
@@ -95,23 +94,26 @@ export class UserRepository {
     }
   }
 
-  async findByUsername(username) {
+  async findByUsername(username, includeAuth = false) {
     try {
       const user = await this.users.findOne({ username });
-      return user ? this._sanitizeUser(user) : null;
+      return user ? this._sanitizeUser(user, includeAuth) : null;
     } catch (error) {
       throw new Error(`Error al buscar usuario por username: ${error.message}`);
     }
   }
 
-  // Método privado para sanitizar datos del usuario
-  _sanitizeUser(user) {
+  _sanitizeUser(user, includeAuth = false) {
     if (!user) return null;
     
     const sanitized = { ...user };
-    delete sanitized.password;
-    delete sanitized.loginAttempts;
-    delete sanitized.lockUntil;
+    
+    // Solo removemos información sensible si no necesitamos autenticación
+    if (!includeAuth) {
+      delete sanitized.password;
+      delete sanitized.loginAttempts;
+      delete sanitized.lockUntil;
+    }
     
     return sanitized;
   }

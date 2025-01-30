@@ -1,12 +1,13 @@
 import { Schema } from "../config/database.js";
 
-const DateSchema = Schema("Dates", {
+const DateSchema =  Schema("Date", {
+  _id: { type: String, required: true }, // Asegúrate de que _id es una cadena
   year: { type: Number, required: true },
-  month: { type: Number, required: true }, // 0-11
-  day: { type: Number, required: true }, // 1-31
-  hours: { type: Number, required: true }, // 0-23
-  minutes: { type: Number, required: true }, // 0-59
-  seconds: { type: Number, required: true }, // 0-59
+  month: { type: Number, required: true },
+  day: { type: Number, required: true },
+  hours: { type: Number, required: true },
+  minutes: { type: Number, required: true },
+  seconds: { type: Number, required: true }
 });
 
-export default DateSchema; 
+export default DateSchema;

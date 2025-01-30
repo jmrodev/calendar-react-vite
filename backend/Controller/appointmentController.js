@@ -1,6 +1,7 @@
 import {
   appointmentService
 } from "../Service/appointmentService.js";
+import AppointmentSchema from '../Models/AppointmentSchema.js';
 
 export const getAllAppointmentsController = async (req, res) => {
   try {
@@ -49,7 +50,7 @@ export const createAppointmentController = async (req, res) => {
   try {
     const appointmentData = {
       ...req.body,
-      createdBy: req.user.id // Desde el middleware de auth
+      createdBy: req.user.id
     };
     
     const appointment = await appointmentService.createAppointment(appointmentData);
@@ -71,7 +72,7 @@ export const updateAppointmentController = async (req, res) => {
     const { id } = req.params;
     const updateData = {
       ...req.body,
-      updatedBy: req.user.id // Desde el middleware de auth
+      updatedBy: req.user.id
     };
     
     const appointment = await appointmentService.updateAppointment(id, updateData);
@@ -156,13 +157,10 @@ export const getAppointmentsByDateController = async (req, res) => {
 export const getAppointmentsByMonthController = async (req, res) => {
   try {
     const { year, month } = req.params;
-    
-    // Validar y convertir parámetros
     const numYear = parseInt(year);
     const numMonth = parseInt(month);
 
-    if (isNaN(numYear) || isNaN(numMonth) || 
-        numMonth < 1 || numMonth > 12) {
+    if (isNaN(numYear) || isNaN(numMonth) || numMonth < 1 || numMonth > 12) {
       return res.status(400).json({
         success: false,
         message: "Año o mes inválido"
@@ -180,5 +178,82 @@ export const getAppointmentsByMonthController = async (req, res) => {
       success: false,
       message: error.message
     });
+  }
+};
+
+export const createAppointment = async (req, res) => {
+  try {
+    const appointment = await AppointmentSchema.create(req.body).save();
+    res.status(201).json({ success: true, data: appointment });
+  } catch (error) {
+    res.status(400).json({ success: false, message: error.message });
+  }
+};
+
+export const getAppointments = async (req, res) => {
+  try {
+    const appointments = await AppointmentSchema.find({});
+    res.status(200).json({ success: true, data: appointments });
+  } catch (error) {
+    res.status(400).json({ success: false, message: error.message });
+  }
+};
+
+export const getAppointmentById = async (req, res) => {
+  try {
+    const appointment = await AppointmentSchema.findOne({ _id: req.params.id });
+    if (!appointment) {
+      return res.status(404).json({ success: false, message: "Appointment not found" });
+    }
+    res.status(200).json({ success: true, data: appointment });
+  } catch (error) {
+    res.status(400).json({ success: false, message: error.message });
+  }
+};
+
+export const getAppointmentsByDate = async (req, res) => {
+  try {
+    const { date } = req.params;
+    const [year, month, day] = date.split('-').map(Number);
+    
+    const appointments = await AppointmentSchema.find(appointment => 
+      appointment.date.year === year &&
+      appointment.date.month === month &&
+      appointment.date.day === day
+    );
+    
+    res.status(200).json({ success: true, data: appointments });
+  } catch (error) {
+    res.status(400).json({ success: false, message: error.message });
+  }
+};
+
+export const updateAppointment = async (req, res) => {
+  try {
+    const appointment = await AppointmentSchema.findOne({ _id: req.params.id });
+    if (!appointment) {
+      return res.status(404).json({ success: false, message: "Appointment not found" });
+    }
+    
+    Object.assign(appointment, req.body);
+    await appointment.save();
+    
+    res.status(200).json({ success: true, data: appointment });
+  } catch (error) {
+    res.status(400).json({ success: false, message: error.message });
+  }
+};
+
+export const deleteAppointment = async (req, res) => {
+  try {
+    const appointment = await AppointmentSchema.findOne({ _id: req.params.id });
+    if (!appointment) {
+      return res.status(404).json({ success: false, message: "Appointment not found" });
+    }
+    
+    await appointment.remove();
+    res.status(200).json({ success: true, message: "Appointment deleted successfully" });
+  } catch (error) {
+    res.status(400).json({ success: false, message: error.message });
   }
 };

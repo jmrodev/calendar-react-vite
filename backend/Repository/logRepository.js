@@ -1,10 +1,11 @@
 import { LogSchema } from "../Models/LogSchema.js";
 import { newLogId } from "../Utils/id/log.js";
+import { v4 as uuidv4 } from 'uuid';
 
 export const createLog = async (logData) => {
   try {
     const log = await LogSchema.create({
-      _id: await newLogId(),
+      _id: uuidv4(),
       ...logData,
       date: new Date(),
       timestamp: Date.now()

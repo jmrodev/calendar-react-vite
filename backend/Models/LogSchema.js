@@ -1,12 +1,9 @@
 import { Schema } from "../config/database.js";
-import { createStructuredDate } from "../Utils/date/dateUtils.js";
+import DateSchema from "./DateSchema.js";
 
-const LogSchema = Schema("Logs", {
-  _id: { type: Number, required: true },
-  timestamp: { 
-    type: Object, 
-    default: () => createStructuredDate(new Date()) 
-  },
+const LogSchema = Schema("Log", {
+  _id: { type: String, required: true },
+  timestamp: DateSchema,
   userId: { type: Number, required: true },
   action: { 
     type: String, 
