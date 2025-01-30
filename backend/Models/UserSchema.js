@@ -32,7 +32,6 @@ const UserSchema = Schema("User", {
     appointmentsManaged: [{ type: Number, ref: "Appointments" }],
   },
   loginAttempts: { type: Number, default: 0 },
-  lockUntil: { type: DateSchema, default: new Date(0)}, // Asegúrate de que lockUntil se establece en null
   lastLogin: DateSchema,
   createdAt: DateSchema,
   updatedAt: DateSchema,

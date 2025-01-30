@@ -7,25 +7,22 @@ export class UserRepository {
 
   async update(id, userData) {
     try {
-      // Aseguramos que el _id no se modifique
       const updateData = { ...userData };
-      delete updateData._id;
+      delete updateData._id; // Evita modificar el ID
 
-      // Aseguramos que lockUntil no sea null
-      if (updateData.lockUntil === undefined) {
-        updateData.lockUntil = null;
-      }
-
-      const user = await this.users.findOne({ _id: id });
+      // Buscar usuario correctamente
+      const user = this.users.findOne(id);
       if (!user) {
         throw new Error("Usuario no encontrado");
       }
 
-      // Actualizamos los campos del usuario
+      // Actualizar los datos
       Object.assign(user, updateData);
 
-      // Guardamos el usuario actualizado
+      // Guardar cambios (en `db-local` esto es obligatorio)
       await user.save();
+
+      console.log("Usuario actualizado:", user);
       return user;
     } catch (error) {
       throw new Error(`Error al actualizar usuario: ${error.message}`);
@@ -39,7 +36,7 @@ export class UserRepository {
 
       // Si no necesitamos datos de autenticación, los removemos
       if (!includeAuth) {
-        const { password, loginAttempts, lockUntil, ...rest } = user;
+        const { password, loginAttempts, ...rest } = user;
         return rest;
       }
 

@@ -1,4 +1,4 @@
-import { v4 as uuidv4 } from 'uuid';
+import { v4 as uuidv4 } from "uuid";
 import LoginAttemptSchema from "../Models/LoginAttemptSchema.js";
 import DateSchema from "../Models/DateSchema.js";
 
@@ -7,11 +7,11 @@ export class AuthRepository {
     this.loginAttempts = LoginAttemptSchema;
   }
 
-  async saveLoginAttempt(username, success, ip = '', userAgent = '') {
+  async saveLoginAttempt(username, success, ip = "", userAgent = "") {
+    
     try {
       const now = new Date();
-      const timestampId = uuidv4(); // Generar UUID
-      console.log('Generated timestamp _id:', typeof(timestampId));
+      const timestampId = uuidv4();
 
       const timestamp = await DateSchema.create({
         _id: timestampId,
@@ -20,26 +20,26 @@ export class AuthRepository {
         day: now.getDate(),
         hours: now.getHours(),
         minutes: now.getMinutes(),
-        seconds: now.getSeconds()
-      });
-      console.log("Timestamp:", timestamp);
+        seconds: now.getSeconds(),
+      }).save;
 
-      const loginAttemptId = uuidv4(); // Generar UUID
-      console.log('Generated loginAttempt _id:', typeof(loginAttemptId));
+      console.log("timestamp", timestamp);
+      
+
+      const loginAttemptId = uuidv4();
 
       const loginAttempt = await this.loginAttempts.create({
         _id: loginAttemptId,
         username,
         success,
-        timestamp: timestamp._id, // Referencia al ID del timestamp
+        timestamp: timestamp._id,
         ip,
-        userAgent
+        userAgent,
       });
-      console.log("Login attempt:", loginAttempt);
 
       return loginAttempt;
     } catch (error) {
-      console.error('Error details:', error);
+      console.error("Error details:", error);
       throw new Error(`Error al guardar intento de login: ${error.message}`);
     }
   }

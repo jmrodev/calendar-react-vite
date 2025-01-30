@@ -9,56 +9,44 @@ export class AuthService {
     this.authRepository = authRepository;
     this.userRepository = userRepository;
     this.MAX_LOGIN_ATTEMPTS = 5;
-    this.LOCK_TIME = 30 * 60 * 1000; // 30 minutos
+    this.LOCK_TIME = 30 * 60 * 1000;
   }
 
   async login(username, password, rememberMe = false, requestInfo = {}) {
     try {
-      console.log("Inicio del proceso de login");
-      
       if (!username || !password) {
         console.error("Error: Usuario y contraseña son requeridos");
         throw new Error("Usuario y contraseña son requeridos");
       }
 
-      // Obtener usuario con información de autenticación
       const user = await this.userRepository.findByUsername(username, true);
-      console.log("Usuario encontrado:", user ? "Sí" : "No");
+      
+      if (!user) {
+        console.error("Error: Usuario no encontrado");
+        throw new Error("Usuario no encontrado");
+      }else {
+        console.log("user", user);
+      }
 
-      // Registrar intento inicial
       const loginAttempt = await this.authRepository.saveLoginAttempt(
         username,
         false,
         requestInfo.ip || "",
         requestInfo.userAgent || ""
       );
-
-      if (!user) {
-        console.error("Error: Usuario no encontrado");
-        throw new Error("Usuario no encontrado");
-      }
-
-      // Verificar bloqueo
-      if (user.lockUntil) {
-        const lockUntil = new Date(user.lockUntil);
-        if (lockUntil > new Date()) {
-          const minutesLeft = Math.ceil((lockUntil - new Date()) / (60 * 1000));
-          throw new Error(
-            `Cuenta bloqueada temporalmente. Intente nuevamente en ${minutesLeft} minutos`
-          );
-        }
-      }
+      
 
       const isValid = await verifyPassword(password, user.password);
-      console.log("Validación de contraseña:", isValid);
       
+
       if (!isValid) {
         console.error("Error: Contraseña incorrecta");
         await this._handleFailedLogin(user);
         throw new Error("Contraseña incorrecta");
+      }else {
+        console.log("isValid", isValid);
       }
 
-      // Registrar login exitoso
       await this.authRepository.saveLoginAttempt(
         username,
         true,
@@ -69,6 +57,7 @@ export class AuthService {
       await this._handleSuccessfulLogin(user);
 
       const token = this._generateToken(user, rememberMe);
+      console.log("user authservice", user);
 
       return {
         success: true,
@@ -98,7 +87,6 @@ export class AuthService {
 
   async register(username, password, role) {
     try {
-      console.log("Inicio del proceso de registro");
       if (!username || !password || !role) {
         console.error("Error: Todos los campos son requeridos");
         throw new Error("Todos los campos son requeridos");
@@ -157,27 +145,26 @@ export class AuthService {
   }
 
   async _handleFailedLogin(user) {
-    console.log("Manejando fallo de login para el usuario:", user.username);
     user.loginAttempts = (user.loginAttempts || 0) + 1;
 
     if (user.loginAttempts >= this.MAX_LOGIN_ATTEMPTS) {
-      const lockUntil = new Date(Date.now() + this.LOCK_TIME);
-      user.lockUntil = createStructuredDate(lockUntil);
-      await this.userRepository.update(user._id.toString(), user); // Asegurarse de que _id es una cadena
-      throw new Error(
-        `Cuenta bloqueada temporalmente hasta ${lockUntil.toLocaleString()}`
-      );
+      await this.userRepository.update(user._id.toString(), user);
+      throw new Error(`Cuenta bloqueada temporalmente`);
     }
 
-    await this.userRepository.update(user._id.toString(), user); // Asegurarse de que _id es una cadena
+    await this.userRepository.update(user._id.toString(), user);
   }
 
   async _handleSuccessfulLogin(user) {
-    console.log("Manejando éxito de login para el usuario:", user.username);
+    if (!user._id) {
+      console.error("Error: El usuario no tiene un _id definido", user);
+      throw new Error("Usuario inválido: Falta el identificador (_id)");
+    }
+
     user.loginAttempts = 0;
-    user.lockUntil = null; // Asegúrate de que lockUntil se establece en null
     user.lastLogin = createStructuredDate(new Date());
-    await this.userRepository.update(user._id.toString(), user); // Asegurarse de que _id es una cadena
+
+    await this.userRepository.update(user._id.toString(), user);
   }
 }
 
