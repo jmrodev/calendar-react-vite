@@ -49,36 +49,40 @@ app.use((err, req, res, next) => {
   });
 });
 
-function findAvailablePort(startPort) {
-  return new Promise((resolve, reject) => {
-    const server = createServer();
-    
-    server.listen(startPort, () => {
-      const { port } = server.address();
-      server.close(() => resolve(port));
-    });
+async function startServer() {
+  function findAvailablePort(startPort) {
+    return new Promise((resolve, reject) => {
+      const server = createServer();
+      
+      server.listen(startPort, () => {
+        const { port } = server.address();
+        server.close(() => resolve(port));
+      });
 
-    server.on('error', (err) => {
-      if (err.code === 'EADDRINUSE') {
-        findAvailablePort(startPort + 1).then(resolve, reject);
-      } else {
-        reject(err);
-      }
+      server.on('error', (err) => {
+        if (err.code === 'EADDRINUSE') {
+          findAvailablePort(startPort + 1).then(resolve, reject);
+        } else {
+          reject(err);
+        }
+      });
     });
+  }
+
+  const port = process.env.PORT || await findAvailablePort(3000);
+
+  const server = app.listen(port, () => {
+    console.log(`Server running on port ${port}`);
+  }).on('error', (err) => {
+    if (err.code === 'EADDRINUSE') {
+      console.log(`Port ${port} is busy, trying ${port + 1}`);
+      server.listen(port + 1);
+    } else {
+      console.error('Server error:', err);
+    }
   });
 }
 
-const port = process.env.PORT || await findAvailablePort(3000);
-
-const server = app.listen(port, () => {
-  console.log(`Server running on port ${port}`);
-}).on('error', (err) => {
-  if (err.code === 'EADDRINUSE') {
-    console.log(`Port ${port} is busy, trying ${port + 1}`);
-    server.listen(port + 1);
-  } else {
-    console.error('Server error:', err);
-  }
-});
+startServer(); // Start the server
 
 export default app;
