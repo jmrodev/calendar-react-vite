@@ -175,7 +175,7 @@ export class AuthService {
   async _handleSuccessfulLogin(user) {
     console.log("Manejando éxito de login para el usuario:", user.username);
     user.loginAttempts = 0;
-    user.lockUntil = null;
+    user.lockUntil = null; // Asegúrate de que lockUntil se establece en null
     user.lastLogin = createStructuredDate(new Date());
     await this.userRepository.update(user._id.toString(), user); // Asegurarse de que _id es una cadena
   }
