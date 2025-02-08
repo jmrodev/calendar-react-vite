@@ -1,7 +1,7 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
-import { loginAsync } from '../redux/slices/authSlice';
+import { loginAsync, clearError } from '../redux/slices/authSlice';
 import ErrorMessage from '../components/common/ErrorMessage';
 import showToast from '../utils/toastUtils';
 import '../styles/pages/login.css';
@@ -12,7 +12,7 @@ export const Login = () => {
   const { loading, error } = useSelector(state => state.auth);
 
   const [formData, setFormData] = useState({
-    username: '',
+    userName: '',
     password: ''
   });
 
@@ -26,8 +26,8 @@ export const Login = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    
-    if (!formData.username || !formData.password) {
+
+    if (!formData.userName || !formData.password) {
       showToast('Por favor complete todos los campos', 'error');
       return;
     }
@@ -49,19 +49,19 @@ export const Login = () => {
         <h2>Iniciar Sesión</h2>
 
         {error && (
-          <ErrorMessage 
+          <ErrorMessage
             message={error}
             onDismiss={() => dispatch(clearError())}
           />
         )}
 
         <div className="form-group">
-          <label htmlFor="username">Usuario:</label>
+          <label htmlFor="userName">Usuario:</label>
           <input
             type="text"
-            id="username"
-            name="username"
-            value={formData.username}
+            id="userName"
+            name="userName"
+            value={formData.userName}
             onChange={handleChange}
             required
           />
@@ -79,8 +79,8 @@ export const Login = () => {
           />
         </div>
 
-        <button 
-          type="submit" 
+        <button
+          type="submit"
           className="login-button"
           disabled={loading}
         >

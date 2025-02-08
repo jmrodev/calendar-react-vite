@@ -7,12 +7,17 @@ import '../styles/pages/dashboard.css';
 const Dashboard = () => {
   const { user, isLoading } = useSelector(state => state.auth);
 
+  // Change redirect to /login instead of /
   if (!user && !isLoading) {
-    return <Navigate to="/" replace />;
+    return <Navigate to="/login" replace />;
   }
 
   if (isLoading) {
-    return <div className="loading">Loading...</div>;
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="loading">Cargando...</div>
+      </div>
+    );
   }
 
   const adminMenuItems = [
@@ -102,4 +107,4 @@ const Dashboard = () => {
   );
 };
 
-export default Dashboard; 
+export default Dashboard;

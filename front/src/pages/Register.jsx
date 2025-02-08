@@ -13,7 +13,7 @@ const Register = () => {
   const { loading, error } = useSelector(state => state.auth);
 
   const [formData, setFormData] = useState({
-    username: '',
+    userName: '',
     password: '',
     confirmPassword: '',
     email: '',
@@ -27,8 +27,8 @@ const Register = () => {
   const validateForm = () => {
     const newErrors = {};
 
-    if (!formData.username || formData.username.length < 3) {
-      newErrors.username = 'El usuario debe tener al menos 3 caracteres';
+    if (!formData.userName || formData.userName.length < 3) {
+      newErrors.userName = 'El usuario debe tener al menos 3 caracteres';
     }
 
     const passwordValidation = validatePassword(formData.password);
@@ -73,7 +73,7 @@ const Register = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    
+
     if (!validateForm()) {
       showToast('Por favor corrija los errores en el formulario', 'error');
       return;
@@ -96,7 +96,7 @@ const Register = () => {
         <h2>Registro</h2>
 
         {error && (
-          <ErrorMessage 
+          <ErrorMessage
             message={error}
             onDismiss={() => dispatch(clearError())}
           />
@@ -104,17 +104,17 @@ const Register = () => {
 
         <div className="form-row">
           <div className="form-group">
-            <label htmlFor="username">Usuario:</label>
+            <label htmlFor="userName">Usuario:</label>
             <input
               type="text"
-              id="username"
-              name="username"
-              value={formData.username}
+              id="userName"
+              name="userName"
+              value={formData.userName}
               onChange={handleChange}
               required
             />
-            {errors.username && (
-              <span className="error-message">{errors.username}</span>
+            {errors.userName && (
+              <span className="error-message">{errors.userName}</span>
             )}
           </div>
 
@@ -198,8 +198,8 @@ const Register = () => {
           </div>
         </div>
 
-        <button 
-          type="submit" 
+        <button
+          type="submit"
           className="register-button"
           disabled={loading}
         >

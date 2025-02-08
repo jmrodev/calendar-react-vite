@@ -1,6 +1,7 @@
 import { store } from '../redux/store';
 import { logoutAsync } from '../redux/slices/authSlice';
 
+
 export const _getHeaders = () => {
     const token = localStorage.getItem('authToken');
     return {
@@ -31,7 +32,7 @@ export const handleApiError = async (response) => {
 };
 
 export const formatApiUrl = (endpoint) => {
-    const baseUrl = process.env.REACT_APP_API_URL || 'http://localhost:3001/api';
+    const baseUrl = (typeof process !== 'undefined' && process.env.REACT_APP_API_URL) || 'http://localhost:3002/api';
     return `${baseUrl}${endpoint}`;
 };
 

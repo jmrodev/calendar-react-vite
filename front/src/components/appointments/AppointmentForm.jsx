@@ -40,10 +40,10 @@ const AppointmentForm = ({ date, time, onClose, onSuccess }) => {
 
     try {
       // Validar campos requeridos
-      if (!formData.patientName.trim() || 
-          !formData.patientEmail.trim() || 
-          !formData.patientPhone.trim() || 
-          !formData.reason.trim()) {
+      if (!formData.patientName.trim() ||
+        !formData.patientEmail.trim() ||
+        !formData.patientPhone.trim() ||
+        !formData.reason.trim()) {
         throw new Error('Todos los campos son requeridos');
       }
 
@@ -72,7 +72,7 @@ const AppointmentForm = ({ date, time, onClose, onSuccess }) => {
         },
         secretary: {
           id: user.id,
-          name: user.username || 'Usuario'
+          name: user.userName || 'Usuario'
         },
         changeLog: []
       };
@@ -86,12 +86,12 @@ const AppointmentForm = ({ date, time, onClose, onSuccess }) => {
     } catch (error) {
       console.error('Error completo:', error);
       const errorMessage = error.message || 'Error al crear la cita';
-      
+
       if (typeof errorMessage === 'string' && errorMessage.toLowerCase().includes('autenticación')) {
         dispatch(logout());
         navigate('/login');
       }
-      
+
       setError(errorMessage);
     } finally {
       setLoading(false);
@@ -107,7 +107,7 @@ const AppointmentForm = ({ date, time, onClose, onSuccess }) => {
         </div>
 
         {error && (
-          <ErrorMessage 
+          <ErrorMessage
             message={error}
             onDismiss={() => setError(null)}
           />
@@ -187,15 +187,15 @@ const AppointmentForm = ({ date, time, onClose, onSuccess }) => {
           </div>
 
           <div className="form-actions">
-            <button 
-              type="button" 
+            <button
+              type="button"
               className="cancel-button"
               onClick={onClose}
             >
               Cancelar
             </button>
-            <button 
-              type="submit" 
+            <button
+              type="submit"
               className="submit-button"
               disabled={loading}
             >

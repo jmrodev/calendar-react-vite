@@ -1,4 +1,4 @@
-import config from '../config/env.cfg';
+import config from '../config/env.cfg.js';
 import { _getHeaders, handleUnauthorizedError } from './utils';
 import { createStructuredDate } from '../utils/dateUtils';
 import { getAuthToken } from '../utils/authUtils';

@@ -1,24 +1,3 @@
-Restarting 'server.js'
-node:internal/modules/esm/resolve:275
-    throw new ERR_MODULE_NOT_FOUND(
-          ^
-
-Error [ERR_MODULE_NOT_FOUND]: Cannot find module '/home/jmro/Documentos/repositorios/calendar-react-vite/backend/Middleware/authMiddleware.js' imported from /home/jmro/Documentos/repositorios/calendar-react-vite/backend/Router/appointmentRouter.js
-    at finalizeResolution (node:internal/modules/esm/resolve:275:11)
-    at moduleResolve (node:internal/modules/esm/resolve:860:10)
-    at defaultResolve (node:internal/modules/esm/resolve:984:11)
-    at ModuleLoader.defaultResolve (node:internal/modules/esm/loader:654:12)
-    at #cachedDefaultResolve (node:internal/modules/esm/loader:603:25)
-    at ModuleLoader.resolve (node:internal/modules/esm/loader:586:38)
-    at ModuleLoader.getModuleJobForImport (node:internal/modules/esm/loader:242:38)
-    at ModuleJob._link (node:internal/modules/esm/module_job:135:49) {
-  code: 'ERR_MODULE_NOT_FOUND',
-  url: 'file:///home/jmro/Documentos/repositorios/calendar-react-vite/backend/Middleware/authMiddleware.js'
-}
-
-Node.js v23.3.0
-Failed running 'server.js'
-
 #!/bin/zsh
 
 # Colores para mejor legibilidad
@@ -60,10 +39,10 @@ open_terminal() {
 }
 
 # Iniciar el backend
-echo -e "${BLUE}Iniciando el backend...${NC}"
-cd backend
-pnpm install
-open_terminal "pnpm start"
+# echo -e "${BLUE}Iniciando el backend...${NC}"
+# cd backend
+# pnpm install
+# open_terminal "pnpm start"
 
 # Esperar un momento para asegurar que el backend esté corriendo
 sleep 3

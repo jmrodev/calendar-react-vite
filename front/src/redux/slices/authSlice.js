@@ -1,18 +1,16 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 import { loginUser, register as registerUser, logout as logoutUser, getCurrentUser } from '../../services/authService';
-import { setAuthToken, removeAuthToken } from '../../utils/authUtils';
 
 export const loginAsync = createAsyncThunk(
-  'auth/login',
+  '/login',
   async (credentials) => {
     const response = await loginUser(credentials);
-    setAuthToken(response.token);
     return response;
   }
 );
 
 export const registerAsync = createAsyncThunk(
-  'auth/register',
+  '/register',
   async (userData, { rejectWithValue }) => {
     try {
       const data = await registerUser(userData);
@@ -24,7 +22,7 @@ export const registerAsync = createAsyncThunk(
 );
 
 export const logoutAsync = createAsyncThunk(
-  'auth/logout',
+  '/logout',
   async (_, { rejectWithValue }) => {
     try {
       await logoutUser();
@@ -36,7 +34,7 @@ export const logoutAsync = createAsyncThunk(
 );
 
 export const getCurrentUserAsync = createAsyncThunk(
-  'auth/getCurrentUser',
+  '/getCurrentUser',
   async (_, { rejectWithValue }) => {
     try {
       const user = await getCurrentUser();
@@ -47,25 +45,21 @@ export const getCurrentUserAsync = createAsyncThunk(
   }
 );
 
-const initialState = {
-  user: null,
-  isAuthenticated: false,
-  loading: false,
-  error: null
-};
-
 const authSlice = createSlice({
-  name: 'auth',
-  initialState,
+  name: 'users',
+  initialState: {
+    user: null,
+    isAuthenticated: false,
+    loading: false,
+    error: null
+  },
   reducers: {
     clearError: (state) => {
       state.error = null;
     },
     logout: (state) => {
       state.user = null;
-      state.token = null;
       state.isAuthenticated = false;
-      removeAuthToken();
     },
     setUser: (state, action) => {
       state.user = action.payload;
@@ -122,4 +116,4 @@ const authSlice = createSlice({
 });
 
 export const { clearError, logout } = authSlice.actions;
-export default authSlice.reducer; 
+export default authSlice.reducer;

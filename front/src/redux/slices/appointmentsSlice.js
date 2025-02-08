@@ -1,6 +1,6 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 import { appointmentsService } from '../../services/appointmentsService';
-import config from '../../config/env.cfg';
+import config from '../../config/env.cfg.js';
 import { getAuthToken } from '../../utils/authUtils';
 
 // Thunks

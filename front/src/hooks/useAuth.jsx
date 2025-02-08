@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import config from "../config/env.cfg";
+import config from "../config/env.cfg.js";
 import { useDispatch, useSelector } from 'react-redux';
 import { loginSuccess, loginFailure } from '../redux/actions/authActions';
 import { useNavigate } from 'react-router-dom';

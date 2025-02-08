@@ -1,17 +1,28 @@
-import { createBrowserRouter } from 'react-router-dom';
+import { createBrowserRouter, Navigate } from 'react-router-dom';
+import { useSelector } from 'react-redux';
 import ProtectedLayout from '../layouts/ProtectedLayout';
 import Dashboard from '../pages/Dashboard';
 import { Login } from '../pages/Login';
+import Register from '../pages/Register';
 import Appointments from '../pages/Appointments';
 import Doctors from '../pages/Doctors';
 import Patients from '../pages/Patients';
 import Settings from '../pages/Settings';
 import UnauthorizedPage from '../pages/UnauthorizedPage';
+import NotFound from '../pages/NotFound';
 
 export const router = createBrowserRouter([
   {
     path: '/',
-    element: <Login />,
+    element: <Navigate to="/dashboard" replace />,
+  },
+  {
+    path: '/login',
+    element: <Login />
+  },
+  {
+    path: '/register',
+    element: <Register />
   },
   {
     element: <ProtectedLayout />,
@@ -42,4 +53,8 @@ export const router = createBrowserRouter([
       }
     ],
   },
-]); 
+  {
+    path: '*',
+    element: <NotFound />
+  }
+]);
